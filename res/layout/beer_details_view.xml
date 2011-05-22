@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_height="fill_parent"
+            android:layout_width="fill_parent"
+        >
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:orientation="vertical"
+                  android:layout_width="fill_parent"
+                  android:layout_height="fill_parent"
+                  android:layout_weight="1"
+                  android:padding="10dp"
+            >
+        <TextView
+                android:id="@+id/beer_name"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                />
+        <TextView
+                android:id="@+id/beer_details"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginLeft="10dp"
+                />
+        <TextView
+                android:id="@+id/beer_notes"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:layout_marginBottom="20dp"
+                />
+
+        <Button
+                android:id="@+id/love_beer_button"
+                android:text="@string/love_this_beer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:minWidth="300dp"
+                android:maxWidth="400dp"
+                android:layout_gravity="center"
+                android:onClick="loveBeer"
+                />
+        <Button
+                android:id="@+id/ok_beer_button"
+                android:text="@string/ok_this_beer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:minWidth="300dp"
+                android:maxWidth="400dp"
+                android:layout_gravity="center"
+                android:onClick="okBeer"
+                />
+        <Button
+                android:id="@+id/hate_beer_button"
+                android:text="@string/hate_this_beer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:minWidth="300dp"
+                android:maxWidth="400dp"
+                android:layout_gravity="center"
+                android:onClick="hateBeer"
+                />
+    </LinearLayout>
+
+</ScrollView>

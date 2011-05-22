@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent"
+        android:layout_weight="1"
+        android:orientation="horizontal" >
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:layout_height="fill_parent"
+                  android:layout_width="fill_parent"
+                  android:layout_weight="1"
+                  android:orientation="vertical"
+            >
+        <TextView android:id="@+id/brewery"
+                android:layout_height="wrap_content"
+                android:layout_width="fill_parent"
+                android:textStyle="bold"
+                android:textSize="24sp"
+                android:layout_weight="1"
+                />
+        <TextView android:id="@+id/beer"
+                android:layout_height="wrap_content"
+                android:layout_width="fill_parent"
+                android:textSize="20sp"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                />
+    </LinearLayout>
+
+    <TextView android:id="@+id/rating"
+               android:layout_height="fill_parent"
+               android:layout_width="wrap_content"
+               android:gravity="right|center_vertical"
+               android:textSize="14sp"
+               android:layout_weight="0"
+               android:layout_marginRight="10dp"
+               />
+
+</LinearLayout>
+

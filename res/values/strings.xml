@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Cambridge Beer Festival</string>
+
+    <string name="hint">Hint: Press and hold Menu to filter the list</string>
+
+    <string formatted="false" name="share_this_beer_text">Drinking %s %s at #cbf38 #beer</string>
+
+    <string name="share_this_beer_title">Share this beer...</string>
+
+    <string name="share_this_beer_subject">Drinking a beer at cbf38</string>
+
+    <string name="abv">ABV</string>
+
+    <string name="brewery">Brewery</string>
+    <string name="rating">Rating</string>
+
+    <string name="like_this_beer">Like</string>
+    <string name="dislike_this_beer">Dislike</string>
+    <string name="rate_this_beer">Rate this beer</string>
+
+    <string name="love_this_beer">I loved it</string>
+    <string name="ok_this_beer">It was OK</string>
+
+    <string name="hate_this_beer">I hated it</string>
+    <string name="oops_this_beer">Forget Rating</string>
+
+    <string name="sort_by_brewery">Sort by Brewery</string>
+    <string name="sort_by_beer">Sort by Beer</string>
+    <string name="sort_by_abv">Sort by ABV</string>
+
+    <string name="Rating_Unrated">Unrated</string>
+    <string name="Rating_Horrible">I hated it</string>
+    <string name="Rating_OK">It was OK</string>
+    <string name="Rating_Love">I loved it</string>
+
+</resources>

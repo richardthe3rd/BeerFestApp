@@ -1,0 +1,15 @@
+Story 1
+ Display list of beers (inc brewery, name, and abv)
+
+Story 2
+ Mark beer a drunk
+ 
+Story 3
+ "Share" beer "Now drinking Adnams Explorer at #cbf38 #beer #camra"
+ 
+Story 4
+ Rate beer (Like, Dislike)
+
+Story 5
+ Share beer with photo
+ 
