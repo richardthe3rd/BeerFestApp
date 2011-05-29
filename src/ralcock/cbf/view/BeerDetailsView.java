@@ -7,19 +7,22 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import ralcock.cbf.R;
 import ralcock.cbf.model.Beer;
-import ralcock.cbf.model.Rating;
+import ralcock.cbf.model.StarRating;
 import ralcock.cbf.model.RatingDatabase;
 
 public class BeerDetailsView extends Activity {
     public static final String EXTRA_BEER = "BEER";
+    public static final String EXTRA_BEER_POSITION = "POSITION";
 
     public static final int RESULT_NOT_MODIFIED = 400;
     public static final int RESULT_MODIFIED = 800;
 
     private RatingDatabase fRatingsDatabase;
+    private int fPosition;
     private Beer fBeer;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -27,8 +30,12 @@ public class BeerDetailsView extends Activity {
         fRatingsDatabase = new RatingDatabase(getApplicationContext());
 
         setContentView(R.layout.beer_details_view);
+
+        fPosition = getIntent().getExtras().getInt(EXTRA_BEER_POSITION);
         fBeer = (Beer)getIntent().getExtras().getSerializable(EXTRA_BEER);
-        setResult(RESULT_NOT_MODIFIED);
+        fBeer.setContext(getApplicationContext());
+
+        setResult(RESULT_NOT_MODIFIED, null);
         displayBeer();
     }
 
@@ -38,20 +45,24 @@ public class BeerDetailsView extends Activity {
         TextView beerTitle = (TextView)findViewById(R.id.beer_name);
         beerTitle.setText(fBeer.getName());
 
-        Rating rating = fRatingsDatabase.getRatingForBeer(fBeer);
+        StarRating rating = fRatingsDatabase.getRatingForBeer(fBeer);
 
         TextView beerDetails = (TextView)findViewById(R.id.beer_details);
 
         String details =
                 getResources().getText(R.string.brewery) + ": " + fBeer.getBrewery().getName() + "\n" +
-                getResources().getText(R.string.abv)     + ": " + fBeer.getAbv()        + "%\n" +
-                getResources().getText(R.string.rating)  + ": ";
-        if (rating != Rating.UNRATED) {
-                details +=  getResources().getText(rating.getId());
-        }
-        details += "\n";
-
+                getResources().getText(R.string.abv)     + ": " + fBeer.getAbv()        + "%\n";
         beerDetails.setText(details);
+
+        RatingBar ratingBar = ((RatingBar)findViewById(R.id.beer_rating));
+        ratingBar.setRating(rating.getNumberOfStars());
+
+        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener(){
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                if (fromUser)
+                    rateBeer( new StarRating((int)rating) );
+            }
+        });
 
         TextView beerNotesView = (TextView)findViewById(R.id.beer_notes);
         beerNotesView.setText(fBeer.getNotes());
@@ -71,33 +82,20 @@ public class BeerDetailsView extends Activity {
                 shareBeer();
                 return true;
             case R.id.clear_rating:
-                rateBeer(Rating.UNRATED);
+                rateBeer(new StarRating(0));
+                displayBeer();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    @SuppressWarnings({"UnusedDeclaration"})
-    public void loveBeer(View button) {
-        rateBeer(Rating.LOVE);
-    }
-    @SuppressWarnings({"UnusedDeclaration"})
-    public void okBeer(View button){
-        rateBeer(Rating.OK);
-    }
-    @SuppressWarnings({"UnusedDeclaration"})
-    public void hateBeer(View button){
-        rateBeer(Rating.HORRIBLE);
-    }
-    @SuppressWarnings({"UnusedDeclaration"})
-    public void unrateBeer(View button){
-        rateBeer(Rating.UNRATED);
-    }
-
-    private void rateBeer(Rating rating) {
-        fRatingsDatabase.setRatingForBeer(fBeer, rating);
-        setResult(RESULT_MODIFIED);
+    private void rateBeer(StarRating rating) {
+        fBeer.setRating(rating);
+        Intent data = new Intent();
+        data.putExtra(EXTRA_BEER, fBeer);
+        data.putExtra(EXTRA_BEER_POSITION, fPosition);
+        setResult(RESULT_MODIFIED, data);
         displayBeer();
     }
 

@@ -1,7 +1,9 @@
-package ralcock.cbf.view;
+package ralcock.cbf;
 
 import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.*;
@@ -9,9 +11,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-import ralcock.cbf.R;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerListLoader;
+import ralcock.cbf.view.BeerDetailsView;
+import ralcock.cbf.view.BeerListAdapter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +33,6 @@ public class CamBeerFestApplication extends ListActivity {
     public CamBeerFestApplication() {
         super();
     }
-
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -69,17 +71,7 @@ public class CamBeerFestApplication extends ListActivity {
             initFromSavedState(savedInstanceState);
         }
 
-        if (fBeerList == null) {
-            initBeerList();
-        }
-
-        fListAdapter = new BeerListAdapter(getApplicationContext(), fBeerList);
-
-        if (fComparator != null) {
-            fListAdapter.sort(fComparator);
-        }
-
-        setListAdapter(fListAdapter);
+        new InitBeerListTask().execute("beers.json");
 
         ListView lv = getListView();
         lv.setTextFilterEnabled(true);
@@ -88,6 +80,7 @@ public class CamBeerFestApplication extends ListActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Intent intent = new Intent(CamBeerFestApplication.this, BeerDetailsView.class);
                 Beer beer = (Beer) getListView().getItemAtPosition(position);
+                intent.putExtra(BeerDetailsView.EXTRA_BEER_POSITION, position);
                 intent.putExtra(BeerDetailsView.EXTRA_BEER, beer);
                 startActivityForResult(intent, SHOW_BEER_DETAILS_REQUEST_CODE);
             }
@@ -107,27 +100,6 @@ public class CamBeerFestApplication extends ListActivity {
                 });
             }
         });
-
-        fHintToast = Toast.makeText(this, R.string.hint, Toast.LENGTH_LONG);
-        fHintToast.show();
-    }
-
-    private void initBeerList() {
-        Log.i(TAG, "Initialising beer list from file");
-        InputStream jsonStream = null;
-        try {
-            jsonStream = getAssets().open("beers.json");
-            BeerListLoader beerListLoader = new BeerListLoader(jsonStream);
-            fBeerList = beerListLoader.getBeerList();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            if (jsonStream != null) try {
-                jsonStream.close();
-            } catch (IOException e) {
-                Log.e(TAG, "Error closing stream", e);
-            }
-        }
     }
 
     @Override
@@ -135,9 +107,13 @@ public class CamBeerFestApplication extends ListActivity {
         Log.i(TAG, "onActivity " + requestCode + ", " + resultCode);
         if (requestCode == SHOW_BEER_DETAILS_REQUEST_CODE) {
             if (resultCode == BeerDetailsView.RESULT_MODIFIED) {
+                int position = data.getExtras().getInt(BeerDetailsView.EXTRA_BEER_POSITION);
+                fListAdapter.getItem(position).updateRating();
                 // need to redraw the list view
-                Log.i(TAG, "Invalidating listview");
-                getListView().invalidateViews();
+                //Log.i(TAG, "Invalidating listview");
+                fListAdapter.notifyDataSetChanged();
+                fListAdapter.sort(fComparator);
+                //getListView().invalidateViews();
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -178,6 +154,14 @@ public class CamBeerFestApplication extends ListActivity {
                 }
                 updateSorting();
                 return true;
+            case R.id.sort_by_rating:
+                if (fComparator instanceof Beer.RatingComparator) {
+                    fComparator = new Beer.ReverseComparator(fComparator);
+                } else {
+                    fComparator = new Beer.RatingComparator();
+                }
+                updateSorting();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -203,4 +187,55 @@ public class CamBeerFestApplication extends ListActivity {
         startActivity(Intent.createChooser(intent, title));
     }
 
+    private void updateListAdapter() {
+        fListAdapter = new BeerListAdapter(getApplicationContext(), fBeerList);
+        if (fComparator != null) {
+            fListAdapter.sort(fComparator);
+        }
+        setListAdapter(fListAdapter);
+    }
+
+    private class InitBeerListTask extends AsyncTask<String, Integer, Vector<Beer>> {
+
+        private ProgressDialog fDialog;
+
+        @Override
+        protected void onPreExecute() {
+            fDialog = ProgressDialog.show(CamBeerFestApplication.this, "", "Loading beers, please wait...", true);
+        }
+
+        @Override
+        protected void onPostExecute(Vector<Beer> beers) {
+            fBeerList = beers;
+            updateListAdapter();
+            fDialog.dismiss();
+            fHintToast = Toast.makeText(CamBeerFestApplication.this, R.string.hint, Toast.LENGTH_LONG);
+            fHintToast.show();
+        }
+
+        @Override
+        protected Vector<Beer> doInBackground(String... jsonFiles) {
+
+            if (fBeerList != null) {
+                return fBeerList;
+            }
+
+            Log.i(TAG, "Initialising beer list from file");
+            InputStream jsonStream = null;
+            try {
+                jsonStream = getAssets().open(jsonFiles[0]);
+                BeerListLoader beerListLoader = new BeerListLoader(getApplicationContext(), jsonStream);
+                return beerListLoader.getBeerList();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                if (jsonStream != null) try {
+                    jsonStream.close();
+                } catch (IOException e) {
+                    Log.e(TAG, "Error closing stream", e);
+                }
+            }
+
+        }
+    }
 }

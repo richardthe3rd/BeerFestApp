@@ -27,13 +27,15 @@
                 />
     </LinearLayout>
 
-    <TextView android:id="@+id/rating"
+    <RatingBar android:id="@+id/rating"
                android:layout_height="fill_parent"
                android:layout_width="wrap_content"
                android:gravity="right|center_vertical"
                android:textSize="14sp"
                android:layout_weight="0"
                android:layout_marginRight="10dp"
+               android:isIndicator="true"
+               style="?android:attr/ratingBarStyleSmall"
                />
 
 </LinearLayout>

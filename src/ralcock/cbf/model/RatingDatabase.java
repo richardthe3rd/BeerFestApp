@@ -10,7 +10,7 @@ import android.util.Log;
 public class RatingDatabase extends SQLiteOpenHelper {
     private static final String TAG = RatingDatabase.class.getName();
 
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
     private static final String BEER_RATINGS_TABLE = "beer_ratings";
     private static final String RATING_COLUMN = "RATING";
     private static final String BREWERY_COLUMN = "BREWERY";
@@ -32,7 +32,7 @@ public class RatingDatabase extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
     }
 
-    public Rating getRatingForBeer(Beer beer) {
+    public StarRating getRatingForBeer(Beer beer) {
         SQLiteDatabase db = null;
         Cursor cursor = null;
         try {
@@ -43,13 +43,19 @@ public class RatingDatabase extends SQLiteOpenHelper {
             if (cursor.getCount() == 1) {
                 String ratingString = cursor.getString(cursor.getColumnIndexOrThrow(RATING_COLUMN));
                 try {
-                    return Rating.valueOf(ratingString);
+                    try {
+                        int ratingInt = Integer.parseInt(ratingString);
+                        return new StarRating(ratingInt);
+                    } catch (NumberFormatException nfx) {
+                        Rating rating = Rating.valueOf(ratingString);
+                        return rating.toStarRating();
+                    }
                 } catch (IllegalArgumentException iax) {
-                    Log.e(TAG, "Illegal rating string " + ratingString + " returning " + Rating.UNRATED);
-                    return Rating.UNRATED;
+                    Log.e(TAG, "Illegal rating string " + ratingString + " returning " + new StarRating(0));
+                    return new StarRating(0);
                 }
             } else {
-                return Rating.UNRATED;
+                return new StarRating(0);
             }
         } finally {
             close(db);
@@ -65,14 +71,14 @@ public class RatingDatabase extends SQLiteOpenHelper {
         if (c!=null) c.close();
     }
 
-    public void setRatingForBeer(Beer beer, Rating rating) {
+    public void setRatingForBeer(Beer beer, StarRating rating) {
         SQLiteDatabase db = null;
         Cursor cursor = null;
         try {
             db = getWritableDatabase();
 
             ContentValues ratingContent = new ContentValues();
-            ratingContent.put(RATING_COLUMN, rating.name());
+            ratingContent.put(RATING_COLUMN, rating.getNumberOfStars());
 
             String whereBeerIs = whereBeerIs(beer);
 

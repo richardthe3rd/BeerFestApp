@@ -13,3 +13,9 @@ Story 4
 Story 5
  Share beer with photo
  
+
+====
+ - Free text rating
+ - Star-based rating
+ - Sort-by rating
+ - Filter (by brewery, beer style, rating, rated/not-rated)

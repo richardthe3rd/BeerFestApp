@@ -13,4 +13,7 @@
           android:icon="@android:drawable/ic_menu_sort_by_size"
           android:title="@string/sort_by_abv"/>
 
+    <item android:id="@+id/sort_by_rating"
+          android:icon="@android:drawable/ic_menu_sort_by_size"
+          android:title="@string/sort_by_rating"/>
 </menu>

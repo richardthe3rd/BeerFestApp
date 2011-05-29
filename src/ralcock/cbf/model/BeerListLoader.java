@@ -1,8 +1,8 @@
 package ralcock.cbf.model;
 
+import android.content.Context;
 import android.util.Log;
 import android.util.TimingLogger;
-import android.widget.ArrayAdapter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,9 +22,12 @@ public class BeerListLoader {
     private static final String JSON_NAME = "name";
     private static final String JSON_NOTES = "notes";
     private static final String JSON_ABV = "abv";
+
+    private final Context fContext;
     private final InputStream fInputStream;
 
-    public BeerListLoader(InputStream inputStream) {
+    public BeerListLoader(Context context, InputStream inputStream) {
+        fContext = context;
         fInputStream = inputStream;
     }
 
@@ -90,26 +93,8 @@ public class BeerListLoader {
             abv = Float.NaN;
         }
         Brewery brewery = new Brewery(breweryName, breweryNotes);
-        Beer beer = new Beer(brewery, beerName, abv, beerNotes);
+        Beer beer = new Beer(fContext, brewery, beerName, abv, beerNotes);
         Log.d(TAG, "Loaded " + beer);
         return beer;
-    }
-
-
-    public void loadBeerList(ArrayAdapter<Beer> listAdapter) throws IOException, JSONException {
-        JSONArray jsonArray = loadJson();
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject jobject = jsonArray.getJSONObject(i);
-
-            JSONObject jsonBreweryObject = jobject.getJSONObject(JSON_BREWERY);
-            Beer beer = createBeer(
-                    jsonBreweryObject.getString(JSON_NAME),
-                    jsonBreweryObject.getString(JSON_NOTES),
-                    jobject.getString(JSON_NAME),
-                    jobject.getString(JSON_ABV),
-                    jobject.getString(JSON_NOTES)
-            );
-
-        }
     }
 }

@@ -34,39 +34,13 @@
                 android:layout_marginBottom="20dp"
                 />
 
-        <Button
-                android:id="@+id/love_beer_button"
-                android:text="@string/love_this_beer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:minWidth="300dp"
-                android:maxWidth="400dp"
-                android:layout_gravity="center"
-                android:onClick="loveBeer"
-                />
-        <Button
-                android:id="@+id/ok_beer_button"
-                android:text="@string/ok_this_beer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:minWidth="300dp"
-                android:maxWidth="400dp"
-                android:layout_gravity="center"
-                android:onClick="okBeer"
-                />
-        <Button
-                android:id="@+id/hate_beer_button"
-                android:text="@string/hate_this_beer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:minWidth="300dp"
-                android:maxWidth="400dp"
-                android:layout_gravity="center"
-                android:onClick="hateBeer"
-                />
+        <RatingBar
+            android:id="@+id/beer_rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:stepSize="1"
+            />
     </LinearLayout>
 
 </ScrollView>

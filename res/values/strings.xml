@@ -29,6 +29,7 @@
     <string name="sort_by_brewery">Sort by Brewery</string>
     <string name="sort_by_beer">Sort by Beer</string>
     <string name="sort_by_abv">Sort by ABV</string>
+    <string name="sort_by_rating">Sort by Rating</string>
 
     <string name="Rating_Unrated">Unrated</string>
     <string name="Rating_Horrible">I hated it</string>

@@ -5,12 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import ralcock.cbf.R;
 import ralcock.cbf.model.Beer;
-import ralcock.cbf.model.Rating;
-import ralcock.cbf.model.RatingDatabase;
 
 import java.util.List;
 
@@ -22,39 +20,44 @@ public class BeerListAdapter extends ArrayAdapter<Beer>{
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        LayoutInflater layoutInflater = LayoutInflater.from(getContext());
-        View view = layoutInflater.inflate(R.layout.beer_item, parent, false);
+        View view;
+        BeerView beerView;
+
+        if (convertView == null) {
+            LayoutInflater layoutInflater = LayoutInflater.from(getContext());
+            view = layoutInflater.inflate(R.layout.beer_item, parent, false);
+            beerView = new BeerView(view);
+            view.setTag(beerView);
+        } else {
+            view = convertView;
+            beerView = (BeerView)view.getTag();
+        }
 
         Beer beer = getItem(position);
 
         String breweryText = beer.getBrewery().getName();
-        setTextViewTextById(view, R.id.brewery, breweryText);
+        beerView.brewery.setText(breweryText);
 
-        RatingDatabase ratingDb = new RatingDatabase(getContext());
-        Rating rating = ratingDb.getRatingForBeer(beer);
-
-        // Don't show UNRATED
-        if (rating != Rating.UNRATED) {
-            setTextViewTextById(view, R.id.rating, getContext().getText(rating.getId()));
-        }
+        beerView.rating.setRating(beer.getRating().getNumberOfStars());
 
         String beerText = beer.getName() + " (" +  beer.getAbv() + "%)";
-        setTextViewTextById(view, R.id.beer, beerText);
+        beerView.beer.setText(beerText);
 
         return view;
     }
 
-    private void setTextViewTextById(View view, int id, CharSequence text) {
-        TextView textView = findTextViewById(view, id);
-        textView.setText(text);
-    }
-
-    private TextView findTextViewById(View view, int id) {
-        return (TextView)view.findViewById(id);
-    }
-
-    private ImageView findImageViewById(View view, int id) {
-        return (ImageView)view.findViewById(id);
+    private static class BeerView {
+        TextView brewery;
+        TextView beer;
+        RatingBar rating;
+        private BeerView(View view) {
+            brewery = findTextViewById(view, R.id.brewery);
+            beer = findTextViewById(view, R.id.beer);
+            rating = (RatingBar)view.findViewById(R.id.rating);
+        }
+        private TextView findTextViewById(View view, int id) {
+            return (TextView)view.findViewById(id);
+        }
     }
 
 }
