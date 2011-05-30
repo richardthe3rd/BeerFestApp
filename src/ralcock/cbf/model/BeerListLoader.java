@@ -15,6 +15,10 @@ import java.util.Vector;
 
 public class BeerListLoader {
 
+    public interface BeerHandler {
+        void handleBeer(Beer beer);
+    }
+
     private static final String TAG = BeerListLoader.class.getSimpleName();
 
     private Vector<Beer> fList;
@@ -42,6 +46,24 @@ public class BeerListLoader {
             }
         }
         return fList;
+    }
+
+    public void loadBeers(BeerHandler handler) throws IOException, JSONException {
+        TimingLogger loadTimer = new TimingLogger(TAG, "loadBeerList");
+        JSONArray jsonArray = loadJson();
+        loadTimer.addSplit("loaded json data");
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject jobject = jsonArray.getJSONObject(i);
+            JSONObject jsonBreweryObject = jobject.getJSONObject(JSON_BREWERY);
+            Beer beer = createBeer(
+                    jsonBreweryObject.getString(JSON_NAME),
+                    jsonBreweryObject.getString(JSON_NOTES),
+                    jobject.getString(JSON_NAME),
+                    jobject.getString(JSON_ABV),
+                    jobject.getString(JSON_NOTES)
+            );
+            handler.handleBeer(beer);
+        }
     }
 
     private Vector<Beer> loadBeerList() throws JSONException, IOException {
