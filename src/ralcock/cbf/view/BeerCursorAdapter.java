@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import ralcock.cbf.R;
+import ralcock.cbf.model.BeerDatabase;
 
 
 public class BeerCursorAdapter extends CursorAdapter {
@@ -27,20 +28,13 @@ public class BeerCursorAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         BeerItemView beerItemView = (BeerItemView)view.getTag();
 
-        // todo
-        String beerName = cursor.getString(cursor.getColumnIndexOrThrow("beer_name"));
-        //String beerNotes = cursor.getString(cursor.getColumnIndexOrThrow("beer_notes"));
-        float beerAbv = cursor.getFloat(cursor.getColumnIndexOrThrow("beer_abv"));
-        String breweryName = cursor.getString(cursor.getColumnIndexOrThrow("brewery_name"));
-        //String breweryNotes = cursor.getString(cursor.getColumnIndexOrThrow("brewery_notes"));
+        String beerName = cursor.getString(cursor.getColumnIndexOrThrow(BeerDatabase.BEER_NAME_COLUMN));
+        float beerAbv = cursor.getFloat(cursor.getColumnIndexOrThrow(BeerDatabase.BEER_ABV_COLUMN));
+        String breweryName = cursor.getString(cursor.getColumnIndexOrThrow(BeerDatabase.BREWERY_NAME_COLUMN));
+        int beerRating = cursor.getInt(cursor.getColumnIndexOrThrow(BeerDatabase.BEER_RATING_COLUMN));
 
-        //Brewery brewery = new Brewery(breweryName, breweryNotes);
-        //Beer beer = new Beer(context, brewery, beerName, beerAbv, beerNotes);
-
-        //String breweryText = beer.getBrewery().getName();
         beerItemView.brewery.setText(breweryName);
-
-        //beerItemView.rating.setRating(beer.getRating().getNumberOfStars());
+        beerItemView.rating.setRating(beerRating);
 
         String beerText = beerName + " (" +  beerAbv + "%)";
         beerItemView.beer.setText(beerText);

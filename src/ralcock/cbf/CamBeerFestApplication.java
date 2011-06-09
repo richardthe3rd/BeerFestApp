@@ -4,7 +4,6 @@ import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,9 +23,8 @@ public class CamBeerFestApplication extends ListActivity {
 
     private static final int SHOW_BEER_DETAILS_REQUEST_CODE = 1;
     private Toast fHintToast = null;
-    private SQLiteDatabase fReadableDatabase;
     private SortOrder fSortOrder = SortOrder.BREWERY_NAME;
-
+    private BeerDatabase fBeerDatabase;
 
     public CamBeerFestApplication() {
         super();
@@ -69,16 +67,16 @@ public class CamBeerFestApplication extends ListActivity {
         new CreateListAdapterTask().execute("beers.json");
 
         ListView lv = getListView();
+
+        // TODO: This isn;t working
         lv.setTextFilterEnabled(true);
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 // TODO
                 Intent intent = new Intent(CamBeerFestApplication.this, BeerDetailsView.class);
-                //Beer beer = (Beer) getListView().getItemAtPosition(position);
-                //intent.putExtra(BeerDetailsView.EXTRA_BEER_POSITION, position);
-                //intent.putExtra(BeerDetailsView.EXTRA_BEER, beer);
-                //startActivityForResult(intent, SHOW_BEER_DETAILS_REQUEST_CODE);
+                intent.putExtra(BeerDetailsView.EXTRA_BEER_ID, id);
+                startActivityForResult(intent, SHOW_BEER_DETAILS_REQUEST_CODE);
             }
         });
 
@@ -89,9 +87,8 @@ public class CamBeerFestApplication extends ListActivity {
                 shareThisMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo();
-                        // TODO
-                        //Beer beer = (Beer) getListView().getItemAtPosition(info.position);
-                        //shareBeer(beer);
+                        Beer beerToShare = fBeerDatabase.getBeerForId(info.id);
+                        shareBeer(beerToShare);
                         return true;
                     }
                 });
@@ -101,18 +98,11 @@ public class CamBeerFestApplication extends ListActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.i(TAG, "onActivity " + requestCode + ", " + resultCode);
         if (requestCode == SHOW_BEER_DETAILS_REQUEST_CODE) {
-            if (resultCode == BeerDetailsView.RESULT_MODIFIED) {
-                int position = data.getExtras().getInt(BeerDetailsView.EXTRA_BEER_POSITION);
-                //fListAdapter.getItem(position).updateRating();
-                // need to redraw the list view
-                //Log.i(TAG, "Invalidating listview");
-                //fListAdapter.notifyDataSetChanged();
-                //fListAdapter.sort(fComparator);
-                //getListView().invalidateViews();
-            }
-        } else {
+            // TODO: This feels over the top. Is it?
+            Cursor c = fBeerDatabase.getBeerListCursor(fSortOrder);
+            getBeerCursorAdapter().changeCursor(c);
+        }  else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -150,7 +140,7 @@ public class CamBeerFestApplication extends ListActivity {
         else
             fSortOrder = sortBy;
 
-        Cursor c = listQuery(fSortOrder);
+        Cursor c = fBeerDatabase.getBeerListCursor(fSortOrder);
         getBeerCursorAdapter().changeCursor(c);
 
         Toast.makeText(getApplicationContext(), "Sort again to reverse direction", Toast.LENGTH_SHORT).show();
@@ -176,13 +166,6 @@ public class CamBeerFestApplication extends ListActivity {
         startActivity(Intent.createChooser(intent, title));
     }
 
-    public Cursor listQuery(SortOrder sortOrder) {
-        String orderByClause = sortOrder.getColumnName() + (sortOrder.isAscending() ? " ASC" : " DESC");
-        return fReadableDatabase.query("beers",
-                new String[]{"_id", "beer_name", "beer_abv", "brewery_name"},
-                null, null, null, null, orderByClause);
-    }
-
     private class CreateListAdapterTask extends AsyncTask<String, Void, BeerDatabase> {
         private ProgressDialog fDialog;
 
@@ -194,8 +177,8 @@ public class CamBeerFestApplication extends ListActivity {
 
         @Override
         protected void onPostExecute(BeerDatabase beerDatabase) {
-            fReadableDatabase = beerDatabase.getReadableDatabase();
-            Cursor c = listQuery(fSortOrder);
+            fBeerDatabase = beerDatabase;
+            Cursor c = beerDatabase.getBeerListCursor(fSortOrder);
             startManagingCursor(c);
             ListAdapter listAdapter = new BeerCursorAdapter(CamBeerFestApplication.this, c);
             setListAdapter(listAdapter);

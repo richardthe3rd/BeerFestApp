@@ -5,7 +5,6 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.test.TouchUtils;
 import android.widget.ListView;
 import ralcock.cbf.model.Beer;
-import ralcock.cbf.view.BeerDetailsView;
 
 /**
  * This is a simple framework for a test of an Application.  See
@@ -78,7 +77,7 @@ public class CamBeerFestApplicationTest extends ActivityInstrumentationTestCase2
         */
 
         Instrumentation.ActivityMonitor monitor = getInstrumentation().addMonitor("ralcock.cbf.view.BeerDetailsView",
-                new Instrumentation.ActivityResult(BeerDetailsView.RESULT_NOT_MODIFIED, null), /*block=*/true);
+                new Instrumentation.ActivityResult(0, null), /*block=*/true);
 
         // click the first child - should start details activity
         TouchUtils.tapView(this, fListView.getChildAt(0));

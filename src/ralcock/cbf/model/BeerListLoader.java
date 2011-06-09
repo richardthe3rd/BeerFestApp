@@ -1,6 +1,5 @@
 package ralcock.cbf.model;
 
-import android.content.Context;
 import android.util.Log;
 import android.util.TimingLogger;
 import org.json.JSONArray;
@@ -21,36 +20,14 @@ public class BeerListLoader {
 
     private static final String TAG = BeerListLoader.class.getSimpleName();
 
-    private Vector<Beer> fList;
     private static final String JSON_BREWERY = "brewery";
     private static final String JSON_NAME = "name";
     private static final String JSON_NOTES = "notes";
     private static final String JSON_ABV = "abv";
 
-    private final Context fContext;
-    private final InputStream fInputStream;
-
-    public BeerListLoader(Context context, InputStream inputStream) {
-        fContext = context;
-        fInputStream = inputStream;
-    }
-
-    public synchronized Vector<Beer> getBeerList() {
-        if (fList == null) {
-            try {
-                fList = loadBeerList();
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return fList;
-    }
-
-    public void loadBeers(BeerHandler handler) throws IOException, JSONException {
+    public void loadBeers(InputStream inputStream, BeerHandler handler) throws IOException, JSONException {
         TimingLogger loadTimer = new TimingLogger(TAG, "loadBeerList");
-        JSONArray jsonArray = loadJson();
+        JSONArray jsonArray = loadJson(inputStream);
         loadTimer.addSplit("loaded json data");
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jobject = jsonArray.getJSONObject(i);
@@ -66,35 +43,10 @@ public class BeerListLoader {
         }
     }
 
-    private Vector<Beer> loadBeerList() throws JSONException, IOException {
-        TimingLogger loadTimer = new TimingLogger(TAG, "loadBeerList");
-        JSONArray jsonArray = loadJson();
-
-        loadTimer.addSplit("loaded json data");
-
-        Vector<Beer> beers = new Vector<Beer>();
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject jobject = jsonArray.getJSONObject(i);
-            JSONObject jsonBreweryObject = jobject.getJSONObject(JSON_BREWERY);
-            Beer beer = createBeer(
-                    jsonBreweryObject.getString(JSON_NAME),
-                    jsonBreweryObject.getString(JSON_NOTES),
-                    jobject.getString(JSON_NAME),
-                    jobject.getString(JSON_ABV),
-                    jobject.getString(JSON_NOTES)
-            );
-            beers.add(beer);
-        }
-
-        loadTimer.addSplit("Created list of Beers");
-        loadTimer.dumpToLog();
-        return beers;
-    }
-
-    private JSONArray loadJson() throws IOException, JSONException {
+    private JSONArray loadJson(InputStream inputStream) throws IOException, JSONException {
         JSONArray jsonArray;
         Log.i(TAG, "Loading beer list from beers.json");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(fInputStream));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         StringBuilder builder = new StringBuilder();
         String line = reader.readLine();
         while (line != null) {
@@ -115,7 +67,7 @@ public class BeerListLoader {
             abv = Float.NaN;
         }
         Brewery brewery = new Brewery(breweryName, breweryNotes);
-        Beer beer = new Beer(fContext, brewery, beerName, abv, beerNotes);
+        Beer beer = new Beer(brewery, beerName, abv, beerNotes);
         Log.d(TAG, "Loaded " + beer);
         return beer;
     }

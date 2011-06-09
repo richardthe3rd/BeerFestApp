@@ -10,10 +10,10 @@ import java.io.Serializable;
 * To change this template use File | Settings | File Templates.
 */
 public enum SortOrder implements Serializable {
-    BEER_NAME("beer_name", "beer"),
-    BEER_ABV("beer_abv", "abv"),
-    BEER_RATING("beer_rating", "rating"),
-    BREWERY_NAME("brewery_name", "brewery");
+    BEER_NAME(BeerDatabase.BEER_NAME_COLUMN, "beer"),
+    BEER_ABV(BeerDatabase.BEER_ABV_COLUMN, "abv"),
+    BEER_RATING(BeerDatabase.BEER_RATING_COLUMN, "rating"),
+    BREWERY_NAME(BeerDatabase.BREWERY_NAME_COLUMN, "brewery");
 
     public String getColumnName() {
         return fColumnName;

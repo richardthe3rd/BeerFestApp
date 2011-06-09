@@ -36,7 +36,7 @@ public class BeerArrayAdapter extends ArrayAdapter<Beer>{
         String breweryText = beer.getBrewery().getName();
         beerItemView.brewery.setText(breweryText);
 
-        beerItemView.rating.setRating(beer.getRating().getNumberOfStars());
+        //beerItemView.rating.setRating(beer.getRating().getNumberOfStars());
 
         String beerText = beer.getName() + " (" +  beer.getAbv() + "%)";
         beerItemView.beer.setText(beerText);
