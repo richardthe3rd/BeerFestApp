@@ -1,7 +1,6 @@
 package ralcock.cbf.view;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
@@ -11,28 +10,30 @@ import android.view.View;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import ralcock.cbf.R;
-import ralcock.cbf.model.*;
+import ralcock.cbf.model.Beer;
+import ralcock.cbf.model.BeerDatabase;
+import ralcock.cbf.model.BeerWithRating;
+import ralcock.cbf.model.StarRating;
 
-// TODO: Too many database queries
-// TODO: Hold a BeerWithRating instead of fId?
-// TODO: Return a BeerWithRating single db query
-public class BeerDetailsView extends Activity {
+public final class BeerDetailsView extends Activity {
     public static final String EXTRA_BEER_ID = "BEER";
 
     private BeerDatabase fBeerDatabase;
+    private BeerWithRating fBeerWithRating;
     private long fId;
+    private BeerSharer fBeerSharer;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         fId = getIntent().getExtras().getLong(EXTRA_BEER_ID);
-
+        fBeerSharer = new BeerSharer(this);
         // open DB and make queries on a bg thread
-        new ShowBeerTask().execute();
-
+        new ShowBeerTask().execute(fId);
     }
 
-    private void displayBeer(Beer beer, StarRating rating) {
+    private void displayBeer() {
+        Beer beer = fBeerWithRating.getBeer();
+        StarRating rating = fBeerWithRating.getRating();
 
         setTitle(beer.getBrewery().getName() + " - " + beer.getName());
 
@@ -71,7 +72,7 @@ public class BeerDetailsView extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.share_beer:
-                shareBeer();
+                fBeerSharer.shareBeer(fBeerWithRating);
                 return true;
             case R.id.clear_rating:
                 rateBeer(new StarRating(0));
@@ -83,31 +84,13 @@ public class BeerDetailsView extends Activity {
 
     private void rateBeer(StarRating rating) {
         fBeerDatabase.rateBeer(fId, rating);
-        Beer beer = fBeerDatabase.getBeerForId(fId);
-        displayBeer(beer, rating);
+        fBeerWithRating = fBeerWithRating.rate(rating);
+        displayBeer();
     }
 
     @SuppressWarnings({"UnusedDeclaration"}) // Called from beer_details_view.xml
     public void shareBeer(View button) {
-        shareBeer();
-    }
-
-    // TODO: This is copy of same method in CamBeerFestApp
-    private void shareBeer() {
-        // todo
-        Beer beer = fBeerDatabase.getBeerForId(fId);
-
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-
-        String extraSubject = getResources().getString(R.string.share_this_beer_subject);
-        intent.putExtra(Intent.EXTRA_SUBJECT, extraSubject);
-
-        String extraText = getResources().getString(R.string.share_this_beer_text, beer.getBrewery().getName(), beer.getName());
-        intent.putExtra(Intent.EXTRA_TEXT, extraText);
-
-        String title = getResources().getString(R.string.share_this_beer_title);
-        startActivity(Intent.createChooser(intent, title) );
+        fBeerSharer.shareBeer(fBeerWithRating);
     }
 
     @Override
@@ -116,19 +99,18 @@ public class BeerDetailsView extends Activity {
         super.onDestroy();
     }
 
-    private class ShowBeerTask extends AsyncTask<Void, Void, BeerWithRating>{
+    private class ShowBeerTask extends AsyncTask<Long, Void, BeerWithRating>{
         @Override
         protected void onPostExecute(BeerWithRating beerWithRating) {
             setContentView(R.layout.beer_details_view);
-            displayBeer(beerWithRating.getBeer(), beerWithRating.getRating());
+            fBeerWithRating = beerWithRating;
+            displayBeer();
         }
 
         @Override
-        protected BeerWithRating doInBackground(Void... voids) {
+        protected BeerWithRating doInBackground(Long... ids) {
             fBeerDatabase = new BeerDatabase(getApplicationContext());
-            Beer beer = fBeerDatabase.getBeerForId(fId);
-            StarRating rating = fBeerDatabase.getRatingForBeer(fId);
-            return new BeerWithRating(beer, rating);
+            return fBeerDatabase.getBeerForId(ids[0]);
         }
     }
 }
