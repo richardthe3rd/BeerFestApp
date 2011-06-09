@@ -5,7 +5,7 @@
 
     <string name="hint">Hint: Press and hold Menu to filter the list</string>
 
-    <string formatted="false" name="share_this_beer_text">Drinking %s %s at #cbf38 #beer</string>
+    <string formatted="false" name="share_this_beer_text">Drinking %s %s at #cbf38 #beer %s</string>
 
     <string name="share_this_beer_title">Share this beer...</string>
 

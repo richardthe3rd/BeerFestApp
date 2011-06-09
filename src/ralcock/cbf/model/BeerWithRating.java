@@ -17,4 +17,7 @@ public class BeerWithRating {
         return fRating;
     }
 
+    public BeerWithRating rate(StarRating starRating) {
+        return new BeerWithRating(fBeer, starRating);
+    }
 }

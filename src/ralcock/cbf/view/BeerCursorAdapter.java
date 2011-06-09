@@ -39,4 +39,13 @@ public class BeerCursorAdapter extends CursorAdapter {
         String beerText = beerName + " (" +  beerAbv + "%)";
         beerItemView.beer.setText(beerText);
     }
+
+
+
+    @Override
+    public CharSequence convertToString(Cursor cursor) {
+        String beerName = cursor.getString(cursor.getColumnIndexOrThrow(BeerDatabase.BEER_NAME_COLUMN));
+        String breweryName = cursor.getString(cursor.getColumnIndexOrThrow(BeerDatabase.BREWERY_NAME_COLUMN));
+        return breweryName + " " + beerName;
+    }
 }

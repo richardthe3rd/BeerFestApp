@@ -8,15 +8,13 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.*;
-import android.widget.AdapterView;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.Toast;
-import ralcock.cbf.model.Beer;
+import android.widget.*;
 import ralcock.cbf.model.BeerDatabase;
+import ralcock.cbf.model.BeerWithRating;
 import ralcock.cbf.model.SortOrder;
 import ralcock.cbf.view.BeerCursorAdapter;
 import ralcock.cbf.view.BeerDetailsView;
+import ralcock.cbf.view.BeerSharer;
 
 public class CamBeerFestApplication extends ListActivity {
     private static final String TAG = CamBeerFestApplication.class.getName();
@@ -25,9 +23,11 @@ public class CamBeerFestApplication extends ListActivity {
     private Toast fHintToast = null;
     private SortOrder fSortOrder = SortOrder.BREWERY_NAME;
     private BeerDatabase fBeerDatabase;
+    private final BeerSharer fBeerSharer;
 
     public CamBeerFestApplication() {
         super();
+        fBeerSharer = new BeerSharer(this);
     }
 
    @Override
@@ -73,7 +73,6 @@ public class CamBeerFestApplication extends ListActivity {
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                // TODO
                 Intent intent = new Intent(CamBeerFestApplication.this, BeerDetailsView.class);
                 intent.putExtra(BeerDetailsView.EXTRA_BEER_ID, id);
                 startActivityForResult(intent, SHOW_BEER_DETAILS_REQUEST_CODE);
@@ -87,8 +86,8 @@ public class CamBeerFestApplication extends ListActivity {
                 shareThisMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo();
-                        Beer beerToShare = fBeerDatabase.getBeerForId(info.id);
-                        shareBeer(beerToShare);
+                        BeerWithRating beerToShare = fBeerDatabase.getBeerForId(info.id);
+                        fBeerSharer.shareBeer(beerToShare);
                         return true;
                     }
                 });
@@ -99,9 +98,7 @@ public class CamBeerFestApplication extends ListActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == SHOW_BEER_DETAILS_REQUEST_CODE) {
-            // TODO: This feels over the top. Is it?
-            Cursor c = fBeerDatabase.getBeerListCursor(fSortOrder);
-            getBeerCursorAdapter().changeCursor(c);
+            getBeerCursorAdapter().notifyDataSetChanged();
         }  else {
             super.onActivityResult(requestCode, resultCode, data);
         }
@@ -140,6 +137,7 @@ public class CamBeerFestApplication extends ListActivity {
         else
             fSortOrder = sortBy;
 
+        //TODO: This loses filtering
         Cursor c = fBeerDatabase.getBeerListCursor(fSortOrder);
         getBeerCursorAdapter().changeCursor(c);
 
@@ -150,20 +148,6 @@ public class CamBeerFestApplication extends ListActivity {
 
     private BeerCursorAdapter getBeerCursorAdapter() {
         return ((BeerCursorAdapter)getListAdapter());
-    }
-
-    private void shareBeer(Beer beer) {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-
-        String extraSubject = getResources().getString(R.string.share_this_beer_subject);
-        intent.putExtra(Intent.EXTRA_SUBJECT, extraSubject);
-
-        String extraText = getResources().getString(R.string.share_this_beer_text, beer.getBrewery().getName(), beer.getName());
-        intent.putExtra(Intent.EXTRA_TEXT, extraText);
-
-        String title = getResources().getString(R.string.share_this_beer_title);
-        startActivity(Intent.createChooser(intent, title));
     }
 
     private class CreateListAdapterTask extends AsyncTask<String, Void, BeerDatabase> {
@@ -180,7 +164,15 @@ public class CamBeerFestApplication extends ListActivity {
             fBeerDatabase = beerDatabase;
             Cursor c = beerDatabase.getBeerListCursor(fSortOrder);
             startManagingCursor(c);
-            ListAdapter listAdapter = new BeerCursorAdapter(CamBeerFestApplication.this, c);
+            BeerCursorAdapter listAdapter = new BeerCursorAdapter(CamBeerFestApplication.this, c);
+
+            listAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+                public Cursor runQuery(CharSequence constraint) {
+                    Log.d(TAG, "runQuery: " + constraint);
+                    return fBeerDatabase.getBeerListCursor(fSortOrder, constraint);
+                }
+            });
+
             setListAdapter(listAdapter);
             fDialog.dismiss();
         }
