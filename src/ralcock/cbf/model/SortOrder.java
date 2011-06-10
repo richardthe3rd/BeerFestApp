@@ -10,34 +10,36 @@ import java.io.Serializable;
 * To change this template use File | Settings | File Templates.
 */
 public enum SortOrder implements Serializable {
-    BEER_NAME(BeerDatabase.BEER_NAME_COLUMN, "beer"),
-    BEER_ABV(BeerDatabase.BEER_ABV_COLUMN, "abv"),
-    BEER_RATING(BeerDatabase.BEER_RATING_COLUMN, "rating"),
-    BREWERY_NAME(BeerDatabase.BREWERY_NAME_COLUMN, "brewery");
+    BREWERY_NAME_ASC(BeerDatabase.BREWERY_NAME_COLUMN+" ASC", "by brewery (A-Z)"),
+    BREWERY_NAME_DESC(BeerDatabase.BREWERY_NAME_COLUMN+" DESC", "by brewery (Z-A)"),
 
-    public String getColumnName() {
-        return fColumnName;
+    BEER_NAME_ASC(BeerDatabase.BEER_NAME_COLUMN+" ASC", "by beer (A-Z)"),
+    BEER_NAME_DESC(BeerDatabase.BEER_NAME_COLUMN+" DESC", "by beer (Z-A)"),
+
+    BEER_ABV_DESC(BeerDatabase.BEER_ABV_COLUMN+" DeSC", "by ABV (high to low)"),
+    BEER_ABV_ASC(BeerDatabase.BEER_ABV_COLUMN+" ASC", "by ABV (low to high)"),
+
+    BEER_RATING_DESC(BeerDatabase.BEER_RATING_COLUMN+" DeSC",  "by rating (high to low)"),
+    BEER_RATING_ASC(BeerDatabase.BEER_RATING_COLUMN+" ASC",  "by rating (low to high)");
+
+    private String fOrderByClause;
+
+    private String fDescription;
+
+    public String getOrderByClause() {
+        return fOrderByClause;
     }
 
     public String getDescription() {
         return fDescription;
     }
 
-    public boolean isAscending() {
-        return fAscending;
+    public String toString() {
+        return fDescription;
     }
 
-    public SortOrder reverse() {
-        fAscending = !fAscending;
-        return this;
-    }
-
-    private String fColumnName;
-    private String fDescription;
-    private boolean fAscending = true;
-
-    SortOrder(String columnName, String msg) {
-        fColumnName = columnName;
-        fDescription = msg;
+    SortOrder(String orderByClause, String description) {
+        fOrderByClause = orderByClause;
+        fDescription = description;
     }
 }

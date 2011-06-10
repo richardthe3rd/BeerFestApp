@@ -1,14 +1,25 @@
 package ralcock.cbf;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.*;
-import android.widget.*;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.FilterQueryProvider;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
 import ralcock.cbf.model.BeerDatabase;
 import ralcock.cbf.model.BeerWithRating;
 import ralcock.cbf.model.SortOrder;
@@ -16,12 +27,15 @@ import ralcock.cbf.view.BeerCursorAdapter;
 import ralcock.cbf.view.BeerDetailsView;
 import ralcock.cbf.view.BeerSharer;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class CamBeerFestApplication extends ListActivity {
     private static final String TAG = CamBeerFestApplication.class.getName();
 
     private static final int SHOW_BEER_DETAILS_REQUEST_CODE = 1;
     private Toast fHintToast = null;
-    private SortOrder fSortOrder = SortOrder.BREWERY_NAME;
+    private SortOrder fSortOrder = SortOrder.BREWERY_NAME_ASC;
     private BeerDatabase fBeerDatabase;
     private final BeerSharer fBeerSharer;
 
@@ -98,8 +112,10 @@ public class CamBeerFestApplication extends ListActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == SHOW_BEER_DETAILS_REQUEST_CODE) {
-            getBeerCursorAdapter().notifyDataSetChanged();
-        }  else {
+            // getBeerCursorAdapter().notifyDataSetChanged();
+            Cursor c = fBeerDatabase.getBeerListCursor(fSortOrder);
+            getBeerCursorAdapter().changeCursor(c);
+        } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -114,36 +130,57 @@ public class CamBeerFestApplication extends ListActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.sort_by_abv:
-                sortBy(SortOrder.BEER_ABV);
-                return true;
-            case R.id.sort_by_beer:
-                sortBy(SortOrder.BEER_NAME);
-                return true;
-            case R.id.sort_by_brewery:
-                sortBy(SortOrder.BREWERY_NAME);
-                return true;
-            case R.id.sort_by_rating:
-                sortBy(SortOrder.BEER_RATING);
+            case R.id.sort:
+                showSortDialog();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+        /*
+        switch (item.getItemId()) {
+            case R.id.sort_by_abv:
+                sortBy(SortOrder.BEER_ABV_ASC);
+                return true;
+            case R.id.sort_by_beer:
+                sortBy(SortOrder.BEER_NAME_ASC);
+                return true;
+            case R.id.sort_by_brewery:
+                sortBy(SortOrder.BREWERY_NAME_ASC);
+                return true;
+            case R.id.sort_by_rating:
+                sortBy(SortOrder.BEER_RATING_ASC);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        */
+    }
+
+    private void showSortDialog() {
+
+        final List<SortOrder> items = Arrays.asList(SortOrder.values());
+
+        ListAdapter listAdapter = new ArrayAdapter<SortOrder>(this, R.layout.sort_by_dialog_list_item, items);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Sort"); // todo resource
+        int checkeditem = items.indexOf(fSortOrder);
+        builder.setSingleChoiceItems(listAdapter, checkeditem, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialogInterface, int i) {
+                sortBy(items.get(i));
+                dialogInterface.dismiss();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private void sortBy(SortOrder sortBy) {
-        if (sortBy == fSortOrder)
-            fSortOrder = sortBy.reverse();
-        else
-            fSortOrder = sortBy;
-
-        //TODO: This loses filtering
+        fSortOrder = sortBy;
+        getListView().clearTextFilter();
         Cursor c = fBeerDatabase.getBeerListCursor(fSortOrder);
         getBeerCursorAdapter().changeCursor(c);
-
-        Toast.makeText(getApplicationContext(), "Sort again to reverse direction", Toast.LENGTH_SHORT).show();
-
-        setTitle(getResources().getText(R.string.app_name) + " (sorted by " + fSortOrder.getDescription() + ")");
+        setTitle(getResources().getText(R.string.app_name) + " (" + fSortOrder.getDescription() + ")");
     }
 
     private BeerCursorAdapter getBeerCursorAdapter() {
@@ -169,7 +206,7 @@ public class CamBeerFestApplication extends ListActivity {
             listAdapter.setFilterQueryProvider(new FilterQueryProvider() {
                 public Cursor runQuery(CharSequence constraint) {
                     Log.d(TAG, "runQuery: " + constraint);
-                    return fBeerDatabase.getBeerListCursor(fSortOrder, constraint);
+                    return fBeerDatabase.getFilteredBeerListCursor(fSortOrder, constraint);
                 }
             });
 
@@ -182,4 +219,5 @@ public class CamBeerFestApplication extends ListActivity {
             return new BeerDatabase(CamBeerFestApplication.this);
         }
     }
-}
+
+ }

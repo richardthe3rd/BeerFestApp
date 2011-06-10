@@ -40,8 +40,6 @@ public class BeerCursorAdapter extends CursorAdapter {
         beerItemView.beer.setText(beerText);
     }
 
-
-
     @Override
     public CharSequence convertToString(Cursor cursor) {
         String beerName = cursor.getString(cursor.getColumnIndexOrThrow(BeerDatabase.BEER_NAME_COLUMN));

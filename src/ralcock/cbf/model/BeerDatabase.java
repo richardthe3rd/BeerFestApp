@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.util.Log;
 import org.json.JSONException;
 
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public final class BeerDatabase {
+    private static final String TAG = "BeerDatabase";
 
     public static final String BEERS_TABLE = "beers";
     public static final String RATINGS_TABLE = "ratings";
@@ -35,44 +37,43 @@ public final class BeerDatabase {
     public BeerWithRating getBeerForId(long beerId) {
         Cursor cursor = null;
         try {
-            // TODO: Get rating in single query
-            cursor = fReadableDatabase.query(BEERS_TABLE,
-                    null, "_id="+beerId, null, null, null, null);
+            cursor = getBeerCursor(beerId);
             cursor.moveToFirst();
+
             String breweryName = cursor.getString(cursor.getColumnIndexOrThrow(BREWERY_NAME_COLUMN));
             String breweryNotes = cursor.getString(cursor.getColumnIndexOrThrow(BREWERY_NOTES_COLUMN));
             Brewery brewery = new Brewery(breweryName, breweryNotes);
+
             String beerName = cursor.getString(cursor.getColumnIndexOrThrow(BEER_NAME_COLUMN));
             float beerAbv = cursor.getFloat(cursor.getColumnIndexOrThrow(BEER_ABV_COLUMN));
             String beerNotes = cursor.getString(cursor.getColumnIndexOrThrow(BEER_NOTES_COLUMN));
-
             Beer beer = new Beer(brewery, beerName, beerAbv, beerNotes);
-            StarRating rating = getRatingForBeer(beerId);
 
-            return new BeerWithRating(beer, rating);
+            int rating = cursor.getInt(cursor.getColumnIndexOrThrow(BEER_RATING_COLUMN));
+            StarRating starRating = new StarRating(rating);
+
+            return new BeerWithRating(beer, starRating);
         } finally {
             if (cursor != null)
                 cursor.close();
         }
     }
 
-    public StarRating getRatingForBeer(long beerId) {
-        Cursor cursor = null;
-        try {
-            cursor = fReadableDatabase.query(RATINGS_TABLE,
-                    new String[]{BEER_RATING_COLUMN},
-                    BEER_ID_COLUMN+"="+beerId, null, null, null, null, "1");
-            cursor.moveToFirst();
-
-            int rating = 0;
-            if (cursor.getCount() == 1)
-                rating = cursor.getInt(cursor.getColumnIndexOrThrow(BEER_RATING_COLUMN));
-
-            return new StarRating(rating);
-        } finally {
-            if (cursor != null)
-                cursor.close();
-        }
+    private Cursor getBeerCursor(long beerId) {
+        String[] columns = {
+                BEERS_TABLE + "._id",
+                BEER_NAME_COLUMN,
+                BEER_ABV_COLUMN,
+                BEER_NOTES_COLUMN,
+                BEER_RATING_COLUMN,
+                BREWERY_NAME_COLUMN,
+                BREWERY_NOTES_COLUMN,
+        };
+        String whereClause = BEERS_TABLE+"._id"+"=" + beerId;
+        String orderByClause = null;
+        String sqlStatement = beerQuery(columns, whereClause, orderByClause);
+        Log.d(TAG, "getBeerCursor: " + sqlStatement);
+        return fReadableDatabase.rawQuery(sqlStatement, null);
     }
 
     public void rateBeer(long beerId, StarRating rating) {
@@ -86,30 +87,68 @@ public final class BeerDatabase {
         }
     }
 
+    public Cursor getBeerListCursor(SortOrder sortOrder) {
+        String[] columns = {
+                BEERS_TABLE + "._id",
+                BEER_NAME_COLUMN,
+                BEER_ABV_COLUMN,
+                BREWERY_NAME_COLUMN,
+                BEER_RATING_COLUMN,
+        };
+        String whereClause = null;
+        String sqlStatement = beerQuery(columns, whereClause, sortOrder.getOrderByClause());
+        Log.d(TAG, "getBeerListCursor: " + sqlStatement);
+        return fReadableDatabase.rawQuery(sqlStatement, null);
+    }
+
+    public Cursor getFilteredBeerListCursor(SortOrder sortOrder, CharSequence filter) {
+        String[] columns = {
+                BEERS_TABLE + "._id",
+                BEER_NAME_COLUMN,
+                BEER_ABV_COLUMN,
+                BREWERY_NAME_COLUMN,
+                BEER_RATING_COLUMN,
+        };
+        String whereClause = BEER_NAME_COLUMN + " LIKE " + "'%"+filter+"%'" + " OR " + BREWERY_NAME_COLUMN + " LIKE " + "'%"+filter+"%'";
+        String sqlStatement = beerQuery(columns, whereClause, sortOrder.getOrderByClause());
+        Log.d(TAG, "getFilteredBeerListCursor: " + sqlStatement);
+        return fReadableDatabase.rawQuery(sqlStatement, null);
+    }
+
+    private String beerQuery(String[] columns, String whereClause, String orderByClause) {
+        StringBuilder sqlStatement = new StringBuilder("SELECT ");
+
+        SQLiteQueryBuilder.appendColumns(sqlStatement, columns);
+
+        sqlStatement.append(" FROM " + BEERS_TABLE + " LEFT JOIN " + RATINGS_TABLE + " ON " + BEERS_TABLE + "._id=" + RATINGS_TABLE + "." + BEER_ID_COLUMN);
+
+        if (whereClause != null) {
+            sqlStatement.append(" WHERE " + whereClause);
+        }
+
+        if (orderByClause != null) {
+            sqlStatement.append(" ORDER BY " + orderByClause);
+        }
+
+        return sqlStatement.toString();
+    }
+
+    /*
+    private String beerQuery(String whereClause, String orderByClause) {
+        String[] columns = {
+                BEERS_TABLE + "._id",
+                BEER_NAME_COLUMN,
+                BEER_ABV_COLUMN,
+                BREWERY_NAME_COLUMN,
+                BEER_RATING_COLUMN
+        };
+        return beerQuery(columns, whereClause, orderByClause);
+    }
+    */
+
     public void close() {
         fReadableDatabase.close();
         fWritableDatabase.close();
-    }
-
-    public Cursor getBeerListCursor(SortOrder sortOrder) {
-        String orderByClause = sortOrder.getColumnName() + (sortOrder.isAscending() ? " ASC" : " DESC");
-
-        String sqlStatement = "SELECT " + BEERS_TABLE + "._id, " + BEER_NAME_COLUMN + ", " + BEER_ABV_COLUMN + ", " + BREWERY_NAME_COLUMN + ", " + BEER_RATING_COLUMN
-                + " FROM " + BEERS_TABLE + " LEFT JOIN " + RATINGS_TABLE + " ON " + BEERS_TABLE + "._id=" + RATINGS_TABLE+"."+BEER_ID_COLUMN
-                + " ORDER BY " + orderByClause;
-
-        return fReadableDatabase.rawQuery(sqlStatement, null);
-    }
-
-    public Cursor getBeerListCursor(SortOrder sortOrder, CharSequence constraint) {
-        String orderByClause = sortOrder.getColumnName() + (sortOrder.isAscending() ? " ASC" : " DESC");
-
-        String sqlStatement = "SELECT " + BEERS_TABLE + "._id, " + BEER_NAME_COLUMN + ", " + BEER_ABV_COLUMN + ", " + BREWERY_NAME_COLUMN + ", " + BEER_RATING_COLUMN
-                + " FROM " + BEERS_TABLE + " LEFT JOIN " + RATINGS_TABLE + " ON " + BEERS_TABLE + "._id=" + RATINGS_TABLE+"."+BEER_ID_COLUMN
-                + " WHERE " + BEER_NAME_COLUMN + " LIKE " + "'%"+constraint+"%'" + " OR " + BREWERY_NAME_COLUMN + " LIKE " + "'%"+constraint+"%'"
-                + " ORDER BY " + orderByClause;
-
-        return fReadableDatabase.rawQuery(sqlStatement, null);
     }
 
     private static final class BeerDatabaseHelper extends SQLiteOpenHelper {
