@@ -154,7 +154,7 @@ public final class BeerDatabase {
     private static final class BeerDatabaseHelper extends SQLiteOpenHelper {
         private static final String TAG = "BeerDatabaseHelper";
 
-        private static final int DB_VERSION = 2;
+        private static final int DB_VERSION = 3; // For Winter Ale Festival 2012
         private static final String DB_NAME = "BEERS";
 
         private final BeerListLoader fLoader;

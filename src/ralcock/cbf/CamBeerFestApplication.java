@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -16,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.FilterQueryProvider;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -39,15 +42,31 @@ public class CamBeerFestApplication extends ListActivity {
     private BeerDatabase fBeerDatabase;
     private final BeerSharer fBeerSharer;
 
+    private BeerCursorAdapter fAdapter;
+    private EditText fEditText = null;
+
+    private TextWatcher fFilterTextWatcher = new TextWatcher() {
+        public void afterTextChanged(Editable s) {}
+
+        public void beforeTextChanged(CharSequence s, int start, int count,
+                int after) {
+        }
+
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            fAdapter.getFilter().filter(s);
+        }
+    };
+
     public CamBeerFestApplication() {
         super();
         fBeerSharer = new BeerSharer(this);
     }
 
-   @Override
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         Log.d(TAG, "In onSaveInstanceState");
         outState.putSerializable("BEER_SORT_ORDER", fSortOrder);
+        outState.putSerializable("BEER_LIST_FILTER_STRING", fEditText.getText().toString());
         super.onSaveInstanceState(outState);
     }
 
@@ -58,8 +77,20 @@ public class CamBeerFestApplication extends ListActivity {
         super.onRestoreInstanceState(state);
     }
 
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG, "In onDestroy");
+        super.onDestroy();
+        fEditText.removeTextChangedListener(fFilterTextWatcher);
+    }
+
     private void initFromSavedState(Bundle state) {
         fSortOrder = (SortOrder) state.getSerializable("BEER_SORT_ORDER");
+        Log.d(TAG, "initFromSavedState fSortOrder->" + fSortOrder);
+
+        String filter_string = (String)state.getSerializable("BEER_LIST_FILTER_STRING");
+        Log.d(TAG, "initFromSavedState fEditText ->" + filter_string);
+        fEditText.setText(filter_string);
     }
 
     /**
@@ -67,12 +98,18 @@ public class CamBeerFestApplication extends ListActivity {
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "In onCreate");
+
         super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.beer_list_view);
 
         // If the toast is showing, cancel it
         if (fHintToast != null) {
             fHintToast.cancel();
         }
+
+        setTitle(getResources().getText(R.string.list_title));
 
         if (savedInstanceState != null) {
             initFromSavedState(savedInstanceState);
@@ -82,7 +119,6 @@ public class CamBeerFestApplication extends ListActivity {
 
         ListView lv = getListView();
 
-        // TODO: This isn;t working
         lv.setTextFilterEnabled(true);
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -107,17 +143,21 @@ public class CamBeerFestApplication extends ListActivity {
                 });
             }
         });
+
+        fEditText = (EditText) findViewById(R.id.search);
+        fEditText.addTextChangedListener(fFilterTextWatcher);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == SHOW_BEER_DETAILS_REQUEST_CODE) {
-            // getBeerCursorAdapter().notifyDataSetChanged();
             Cursor c = fBeerDatabase.getBeerListCursor(fSortOrder);
             getBeerCursorAdapter().changeCursor(c);
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+        // restore the filter
+        fAdapter.getFilter().filter(fEditText.getText());
     }
 
     @Override
@@ -136,34 +176,15 @@ public class CamBeerFestApplication extends ListActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-        /*
-        switch (item.getItemId()) {
-            case R.id.sort_by_abv:
-                sortBy(SortOrder.BEER_ABV_ASC);
-                return true;
-            case R.id.sort_by_beer:
-                sortBy(SortOrder.BEER_NAME_ASC);
-                return true;
-            case R.id.sort_by_brewery:
-                sortBy(SortOrder.BREWERY_NAME_ASC);
-                return true;
-            case R.id.sort_by_rating:
-                sortBy(SortOrder.BEER_RATING_ASC);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-        */
     }
 
     private void showSortDialog() {
-
         final List<SortOrder> items = Arrays.asList(SortOrder.values());
 
         ListAdapter listAdapter = new ArrayAdapter<SortOrder>(this, R.layout.sort_by_dialog_list_item, items);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Sort"); // todo resource
+        builder.setTitle(R.string.sort_dialog_title);
         int checkeditem = items.indexOf(fSortOrder);
         builder.setSingleChoiceItems(listAdapter, checkeditem, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -180,7 +201,7 @@ public class CamBeerFestApplication extends ListActivity {
         getListView().clearTextFilter();
         Cursor c = fBeerDatabase.getBeerListCursor(fSortOrder);
         getBeerCursorAdapter().changeCursor(c);
-        setTitle(getResources().getText(R.string.app_name) + " (" + fSortOrder.getDescription() + ")");
+        setTitle(getResources().getText(R.string.list_title) + " (" + fSortOrder.getDescription() + ")");
     }
 
     private BeerCursorAdapter getBeerCursorAdapter() {
@@ -201,16 +222,17 @@ public class CamBeerFestApplication extends ListActivity {
             fBeerDatabase = beerDatabase;
             Cursor c = beerDatabase.getBeerListCursor(fSortOrder);
             startManagingCursor(c);
-            BeerCursorAdapter listAdapter = new BeerCursorAdapter(CamBeerFestApplication.this, c);
+            fAdapter = new BeerCursorAdapter(CamBeerFestApplication.this, c);
 
-            listAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+            fAdapter.setFilterQueryProvider(new FilterQueryProvider() {
                 public Cursor runQuery(CharSequence constraint) {
                     Log.d(TAG, "runQuery: " + constraint);
                     return fBeerDatabase.getFilteredBeerListCursor(fSortOrder, constraint);
                 }
             });
 
-            setListAdapter(listAdapter);
+            setListAdapter(fAdapter);
+
             fDialog.dismiss();
         }
 

@@ -23,12 +23,16 @@ public final class BeerSharer {
         String extraSubject = fContext.getResources().getString(R.string.share_this_beer_subject);
         intent.putExtra(Intent.EXTRA_SUBJECT, extraSubject);
 
-        String ratingString = "";
+        String extraText;
         int rating = beerWithRating.getRating().getNumberOfStars();
-        if (rating > 0) {ratingString = String.format("%d/5", rating);}
+        if (rating > 0) {
+            extraText = fContext.getResources().getString(R.string.share_this_rated_beer_text,
+                    rating, beer.getBrewery().getName(), beer.getName());
+        } else {
+            extraText = fContext.getResources().getString(R.string.share_this_beer_text,
+                    beer.getBrewery().getName(), beer.getName());
+        }
 
-        String extraText = fContext.getResources().getString(R.string.share_this_beer_text,
-                beer.getBrewery().getName(), beer.getName(), ratingString);
         intent.putExtra(Intent.EXTRA_TEXT, extraText);
 
         String title = fContext.getResources().getString(R.string.share_this_beer_title);

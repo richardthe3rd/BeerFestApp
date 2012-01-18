@@ -2,14 +2,14 @@
 <resources>
 
     <string name="app_name">Cambridge Beer Festival</string>
+    <string name="list_title">Cambridge Winter Ale Festival</string>
 
-    <string name="hint">Hint: Press and hold Menu to filter the list</string>
-
-    <string formatted="false" name="share_this_beer_text">Drinking %s %s at #cbf38 #beer %s</string>
+    <string formatted="false" name="share_this_beer_text">Drinking %s %s @cambeerfest #CWAF #beer</string>
+    <string formatted="false" name="share_this_rated_beer_text">Gave %d stars to %s %s @cambeerfest #CWAF #beer</string>
 
     <string name="share_this_beer_title">Share this beer...</string>
 
-    <string name="share_this_beer_subject">Drinking a beer at cbf38</string>
+    <string name="share_this_beer_subject">Drinking an ale at Cambridge Winter Ale Festival</string>
 
     <string name="abv">ABV</string>
 
@@ -25,6 +25,11 @@
 
     <string name="hate_this_beer">I hated it</string>
     <string name="oops_this_beer">Forget Rating</string>
+
+    <string name="sort_dialog_title">Sort</string>
+
+    <string name="sort_menu_label">Sort</string>
+    <string name="search_menu_label">Search</string>
 
     <string name="sort_by_brewery">Sort by Brewery</string>
     <string name="sort_by_beer">Sort by Beer</string>

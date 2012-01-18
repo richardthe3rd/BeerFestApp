@@ -1,6 +1,9 @@
-function cambeerfest38( jsonFile )
+function cambeerfest38( jsonFile, compact )
 
-compact = true;
+if nargin == 1
+    compact = true;
+end
+
 if compact
     newline = '';
     indent = '';
