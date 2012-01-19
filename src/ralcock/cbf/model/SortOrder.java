@@ -6,7 +6,7 @@ import java.io.Serializable;
 public enum SortOrder implements Serializable {
 
     BREWERY_NAME_ASC(BeerDatabase.BREWERY_NAME_COLUMN+" ASC", "by Brewery (A-Z)"),
-    BREWERY_NAME_DESC(BeerDatabase.BREWERY_NAME_COLUMN+" DESC", "by brewery (Z-A)"),
+    BREWERY_NAME_DESC(BeerDatabase.BREWERY_NAME_COLUMN+" DESC", "by Brewery (Z-A)"),
 
     BEER_NAME_ASC(BeerDatabase.BEER_NAME_COLUMN+" ASC", "by Beer (A-Z)"),
     BEER_NAME_DESC(BeerDatabase.BEER_NAME_COLUMN+" DESC", "by Beer (Z-A)"),
