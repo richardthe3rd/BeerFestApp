@@ -35,4 +35,28 @@ public class Beer implements Serializable {
     public String toString() {
         return fBrewery.getName() + " " + fName;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Beer beer = (Beer) o;
+
+        if (Float.compare(beer.fAbv, fAbv) != 0) return false;
+        if (!fBrewery.equals(beer.fBrewery)) return false;
+        if (!fName.equals(beer.fName)) return false;
+        if (!fNotes.equals(beer.fNotes)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = fBrewery.hashCode();
+        result = 31 * result + fName.hashCode();
+        result = 31 * result + (fAbv != +0.0f ? Float.floatToIntBits(fAbv) : 0);
+        result = 31 * result + fNotes.hashCode();
+        return result;
+    }
 }
