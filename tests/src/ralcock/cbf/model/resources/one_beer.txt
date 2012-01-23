@@ -1,0 +1,12 @@
+[
+    {
+        "brewery":
+        {
+            "name":"BREWERY_NAME",
+            "notes":"BREWERY_NOTES"
+        },
+        "name":"BEER_NAME",
+        "abv":1,
+        "notes":"BEER_NOTES"
+    }
+]

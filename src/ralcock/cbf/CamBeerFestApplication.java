@@ -23,13 +23,15 @@ import android.widget.EditText;
 import android.widget.FilterQueryProvider;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import ralcock.cbf.model.BeerDatabase;
-import ralcock.cbf.model.BeerWithRating;
-import ralcock.cbf.model.SortOrder;
+import org.json.JSONException;
+import ralcock.cbf.model.*;
+import ralcock.cbf.util.IOUtils;
 import ralcock.cbf.view.BeerCursorAdapter;
 import ralcock.cbf.view.BeerDetailsView;
 import ralcock.cbf.view.BeerSharer;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -275,9 +277,26 @@ public class CamBeerFestApplication extends ListActivity {
 
         @Override
         protected BeerDatabase doInBackground(String... strings) {
-            return new BeerDatabase(CamBeerFestApplication.this);
+            CamBeerFestApplication context = CamBeerFestApplication.this;
+            InputStream inputStream = null;
+            try {
+                 inputStream = context.getAssets().open("beers.json");
+                 JsonBeerList jsonBeerList = new JsonBeerList(inputStream);
+                 BeerDatabaseHelper databaseHelper = new BeerDatabaseHelper(context, jsonBeerList);
+                 return new BeerDatabase(databaseHelper);
+            } catch (IOException iox) {
+                // Failed
+                Log.e(TAG, "Exception to opening input stream.", iox);
+                return null;
+            } catch (JSONException jx) {
+                // Failed
+                Log.e(TAG, "Exception to opening input stream.", jx);
+                return null;
+            } finally {
+                IOUtils.safeClose(TAG, inputStream);
+            }
+
         }
+
     }
-
-
  }

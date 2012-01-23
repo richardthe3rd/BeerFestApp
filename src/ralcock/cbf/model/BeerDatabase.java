@@ -1,19 +1,16 @@
 package ralcock.cbf.model;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.util.Log;
-import org.json.JSONException;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 public final class BeerDatabase {
     private static final String TAG = "BeerDatabase";
+
+    public static final String DATABASE_NAME = "BEERS";
 
     public static final String BEERS_TABLE = "beers";
     public static final String RATINGS_TABLE = "ratings";
@@ -25,13 +22,12 @@ public final class BeerDatabase {
     public static final String BEER_ID_COLUMN = "beer_id";
     public static final String BEER_RATING_COLUMN = "beer_rating";
 
-    private SQLiteDatabase fReadableDatabase;
-    private SQLiteDatabase fWritableDatabase;
+    private final SQLiteDatabase fReadableDatabase;
+    private final SQLiteDatabase fWritableDatabase;
 
-    public BeerDatabase(Context context) {
-        BeerDatabaseHelper beerDatabaseHelper = new BeerDatabaseHelper(context, new BeerListLoader());
-        fReadableDatabase = beerDatabaseHelper.getReadableDatabase();
-        fWritableDatabase = beerDatabaseHelper.getWritableDatabase();
+    public BeerDatabase(final SQLiteOpenHelper databaseHelper) {
+        fReadableDatabase = databaseHelper.getReadableDatabase();
+        fWritableDatabase = databaseHelper.getWritableDatabase();
     }
 
     public BeerWithRating getBeerForId(long beerId) {
@@ -133,90 +129,8 @@ public final class BeerDatabase {
         return sqlStatement.toString();
     }
 
-    /*
-    private String beerQuery(String whereClause, String orderByClause) {
-        String[] columns = {
-                BEERS_TABLE + "._id",
-                BEER_NAME_COLUMN,
-                BEER_ABV_COLUMN,
-                BREWERY_NAME_COLUMN,
-                BEER_RATING_COLUMN
-        };
-        return beerQuery(columns, whereClause, orderByClause);
-    }
-    */
-
     public void close() {
         fReadableDatabase.close();
         fWritableDatabase.close();
-    }
-
-    private static final class BeerDatabaseHelper extends SQLiteOpenHelper {
-        private static final String TAG = "BeerDatabaseHelper";
-
-        private static final int DB_VERSION = 3; // For Winter Ale Festival 2012
-        private static final String DB_NAME = "BEERS";
-
-        private final BeerListLoader fLoader;
-        private final Context fContext;
-
-        public BeerDatabaseHelper(Context context, BeerListLoader loader) {
-            super(context, DB_NAME, null, DB_VERSION);
-            fContext = context;
-            fLoader = loader;
-        }
-
-        @Override
-        public void onCreate(final SQLiteDatabase sqLiteDatabase) {
-            sqLiteDatabase.execSQL("CREATE TABLE " + BEERS_TABLE + " " +
-                    "(_id INTEGER PRIMARY KEY AUTOINCREMENT, "+
-                    BEER_NAME_COLUMN + " TEXT, " +
-                    BEER_NOTES_COLUMN + " TEXT, " +
-                    BEER_ABV_COLUMN + " REAL, " +
-                    BREWERY_NAME_COLUMN + " TEXT, " +
-                    BREWERY_NOTES_COLUMN + " TEXT" +
-                    ")");
-
-            InputStream inputStream = null;
-            try {
-                inputStream = fContext.getAssets().open("beers.json");
-                fLoader.loadBeers(inputStream, new BeerListLoader.BeerHandler() {
-                    public void handleBeer(Beer beer) {
-                        ContentValues cv = new ContentValues();
-                        cv.put(BEER_NAME_COLUMN, beer.getName());
-                        cv.put(BEER_NOTES_COLUMN, beer.getNotes());
-                        cv.put(BEER_ABV_COLUMN, beer.getAbv());
-                        cv.put(BREWERY_NAME_COLUMN, beer.getBrewery().getName());
-                        cv.put(BREWERY_NOTES_COLUMN, beer.getBrewery().getDescription());
-                        sqLiteDatabase.insert(BEERS_TABLE, BEER_NAME_COLUMN, cv);
-                    }
-                });
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
-            } finally {
-                if (inputStream!=null) {
-                    try {
-                        inputStream.close();
-                    } catch (IOException e) {
-                        Log.i(TAG, "Failed to close stream", e);
-                    }
-                }
-            }
-
-            sqLiteDatabase.execSQL("CREATE TABLE " + RATINGS_TABLE + " " +
-                    "(_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    BEER_ID_COLUMN + " INTEGER, " +
-                    BEER_RATING_COLUMN + " REAL " +
-                    ")");
-        }
-
-        @Override
-        public void onUpgrade(SQLiteDatabase sqLiteDatabase, int old_version, int new_version) {
-            sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + BEERS_TABLE);
-            sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + RATINGS_TABLE);
-            onCreate(sqLiteDatabase);
-        }
     }
 }

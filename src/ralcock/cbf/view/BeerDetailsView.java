@@ -1,21 +1,27 @@
 package ralcock.cbf.view;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import org.json.JSONException;
 import ralcock.cbf.R;
-import ralcock.cbf.model.Beer;
-import ralcock.cbf.model.BeerDatabase;
-import ralcock.cbf.model.BeerWithRating;
-import ralcock.cbf.model.StarRating;
+import ralcock.cbf.model.*;
+import ralcock.cbf.util.IOUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 public final class BeerDetailsView extends Activity {
+    private static final String TAG = BeerDetailsView.class.getName();
+
     public static final String EXTRA_BEER_ID = "BEER";
 
     private BeerDatabase fBeerDatabase;
@@ -109,8 +115,27 @@ public final class BeerDetailsView extends Activity {
 
         @Override
         protected BeerWithRating doInBackground(Long... ids) {
-            fBeerDatabase = new BeerDatabase(getApplicationContext());
-            return fBeerDatabase.getBeerForId(ids[0]);
+            Context context = BeerDetailsView.this;
+            InputStream inputStream = null;
+            try {
+                inputStream = context.getAssets().open("beers.json");
+                JsonBeerList jsonBeerList = new JsonBeerList(inputStream);
+                BeerDatabaseHelper databaseHelper = new BeerDatabaseHelper(context, jsonBeerList);
+                fBeerDatabase = new BeerDatabase(databaseHelper);
+
+                return fBeerDatabase.getBeerForId(ids[0]);
+            } catch (IOException iox) {
+                // Failed
+                Log.e(TAG, "Exception to opening input stream.", iox);
+                return null;
+            } catch (JSONException jx) {
+                // Failed
+                Log.e(TAG, "Exception to opening input stream.", jx);
+                return null;
+            } finally {
+                IOUtils.safeClose(TAG, inputStream);
+            }
+
         }
     }
 }
