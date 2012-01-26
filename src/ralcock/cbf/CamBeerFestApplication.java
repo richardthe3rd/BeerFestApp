@@ -5,7 +5,6 @@ import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -14,7 +13,6 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -24,7 +22,11 @@ import android.widget.FilterQueryProvider;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import org.json.JSONException;
-import ralcock.cbf.model.*;
+import ralcock.cbf.model.BeerDatabase;
+import ralcock.cbf.model.BeerDatabaseHelper;
+import ralcock.cbf.model.BeerWithRating;
+import ralcock.cbf.model.JsonBeerList;
+import ralcock.cbf.model.SortOrder;
 import ralcock.cbf.util.IOUtils;
 import ralcock.cbf.view.BeerCursorAdapter;
 import ralcock.cbf.view.BeerDetailsView;
@@ -40,88 +42,27 @@ public class CamBeerFestApplication extends ListActivity {
 
     private static final int SHOW_BEER_DETAILS_REQUEST_CODE = 1;
 
-    private static final String PREFS_NAME = CamBeerFestApplication.class.getSimpleName();
-
-    private static final String BEER_LIST_SORT_ORDER_PREF_KEY = "sortOrder";
-    private static final String  BEER_LIST_FILTER_TEXT_PREF_KEY = "filterText";
-
-    private static final SortOrder BEER_LIST_DEFAULT_SORT_ORDER = SortOrder.BREWERY_NAME_ASC;
-
-    private SortOrder fSortOrder = BEER_LIST_DEFAULT_SORT_ORDER;
     private BeerDatabase fBeerDatabase;
     private final BeerSharer fBeerSharer;
 
     private BeerCursorAdapter fAdapter;
 
-    private String fFilterText = "";
     private EditText fFilterTextBox = null;
 
     private final TextWatcher fFilterTextWatcher = new TextWatcher() {
         public void afterTextChanged(Editable s) {}
-
-        public void beforeTextChanged(CharSequence s, int start, int count,
-                int after) {
-        }
-
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             filterBy(s.toString());
         }
     };
 
+    private AppPreferences fAppPreferences;
+
     public CamBeerFestApplication() {
         super();
+        fAppPreferences = new AppPreferences(this);
         fBeerSharer = new BeerSharer(this);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        Log.d(TAG, "In onSaveInstanceState");
-        savePreferences();
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle state) {
-        Log.d(TAG, "In onRestoreInstanceState");
-        restoreFromPreferences();
-        super.onRestoreInstanceState(state);
-    }
-
-    @Override
-    protected void onPause() {
-        Log.d(TAG, "In onPause");
-        super.onPause();
-        savePreferences();
-    }
-
-    private void savePreferences() {
-        // We need an Editor object to make preference changes.
-        // All objects are from android.context.Context
-        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putString(BEER_LIST_SORT_ORDER_PREF_KEY, fSortOrder.name());
-        editor.putString(BEER_LIST_FILTER_TEXT_PREF_KEY, fFilterText);
-        editor.commit();
-    }
-
-    private void restoreFromPreferences() {
-        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-        if(settings==null) {
-            return;
-        }
-
-        String sortOrderName = settings.getString(BEER_LIST_SORT_ORDER_PREF_KEY, SortOrder.BREWERY_NAME_DESC.name());
-        fSortOrder = SortOrder.valueOf(sortOrderName);
-
-        fFilterText = settings.getString(BEER_LIST_FILTER_TEXT_PREF_KEY, "");
-        fFilterTextBox.setText(fFilterText);
-    }
-
-    @Override
-    protected void onResume() {
-        Log.d(TAG, "In onResume");
-        super.onResume();
-        restoreFromPreferences();
     }
 
     @Override
@@ -143,6 +84,7 @@ public class CamBeerFestApplication extends ListActivity {
         setContentView(R.layout.beer_list_view);
 
         fFilterTextBox = (EditText) findViewById(R.id.search);
+        fFilterTextBox.setText(fAppPreferences.getFilterText());
 
         setTitle(getResources().getText(R.string.list_title));
 
@@ -179,8 +121,8 @@ public class CamBeerFestApplication extends ListActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == SHOW_BEER_DETAILS_REQUEST_CODE) {
-            sortBy(fSortOrder);
-            filterBy(fFilterText);
+            sortBy(fAppPreferences.getSortOrder());
+            filterBy(fAppPreferences.getFilterText());
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
@@ -188,7 +130,7 @@ public class CamBeerFestApplication extends ListActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
+        android.view.MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.list_menu, menu);
         return true;
     }
@@ -211,8 +153,8 @@ public class CamBeerFestApplication extends ListActivity {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.sort_dialog_title);
-        int checkeditem = items.indexOf(fSortOrder);
-        builder.setSingleChoiceItems(listAdapter, checkeditem, new DialogInterface.OnClickListener() {
+        int checkedItem = items.indexOf(fAppPreferences.getSortOrder());
+        builder.setSingleChoiceItems(listAdapter, checkedItem, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialogInterface, int i) {
                 sortBy(items.get(i));
                 dialogInterface.dismiss();
@@ -222,24 +164,15 @@ public class CamBeerFestApplication extends ListActivity {
         dialog.show();
     }
 
-    private void filterBy(String filterText, BeerCursorAdapter adapter) {
-        adapter.getFilter().filter(filterText);
-    }
-
-    private void sortBy(SortOrder sortOrder, BeerCursorAdapter adapter) {
-        Cursor c = fBeerDatabase.getBeerListCursor(sortOrder);
-        adapter.changeCursor(c);
-        filterBy(fFilterText, adapter);
-    }
-
-    private void sortBy(SortOrder sortBy) {
-        fSortOrder = sortBy;
-        sortBy(sortBy, fAdapter);
-    }
-
     private void filterBy(String filterText) {
-        fFilterText = filterText;
-        filterBy(filterText, fAdapter);
+        fAdapter.getFilter().filter(filterText);
+        fAppPreferences.setFilterText(filterText);
+    }
+
+    private void sortBy(SortOrder sortOrder) {
+        Cursor c = fBeerDatabase.getFilteredBeerListCursor(sortOrder, fAppPreferences.getFilterText());
+        fAdapter.changeCursor(c);
+        fAppPreferences.setSortOrder(sortOrder);
     }
 
     private class CreateListAdapterTask extends AsyncTask<String, Void, BeerDatabase> {
@@ -255,18 +188,16 @@ public class CamBeerFestApplication extends ListActivity {
         protected void onPostExecute(BeerDatabase beerDatabase) {
             fBeerDatabase = beerDatabase;
 
-            Cursor c = beerDatabase.getBeerListCursor(fSortOrder);
+            Cursor c = fBeerDatabase.getFilteredBeerListCursor(fAppPreferences.getSortOrder(), fAppPreferences.getFilterText());
             startManagingCursor(c);
             fAdapter = new BeerCursorAdapter(CamBeerFestApplication.this, c);
 
             fAdapter.setFilterQueryProvider(new FilterQueryProvider() {
-                public Cursor runQuery(CharSequence constraint) {
-                    Log.d(TAG, "runQuery: " + constraint);
-                    return fBeerDatabase.getFilteredBeerListCursor(fSortOrder, constraint);
+                public Cursor runQuery(CharSequence filterText) {
+                    Log.d(TAG, "FilterQueryProvider.runQuery with filter: " + filterText);
+                    return fBeerDatabase.getFilteredBeerListCursor(fAppPreferences.getSortOrder(), filterText);
                 }
             });
-            filterBy(fFilterText, fAdapter);
-
             // update the ui
             fFilterTextBox.addTextChangedListener(fFilterTextWatcher);
 
