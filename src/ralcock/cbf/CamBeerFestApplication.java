@@ -43,11 +43,14 @@ public class CamBeerFestApplication extends ListActivity {
     private static final int SHOW_BEER_DETAILS_REQUEST_CODE = 1;
 
     private BeerDatabase fBeerDatabase;
-    private final BeerSharer fBeerSharer;
 
     private BeerCursorAdapter fAdapter;
 
     private EditText fFilterTextBox = null;
+
+    private final BeerSharer fBeerSharer;
+
+    private final AppPreferences fAppPreferences;
 
     private final TextWatcher fFilterTextWatcher = new TextWatcher() {
         public void afterTextChanged(Editable s) {}
@@ -57,7 +60,6 @@ public class CamBeerFestApplication extends ListActivity {
         }
     };
 
-    private AppPreferences fAppPreferences;
 
     public CamBeerFestApplication() {
         super();
