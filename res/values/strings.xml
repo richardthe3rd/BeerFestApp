@@ -40,5 +40,6 @@
     <string name="Rating_Horrible">I hated it</string>
     <string name="Rating_OK">It was OK</string>
     <string name="Rating_Love">I loved it</string>
+    <string name="filter_hint">type to filter</string>
 
 </resources>
