@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FilterQueryProvider;
 import android.widget.ListAdapter;
@@ -88,6 +89,14 @@ public class CamBeerFestApplication extends ListActivity {
         fFilterTextBox = (EditText) findViewById(R.id.search);
         fFilterTextBox.setText(fAppPreferences.getFilterText());
 
+        Button clearFilterButton = (Button)findViewById(R.id.clear_filter_text);
+        clearFilterButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                fFilterTextBox.setText("");
+                filterBy("");
+            }
+        });
+        
         setTitle(getResources().getText(R.string.list_title));
 
         new CreateListAdapterTask().execute("beers.json");
