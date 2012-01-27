@@ -43,4 +43,5 @@
     <string name="Rating_Love">I loved it</string>
     <string name="filter_hint">type to filter</string>
 
+    <string name="loading_message">Loading beers, please wait...</string>
 </resources>
