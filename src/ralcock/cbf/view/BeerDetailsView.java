@@ -1,7 +1,6 @@
 package ralcock.cbf.view;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
@@ -13,7 +12,7 @@ import android.widget.TextView;
 import ralcock.cbf.R;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerDatabase;
-import ralcock.cbf.model.BeerDatabaseHelper;
+import ralcock.cbf.model.BeerDatabaseFactory;
 import ralcock.cbf.model.BeerWithRating;
 import ralcock.cbf.model.StarRating;
 
@@ -26,14 +25,20 @@ public final class BeerDetailsView extends Activity {
     private BeerDatabase fBeerDatabase;
     private BeerWithRating fBeerWithRating;
     private long fId;
-    private BeerSharer fBeerSharer;
+    private final BeerSharer fBeerSharer;
+
+    public BeerDetailsView() {
+        fBeerSharer = new BeerSharer(this);
+    }
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         fId = getIntent().getExtras().getLong(EXTRA_BEER_ID);
-        fBeerSharer = new BeerSharer(this);
+
         // open DB and make queries on a bg thread
-        new ShowBeerTask().execute(fId);
+        final BeerDatabaseFactory databaseFactory = new BeerDatabaseFactory(this);
+        new ShowBeerTask(databaseFactory).execute(fId);
     }
 
     private void displayBeer() {
@@ -105,6 +110,12 @@ public final class BeerDetailsView extends Activity {
     }
 
     private class ShowBeerTask extends AsyncTask<Long, Void, BeerWithRating>{
+        private BeerDatabaseFactory fDatabaseFactory;
+
+        private ShowBeerTask(BeerDatabaseFactory databaseFactory) {
+            fDatabaseFactory = databaseFactory;
+        }
+
         @Override
         protected void onPostExecute(BeerWithRating beerWithRating) {
             setContentView(R.layout.beer_details_view);
@@ -114,11 +125,7 @@ public final class BeerDetailsView extends Activity {
 
         @Override
         protected BeerWithRating doInBackground(Long... ids) {
-            Context context = BeerDetailsView.this;
-            //inputStream = context.getAssets().open("beers.json");
-            //JsonBeerList jsonBeerList = new JsonBeerList(inputStream);
-            BeerDatabaseHelper databaseHelper = new BeerDatabaseHelper(context);
-            fBeerDatabase = new BeerDatabase(databaseHelper);
+            fBeerDatabase = fDatabaseFactory.createDatabase();
             return fBeerDatabase.getBeerForId(ids[0]);
         }
     }

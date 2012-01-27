@@ -27,7 +27,7 @@ import android.widget.ListView;
 import org.json.JSONException;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerDatabase;
-import ralcock.cbf.model.BeerDatabaseHelper;
+import ralcock.cbf.model.BeerDatabaseFactory;
 import ralcock.cbf.model.BeerWithRating;
 import ralcock.cbf.model.JsonBeerList;
 import ralcock.cbf.model.SortOrder;
@@ -63,11 +63,13 @@ public class CamBeerFestApplication extends ListActivity {
             filterBy(s.toString());
         }
     };
+    private BeerDatabaseFactory fDatabaseFactory;
 
 
     public CamBeerFestApplication() {
         super();
         fAppPreferences = new AppPreferences(this);
+        fDatabaseFactory = new BeerDatabaseFactory(this);
         fBeerSharer = new BeerSharer(this);
     }
 
@@ -103,9 +105,7 @@ public class CamBeerFestApplication extends ListActivity {
         
         setTitle(getResources().getText(R.string.list_title));
 
-        BeerDatabaseHelper databaseHelper = new BeerDatabaseHelper(this);
-        fBeerDatabase = new BeerDatabase(databaseHelper);
-
+        fBeerDatabase = fDatabaseFactory.createDatabase();
         Cursor cursor = fBeerDatabase.getFilteredBeerListCursor(
                             fAppPreferences.getSortOrder(),
                             fAppPreferences.getFilterText());
