@@ -2,13 +2,14 @@ package ralcock.cbf.model;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.util.Log;
 
 public final class BeerDatabase {
-    private static final String TAG = "BeerDatabase";
+    private static final String TAG = BeerDatabase.class.getName();
 
     public static final String DATABASE_NAME = "BEERS";
 
@@ -29,6 +30,22 @@ public final class BeerDatabase {
         fReadableDatabase = databaseHelper.getReadableDatabase();
         fWritableDatabase = databaseHelper.getWritableDatabase();
     }
+
+    public long countBeers(){
+        return DatabaseUtils.queryNumEntries(fReadableDatabase, BEERS_TABLE);
+    }
+
+    public void insertBeer(Beer beer){
+        ContentValues cv = new ContentValues();
+        cv.put(BeerDatabase.BEER_NAME_COLUMN, beer.getName());
+        cv.put(BeerDatabase.BEER_NOTES_COLUMN, beer.getNotes());
+        cv.put(BeerDatabase.BEER_ABV_COLUMN, beer.getAbv());
+        cv.put(BeerDatabase.BREWERY_NAME_COLUMN, beer.getBrewery().getName());
+        cv.put(BeerDatabase.BREWERY_NOTES_COLUMN, beer.getBrewery().getDescription());
+        fWritableDatabase.insert(BeerDatabase.BEERS_TABLE, BeerDatabase.BEER_NAME_COLUMN, cv);
+        Log.v(TAG, "Inserted " + beer);
+    }
+
 
     public BeerWithRating getBeerForId(long beerId) {
         Cursor cursor = null;
@@ -132,5 +149,9 @@ public final class BeerDatabase {
     public void close() {
         fReadableDatabase.close();
         fWritableDatabase.close();
+    }
+
+    public void clearAll() {
+        fWritableDatabase.delete(BEERS_TABLE, null, null);
     }
 }

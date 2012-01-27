@@ -3,6 +3,7 @@ package ralcock.cbf;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -11,6 +12,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.TimingLogger;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +25,7 @@ import android.widget.FilterQueryProvider;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import org.json.JSONException;
+import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerDatabase;
 import ralcock.cbf.model.BeerDatabaseHelper;
 import ralcock.cbf.model.BeerWithRating;
@@ -88,6 +91,7 @@ public class CamBeerFestApplication extends ListActivity {
 
         fFilterTextBox = (EditText) findViewById(R.id.search);
         fFilterTextBox.setText(fAppPreferences.getFilterText());
+        fFilterTextBox.addTextChangedListener(fFilterTextWatcher);
 
         Button clearFilterButton = (Button)findViewById(R.id.clear_filter_text);
         clearFilterButton.setOnClickListener(new View.OnClickListener() {
@@ -99,8 +103,34 @@ public class CamBeerFestApplication extends ListActivity {
         
         setTitle(getResources().getText(R.string.list_title));
 
-        new CreateListAdapterTask().execute("beers.json");
+        BeerDatabaseHelper databaseHelper = new BeerDatabaseHelper(this);
+        fBeerDatabase = new BeerDatabase(databaseHelper);
 
+        Cursor cursor = fBeerDatabase.getFilteredBeerListCursor(
+                            fAppPreferences.getSortOrder(),
+                            fAppPreferences.getFilterText());
+        startManagingCursor(cursor);
+
+        asyncLoadBeers("beers.json");
+
+        // List adapter setup
+        fAdapter = new BeerCursorAdapter(CamBeerFestApplication.this, cursor);
+        fAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+            public Cursor runQuery(CharSequence filterText) {
+                Log.d(TAG, "FilterQueryProvider.runQuery with filter: " + filterText);
+                return fBeerDatabase.getFilteredBeerListCursor(fAppPreferences.getSortOrder(), filterText);
+            }
+        });
+        setListAdapter(fAdapter);
+
+        configureListView();
+    }
+
+    private void asyncLoadBeers(String source) {
+        new PossiblyLoadBeersTask(this, fBeerDatabase).execute(source);
+    }
+
+    private void configureListView() {
         ListView lv = getListView();
 
         lv.setTextFilterEnabled(true);
@@ -152,6 +182,10 @@ public class CamBeerFestApplication extends ListActivity {
             case R.id.sort:
                 showSortDialog();
                 return true;
+            case R.id.reload_database:
+                fBeerDatabase.clearAll();
+                asyncLoadBeers("beers.json");
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -181,64 +215,82 @@ public class CamBeerFestApplication extends ListActivity {
     }
 
     private void sortBy(SortOrder sortOrder) {
-        Cursor c = fBeerDatabase.getFilteredBeerListCursor(sortOrder, fAppPreferences.getFilterText());
-        fAdapter.changeCursor(c);
         fAppPreferences.setSortOrder(sortOrder);
+        updateCursor();
     }
 
-    private class CreateListAdapterTask extends AsyncTask<String, Void, BeerDatabase> {
-        private ProgressDialog fDialog;
+    private void updateCursor() {
+        Cursor c = fBeerDatabase.getFilteredBeerListCursor(fAppPreferences.getSortOrder(), fAppPreferences.getFilterText());
+        fAdapter.changeCursor(c);
+    }
 
-        @Override
-        protected void onPreExecute() {
-            fDialog = ProgressDialog.show(CamBeerFestApplication.this, "",
-                    "Loading beers, please wait...", false);
+    private static class PossiblyLoadBeersTask extends AsyncTask<String, Beer, Long> {
+        private final ProgressDialog fDialog;
+        private final CamBeerFestApplication fApplication;
+        private final BeerDatabase fBeerDatabase;
+
+
+        public PossiblyLoadBeersTask(CamBeerFestApplication application, BeerDatabase beerDatabase) {
+            fApplication = application;
+            fBeerDatabase = beerDatabase;
+            fDialog = new ProgressDialog(fApplication);
+            fDialog.setMessage("Loading beers, please wait...");
+            fDialog.setIndeterminate(true);
         }
 
         @Override
-        protected void onPostExecute(BeerDatabase beerDatabase) {
-            fBeerDatabase = beerDatabase;
+        protected void onPreExecute() {
+            if(fBeerDatabase.countBeers()==0) {
+                fDialog.show();
+            }
+        }
 
-            Cursor c = fBeerDatabase.getFilteredBeerListCursor(fAppPreferences.getSortOrder(), fAppPreferences.getFilterText());
-            startManagingCursor(c);
-            fAdapter = new BeerCursorAdapter(CamBeerFestApplication.this, c);
+        @Override
+        protected void onProgressUpdate(Beer... beers) {
+            fDialog.setMessage("Loaded " + beers[0].getName());
+        }
 
-            fAdapter.setFilterQueryProvider(new FilterQueryProvider() {
-                public Cursor runQuery(CharSequence filterText) {
-                    Log.d(TAG, "FilterQueryProvider.runQuery with filter: " + filterText);
-                    return fBeerDatabase.getFilteredBeerListCursor(fAppPreferences.getSortOrder(), filterText);
-                }
-            });
-            // update the ui
-            fFilterTextBox.addTextChangedListener(fFilterTextWatcher);
-
-            setListAdapter(fAdapter);
-
+        @Override
+        protected void onPostExecute(Long count) {
+            fDialog.setMessage("Loaded " + count + " beers.");
+            fApplication.updateCursor();
             fDialog.dismiss();
         }
 
         @Override
-        protected BeerDatabase doInBackground(String... strings) {
-            CamBeerFestApplication context = CamBeerFestApplication.this;
+        protected Long doInBackground(String... inputs) {
+            if (fBeerDatabase.countBeers()==0) {
+                Log.i(TAG, "Starting background initialization of database from " + inputs[0]);
+                initializeDatabase(fApplication, inputs[0]);
+                final long count = fBeerDatabase.countBeers();
+                Log.i(TAG, "Finished background initialization of database. Loaded " + count);
+                return count;
+            } else {
+                return 0L;
+            }
+        }
+
+        private void initializeDatabase(Context context, String input) {
             InputStream inputStream = null;
             try {
-                 inputStream = context.getAssets().open("beers.json");
-                 JsonBeerList jsonBeerList = new JsonBeerList(inputStream);
-                 BeerDatabaseHelper databaseHelper = new BeerDatabaseHelper(context, jsonBeerList);
-                 return new BeerDatabase(databaseHelper);
+                TimingLogger tlogger = new TimingLogger("initializeDatabase", "Opening stream");
+                inputStream = context.getAssets().open(input);
+                tlogger.addSplit("Opened stream");
+                for(Beer beer: new JsonBeerList(inputStream)){
+                    fBeerDatabase.insertBeer(beer);
+                    publishProgress(beer);
+                }
+                tlogger.addSplit("Inserted all beers.");
+                tlogger.dumpToLog();
             } catch (IOException iox) {
                 // Failed
-                Log.e(TAG, "Exception to opening input stream.", iox);
-                return null;
+                Log.e(TAG, "Exception while initializing database.", iox);
             } catch (JSONException jx) {
                 // Failed
-                Log.e(TAG, "Exception to opening input stream.", jx);
-                return null;
+                Log.e(TAG, "Exception while initializing database.", jx);
             } finally {
                 IOUtils.safeClose(TAG, inputStream);
             }
-
         }
-
     }
- }
+}

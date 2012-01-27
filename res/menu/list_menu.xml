@@ -6,4 +6,7 @@
           android:icon="@android:drawable/ic_menu_sort_by_size"
           android:title="@string/sort_menu_label"/>
 
+    <item android:id="@+id/reload_database"
+          android:title="@string/reload_menu_label"/>
+
 </menu>

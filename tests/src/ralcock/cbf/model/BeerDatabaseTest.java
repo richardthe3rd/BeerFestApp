@@ -20,11 +20,13 @@ public class BeerDatabaseTest extends AndroidTestCase {
     }
 
     public void testBeerDatabase() throws IOException, JSONException {
-        InputStream inputStream = BeerDatabaseTest.class.getResourceAsStream("resources/one_beer.txt");
-        JsonBeerList jsonBeerList = new JsonBeerList(inputStream);
-        BeerDatabaseHelper databaseHelper = new BeerDatabaseHelper(getContext(), jsonBeerList);
+        BeerDatabaseHelper databaseHelper = new BeerDatabaseHelper(getContext());
         BeerDatabase db = new BeerDatabase(databaseHelper);
-        assertNotNull(db);
+
+        InputStream inputStream = BeerDatabaseTest.class.getResourceAsStream("resources/one_beer.txt");
+        for(Beer beer: new JsonBeerList(inputStream)){
+            db.insertBeer(beer);
+        }
 
         Cursor c = db.getBeerListCursor(SortOrder.BEER_NAME_ASC);
         assertEquals(1, c.getCount());
