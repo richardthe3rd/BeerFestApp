@@ -51,6 +51,7 @@ class LoadBeersTask extends AsyncTask<String, Beer, Long> {
 
     @Override
     protected Long doInBackground(String... inputs) {
+        // todo: Need a more intelligent way of deciding to do an update.
         if (fBeerDatabase.countBeers()==0) {
             Log.i(TAG, "Starting background initialization of database from " + inputs[0]);
             initializeDatabase(fApplication, inputs[0]);
@@ -69,6 +70,7 @@ class LoadBeersTask extends AsyncTask<String, Beer, Long> {
             inputStream = context.getAssets().open(input);
             tlogger.addSplit("Opened stream");
             for(Beer beer: new JsonBeerList(inputStream)){
+                //todo: merge instead of insert
                 fBeerDatabase.insertBeer(beer);
                 publishProgress(beer);
             }
