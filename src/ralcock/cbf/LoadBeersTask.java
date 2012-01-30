@@ -1,37 +1,31 @@
 package ralcock.cbf;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.util.TimingLogger;
-import org.json.JSONException;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerDatabase;
-import ralcock.cbf.model.JsonBeerList;
-import ralcock.cbf.util.IOUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-class LoadBeersTask extends AsyncTask<String, Beer, Long> {
+class LoadBeersTask extends AsyncTask<Iterable<Beer>, Beer, Long> {
 
     private static final String TAG = "cbf."+LoadBeersTask.class.getSimpleName();
 
     private final ProgressDialog fDialog;
-    private final CamBeerFestApplication fApplication;
+    private final BeerListView fBeerListView;
     private final BeerDatabase fBeerDatabase;
+    private long fStartTime;
 
-    LoadBeersTask(CamBeerFestApplication application, BeerDatabase beerDatabase) {
-        fApplication = application;
+    LoadBeersTask(final BeerDatabase beerDatabase,
+                  final BeerListView beerListView,
+                  final ProgressDialog progressDialog) {
         fBeerDatabase = beerDatabase;
-        fDialog = new ProgressDialog(fApplication);
-        fDialog.setMessage(fApplication.getResources().getText(R.string.loading_message));
-        fDialog.setIndeterminate(true);
+        fBeerListView = beerListView;
+        fDialog = progressDialog;
     }
 
     @Override
     protected void onPreExecute() {
+        fStartTime = System.currentTimeMillis();
         if(fBeerDatabase.countBeers()==0) {
             fDialog.show();
         }
@@ -44,17 +38,18 @@ class LoadBeersTask extends AsyncTask<String, Beer, Long> {
 
     @Override
     protected void onPostExecute(Long count) {
-        fDialog.setMessage("Loaded " + count + " beers.");
-        fApplication.updateCursor();
+        final long time = (System.currentTimeMillis() - fStartTime) / 1000;
+        fDialog.setMessage("Loaded " + count + " beers in " + time + " seconds.");
+        fBeerListView.updateCursor();
         fDialog.dismiss();
     }
 
     @Override
-    protected Long doInBackground(String... inputs) {
+    protected Long doInBackground(Iterable<Beer>... beers) {
         // todo: Need a more intelligent way of deciding to do an update.
         if (fBeerDatabase.countBeers()==0) {
-            Log.i(TAG, "Starting background initialization of database from " + inputs[0]);
-            initializeDatabase(fApplication, inputs[0]);
+            Log.i(TAG, "Starting background initialization of database from " + beers[0]);
+            initializeDatabase(beers[0]);
             final long count = fBeerDatabase.countBeers();
             Log.i(TAG, "Finished background initialization of database. Loaded " + count);
             return count;
@@ -63,27 +58,11 @@ class LoadBeersTask extends AsyncTask<String, Beer, Long> {
         }
     }
 
-    private void initializeDatabase(Context context, String input) {
-        InputStream inputStream = null;
-        try {
-            TimingLogger tlogger = new TimingLogger(TAG, "Opening stream");
-            inputStream = context.getAssets().open(input);
-            tlogger.addSplit("Opened stream");
-            for(Beer beer: new JsonBeerList(inputStream)){
-                //todo: merge instead of insert
-                fBeerDatabase.insertBeer(beer);
-                publishProgress(beer);
-            }
-            tlogger.addSplit("Inserted all beers.");
-            tlogger.dumpToLog();
-        } catch (IOException iox) {
-            // Failed
-            Log.e(TAG, "Exception while initializing database.", iox);
-        } catch (JSONException jx) {
-            // Failed
-            Log.e(TAG, "Exception while initializing database.", jx);
-        } finally {
-            IOUtils.safeClose(TAG, inputStream);
+    private void initializeDatabase(Iterable<Beer> beers) {
+        for(Beer beer: beers){
+            //todo: merge instead of insert
+            fBeerDatabase.insertBeer(beer);
+            publishProgress(beer);
         }
     }
 }

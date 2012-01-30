@@ -5,6 +5,9 @@
       android:versionName="2.0.1"
       android:installLocation="internalOnly">
 
+    <uses-permission
+            android:name="android.permission.INTERNET" />
+
     <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="8" />
 
     <application android:label="CamBeerFest" android:icon="@drawable/caskman">

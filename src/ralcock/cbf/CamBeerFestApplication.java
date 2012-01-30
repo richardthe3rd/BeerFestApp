@@ -2,6 +2,7 @@ package ralcock.cbf;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -20,18 +21,24 @@ import android.widget.EditText;
 import android.widget.FilterQueryProvider;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import org.json.JSONException;
+import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerDatabase;
 import ralcock.cbf.model.BeerDatabaseFactory;
 import ralcock.cbf.model.BeerWithRating;
+import ralcock.cbf.model.JsonBeerList;
 import ralcock.cbf.model.SortOrder;
 import ralcock.cbf.view.BeerCursorAdapter;
 import ralcock.cbf.view.BeerDetailsView;
 import ralcock.cbf.view.BeerSharer;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
-public class CamBeerFestApplication extends ListActivity {
+public class CamBeerFestApplication extends ListActivity implements BeerListView {
     private static final String TAG = CamBeerFestApplication.class.getName();
 
     private static final int SHOW_BEER_DETAILS_REQUEST_CODE = 1;
@@ -101,7 +108,7 @@ public class CamBeerFestApplication extends ListActivity {
                             fAppPreferences.getFilterText());
         startManagingCursor(cursor);
 
-        asyncLoadBeers("beers.json");
+        asyncLoadBeers();
 
         // List adapter setup
         fAdapter = new BeerCursorAdapter(CamBeerFestApplication.this, cursor);
@@ -116,8 +123,32 @@ public class CamBeerFestApplication extends ListActivity {
         configureListView();
     }
 
-    private void asyncLoadBeers(String source) {
-        new LoadBeersTask(this, fBeerDatabase).execute(source);
+    private InputStream inputStream() throws IOException {
+        boolean localJson = false;
+        if(localJson){
+            return getAssets().open("beers.json");
+        } else {
+            // URL is in my Dropbox public folder.
+            URL url = new URL("http://dl.dropbox.com/u/4457379/beers.json");
+            return url.openStream();
+        }
+    }
+    private void asyncLoadBeers() {
+
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage(getResources().getText(R.string.loading_message));
+        progressDialog.setIndeterminate(true);
+
+        final LoadBeersTask task = new LoadBeersTask(fBeerDatabase, this, progressDialog);
+        try {
+            final Iterable<Beer> beers = new JsonBeerList(inputStream());
+            //noinspection unchecked
+            task.execute(beers);
+        } catch (IOException iox) {
+            Log.e(TAG, "Failed to load beers.", iox);
+        } catch (JSONException jsx) {
+            Log.e(TAG, "Failed to load beers.", jsx);
+        }
     }
 
     private void configureListView() {
@@ -174,7 +205,7 @@ public class CamBeerFestApplication extends ListActivity {
                 return true;
             case R.id.reload_database:
                 fBeerDatabase.clearAll();
-                asyncLoadBeers("beers.json");
+                asyncLoadBeers();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -209,9 +240,8 @@ public class CamBeerFestApplication extends ListActivity {
         updateCursor();
     }
 
-    void updateCursor() {
+    public void updateCursor() {
         Cursor c = fBeerDatabase.getFilteredBeerListCursor(fAppPreferences.getSortOrder(), fAppPreferences.getFilterText());
         fAdapter.changeCursor(c);
     }
-
 }
