@@ -9,7 +9,7 @@ public class LifecycleTest extends ActivityUnitTestCase<CamBeerFestApplication> 
 
     private Activity fActivity;
 
-    public LifecycleTest(Class<BeerListView> activityClass) {
+    public LifecycleTest(Class<CamBeerFestApplication> activityClass) {
         super(activityClass);
     }
 
