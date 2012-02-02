@@ -17,9 +17,14 @@ public enum SortOrder implements Serializable {
     BEER_RATING_DESC(BeerDatabase.BEER_RATING_COLUMN+" DESC",  "by Rating (high to low)"),
     BEER_RATING_ASC(BeerDatabase.BEER_RATING_COLUMN+" ASC",  "by Rating (low to high)");
 
-    private String fOrderByClause;
+    private final String fOrderByClause;
 
-    private String fDescription;
+    private final String fDescription;
+
+    SortOrder(final String orderByClause, final String description) {
+        fOrderByClause = orderByClause;
+        fDescription = description;
+    }
 
     public String getOrderByClause() {
         return fOrderByClause;
@@ -33,8 +38,4 @@ public enum SortOrder implements Serializable {
         return fDescription;
     }
 
-    SortOrder(String orderByClause, String description) {
-        fOrderByClause = orderByClause;
-        fDescription = description;
-    }
 }

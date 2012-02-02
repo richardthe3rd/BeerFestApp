@@ -2,13 +2,13 @@ package ralcock.cbf.model;
 
 import java.io.Serializable;
 
-public class Beer implements Serializable {
+public final class Beer implements Serializable {
     private final Brewery fBrewery;
     private final String fName;
     private final float fAbv;
     private final String fNotes;
 
-    public Beer(Brewery brewery, String name, float abv, String notes) {
+    public Beer(final Brewery brewery, final String name, final float abv, final String notes) {
         fBrewery = brewery;
         fName = name;
         fAbv = abv;
@@ -31,9 +31,14 @@ public class Beer implements Serializable {
         return fAbv;
     }
 
-    // Used by the test filtering
+    @Override
     public String toString() {
-        return fBrewery.getName() + " " + fName;
+        return "Beer{" +
+                "fBrewery=" + fBrewery +
+                ", fName='" + fName + '\'' +
+                ", fAbv=" + fAbv +
+                ", fNotes='" + fNotes + '\'' +
+                '}';
     }
 
     @Override

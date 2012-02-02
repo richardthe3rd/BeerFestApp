@@ -2,11 +2,15 @@ package ralcock.cbf.model;
 
 import java.io.Serializable;
 
-public class Brewery implements Serializable {
+public final class Brewery implements Serializable {
 
-    public Brewery(String name, String description) {
-        this.fName = name;
-        this.fDescription = description;
+    private final String fName;
+
+    private final String fDescription;
+
+    public Brewery(final String name, final String description) {
+        fName = name;
+        fDescription = description;
     }
 
     public String getName() {
@@ -17,12 +21,14 @@ public class Brewery implements Serializable {
         return fDescription;
     }
 
+    @Override
     public String toString() {
-        return fName;
+        return "Brewery{" +
+                "fName='" + fName + '\'' +
+                ", fDescription='" + fDescription + '\'' +
+                '}';
     }
 
-    private String fName;
-    private String fDescription;
 
     @Override
     public boolean equals(Object o) {

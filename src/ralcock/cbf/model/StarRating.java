@@ -2,11 +2,11 @@ package ralcock.cbf.model;
 
 import java.io.Serializable;
 
-public class StarRating implements Serializable, Comparable<StarRating> {
+public final class StarRating implements Serializable, Comparable<StarRating> {
 
-    private int fRating;
+    private final int fRating;
 
-    public StarRating(int rating) {
+    public StarRating(final int rating) {
         fRating = rating;
     }
 
@@ -14,10 +14,9 @@ public class StarRating implements Serializable, Comparable<StarRating> {
         return fRating;
     }
 
-    public int compareTo(StarRating starRating) {
+    public int compareTo(final StarRating starRating) {
         if (fRating > starRating.fRating) return -1;
         if (fRating == starRating.fRating) return 0;
-
         return 1;
     }
 }

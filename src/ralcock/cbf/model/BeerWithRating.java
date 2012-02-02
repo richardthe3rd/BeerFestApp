@@ -1,10 +1,10 @@
 package ralcock.cbf.model;
 
-public class BeerWithRating {
-    private Beer fBeer;
-    private StarRating fRating;
+public final class BeerWithRating {
+    private final Beer fBeer;
+    private final StarRating fRating;
 
-    public BeerWithRating(Beer beer, StarRating rating) {
+    public BeerWithRating(final Beer beer, final StarRating rating) {
         fBeer = beer;
         fRating = rating;
     }
@@ -17,7 +17,8 @@ public class BeerWithRating {
         return fRating;
     }
 
-    public BeerWithRating rate(StarRating starRating) {
+    public BeerWithRating rate(final StarRating starRating) {
         return new BeerWithRating(fBeer, starRating);
     }
+
 }
