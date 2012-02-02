@@ -10,8 +10,8 @@ public final class BeerDatabaseHelper extends SQLiteOpenHelper {
 
     private static final int DB_VERSION = 3; // For Winter Ale Festival 2012
 
-    public BeerDatabaseHelper(final Context context) {
-        super(context, BeerDatabase.DATABASE_NAME, null, DB_VERSION);
+    public BeerDatabaseHelper(final Context context, final String databaseName) {
+        super(context, databaseName, null, DB_VERSION);
     }
 
     @Override

@@ -4,13 +4,13 @@ import android.content.Context;
 
 public class BeerDatabaseFactory {
 
-    private Context fContext;
+    private final Context fContext;
 
-    public BeerDatabaseFactory(Context context) {
+    public BeerDatabaseFactory(final Context context) {
         this.fContext = context;
     }
 
     public BeerDatabase createDatabase(){
-        return new BeerDatabase(new BeerDatabaseHelper(fContext));
+        return new BeerDatabase(new BeerDatabaseHelper(fContext, BeerDatabase.DATABASE_NAME));
     }
 }

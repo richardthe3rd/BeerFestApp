@@ -9,26 +9,21 @@ import java.io.InputStream;
 
 public class BeerDatabaseTest extends AndroidTestCase {
 
-    @Override
-    public void setUp() throws Exception {
-        getContext().deleteDatabase(BeerDatabase.DATABASE_NAME);
-    }
+    private BeerDatabase fBeerDataBase;
 
     @Override
-    public void tearDown() throws Exception {
-        getContext().deleteDatabase(BeerDatabase.DATABASE_NAME);
+    public void setUp() throws Exception {
+       fBeerDataBase = new BeerDatabase(new BeerDatabaseHelper(getContext(), null));
     }
 
     public void testBeerDatabase() throws IOException, JSONException {
-        BeerDatabaseHelper databaseHelper = new BeerDatabaseHelper(getContext());
-        BeerDatabase db = new BeerDatabase(databaseHelper);
 
-        InputStream inputStream = BeerDatabaseTest.class.getResourceAsStream("resources/one_beer.txt");
+        InputStream inputStream = BeerDatabaseTest.class.getResourceAsStream("resources/one_beer.json");
         for(Beer beer: new JsonBeerList(inputStream)){
-            db.insertBeer(beer);
+            fBeerDataBase.insertBeer(beer);
         }
 
-        Cursor c = db.getBeerListCursor(SortOrder.BEER_NAME_ASC);
+        Cursor c = fBeerDataBase.getBeerListCursor(SortOrder.BEER_NAME_ASC);
         assertEquals(1, c.getCount());
         c.moveToFirst();
         assertEquals("BREWERY_NAME",  c.getString(c.getColumnIndexOrThrow(BeerDatabase.BREWERY_NAME_COLUMN)));
