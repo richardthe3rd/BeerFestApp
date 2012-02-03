@@ -1,14 +1,13 @@
 package ralcock.cbf.model;
 
 import android.util.Log;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -27,7 +26,7 @@ public class JsonBeerList implements Iterable<Beer> {
     private List<Beer> fBeerList;
 
     public JsonBeerList(final InputStream inputStream) throws IOException, JSONException {
-        assert inputStream!=null;
+        assert inputStream != null;
         fInputStream = inputStream;
     }
 
@@ -47,36 +46,43 @@ public class JsonBeerList implements Iterable<Beer> {
 
     private List<Beer> makeBeerList(final JSONObject json) throws JSONException {
         Vector<Beer> beers = new Vector<Beer>();
-        JSONArray producers = json.getJSONArray(PRODUCERS);
-        for(int producerIndex=0; producerIndex<producers.length(); producerIndex++){
-            JSONObject producer = producers.getJSONObject(producerIndex);
-            Brewery brewery = new Brewery(producer.getString(NAME), producer.getString(NOTES));
-            JSONArray produce = producer.getJSONArray(PRODUCE);
-            for(int produceIndex=0; produceIndex<produce.length(); produceIndex++){
-                JSONObject product = produce.getJSONObject(produceIndex);
-                Beer beer = new Beer(brewery,
-                                product.getString(NAME),
-                                (float)product.getDouble(ABV),
-                                product.getString(NOTES));
-                
+
+        IterableJSONArray producers = new IterableJSONArray(json.getJSONArray(PRODUCERS));
+        for (JSONObject producer : producers) {
+            Brewery brewery = makeBrewery(producer);
+            IterableJSONArray produce = new IterableJSONArray(producer.getJSONArray(PRODUCE));
+            for (JSONObject product : produce) {
+                Beer beer = makeBeer(brewery, product);
                 beers.add(beer);
             }
-            
         }
         return beers;
     }
 
+    private Beer makeBeer(final Brewery brewery, final JSONObject product) throws JSONException {
+        return new Beer(brewery,
+                product.getString(NAME),
+                (float) product.getDouble(ABV),
+                product.getString(NOTES));
+    }
 
-    private static JSONObject loadJson(InputStream inputStream) throws IOException, JSONException {
+    private Brewery makeBrewery(final JSONObject producer) throws JSONException {
+        return new Brewery(producer.getString(NAME), producer.getString(NOTES));
+    }
+
+    private static JSONObject loadJson(final InputStream inputStream) throws IOException, JSONException {
         Log.i(TAG, "Loading beer list from input stream.");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        Reader reader = new InputStreamReader(inputStream);
         StringBuilder builder = new StringBuilder();
-        String line = reader.readLine();
-        while (line != null) {
-            builder.append(line);
-            line = reader.readLine();
-        }
-        String jsonString = builder.toString();
-        return new JSONObject(jsonString);
+        final char[] buffer = new char[0x10000];
+        int read;
+        do {
+            read = reader.read(buffer);
+            if (read > 0) {
+                builder.append(buffer, 0, read);
+            }
+        } while (read >= 0);
+
+        return new JSONObject(builder.toString());
     }
 }
