@@ -26,9 +26,14 @@ public class BeerDatabaseTest extends AndroidTestCase {
         Cursor c = fBeerDataBase.getBeerListCursor(SortOrder.BEER_NAME_ASC);
         assertEquals(1, c.getCount());
         c.moveToFirst();
-        assertEquals("BREWERY_NAME",  c.getString(c.getColumnIndexOrThrow(BeerDatabase.BREWERY_NAME_COLUMN)));
-        assertEquals("BEER_NAME",     c.getString(c.getColumnIndexOrThrow(BeerDatabase.BEER_NAME_COLUMN)));
-        assertEquals("1",             c.getString(c.getColumnIndexOrThrow(BeerDatabase.BEER_ABV_COLUMN)));
+        final String actualBreweryName = c.getString(c.getColumnIndexOrThrow(BeerDatabase.BREWERY_NAME_COLUMN));
+        assertEquals("BREWERY_ONE", actualBreweryName);
+        final String actualBeerName = c.getString(c.getColumnIndexOrThrow(BeerDatabase.BEER_NAME_COLUMN));
+        assertEquals("BEER_ONE", actualBeerName);
+        final float actualBeerAbv = c.getFloat(c.getColumnIndexOrThrow(BeerDatabase.BEER_ABV_COLUMN));
+        assertEquals(1.0f, actualBeerAbv);
+        final String actualBeerStatus = c.getString(c.getColumnIndexOrThrow(BeerDatabase.BEER_STATUS_COLUMN));
+        assertEquals("BEER_ONE_STATUS", actualBeerStatus);
         // beers not rated at start.
         assertNull(c.getString(c.getColumnIndexOrThrow(BeerDatabase.BEER_RATING_COLUMN)));
     }

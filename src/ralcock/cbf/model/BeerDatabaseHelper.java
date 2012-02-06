@@ -8,7 +8,7 @@ public final class BeerDatabaseHelper extends SQLiteOpenHelper {
     @SuppressWarnings("UnusedDeclaration")
     private static final String TAG = BeerDatabaseHelper.class.getName();
 
-    private static final int DB_VERSION = 3; // For Winter Ale Festival 2012
+    private static final int DB_VERSION = 4; // Added beer status column
 
     public BeerDatabaseHelper(final Context context, final String databaseName) {
         super(context, databaseName, null, DB_VERSION);
@@ -21,6 +21,7 @@ public final class BeerDatabaseHelper extends SQLiteOpenHelper {
                 BeerDatabase.BEER_NAME_COLUMN + " TEXT, " +
                 BeerDatabase.BEER_NOTES_COLUMN + " TEXT, " +
                 BeerDatabase.BEER_ABV_COLUMN + " REAL, " +
+                BeerDatabase.BEER_STATUS_COLUMN + " TEXT, " +
                 BeerDatabase.BREWERY_NAME_COLUMN + " TEXT, " +
                 BeerDatabase.BREWERY_NOTES_COLUMN + " TEXT" +
                 ")");

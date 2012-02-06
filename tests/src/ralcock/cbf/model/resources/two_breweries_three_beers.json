@@ -9,7 +9,8 @@
                     "id": "BEER1",
                     "name": "BEER_ONE",
                     "notes": "BEER_ONE_NOTES",
-                    "abv": 1.1
+                    "abv": 1.1,
+                    "status": "BEER_ONE_STATUS"
                 }
             ]
         },
@@ -22,13 +23,15 @@
                     "id": "BEER2",
                     "name": "BEER_TWO",
                     "notes": "BEER_TWO_NOTES",
-                    "abv": 2.2
+                    "abv": 2.2,
+                    "status": "BEER_TWO_STATUS"
                 },
                 {
                     "id": "BEER3",
                     "name": "BEER_THREE",
                     "notes": "BEER_THREE_NOTES",
-                    "abv": 3.3
+                    "abv": 3.3,
+                    "status": "BEER_THREE_STATUS"
                 }
             ]
         }

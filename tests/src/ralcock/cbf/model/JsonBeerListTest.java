@@ -10,7 +10,7 @@ public class JsonBeerListTest extends AndroidTestCase {
 
     public void testLoadBeers() throws Exception {
         InputStream inputStream = BeerDatabaseTest.class.getResourceAsStream("resources/one_beer.json");
-        final Beer expectedBeer = new Beer(new Brewery("BREWERY_ONE", "BREWERY_ONE_NOTES"), "BEER_ONE", 1.0f, "BEER_ONE_NOTES");
+        final Beer expectedBeer = new Beer(new Brewery("BREWERY_ONE", "BREWERY_ONE_NOTES"), "BEER_ONE", 1.0f, "BEER_ONE_NOTES", "BEER_ONE_STATUS");
         JsonBeerList jsonBeerList = new JsonBeerList(inputStream);
         for(Beer beer : jsonBeerList) {
             assertEquals(expectedBeer, beer);
@@ -21,9 +21,9 @@ public class JsonBeerListTest extends AndroidTestCase {
         InputStream inputStream = BeerDatabaseTest.class.getResourceAsStream("resources/two_breweries_three_beers.json");
 
         List<Beer> expectedBeers = new Vector<Beer>(3);
-        expectedBeers.add(new Beer(new Brewery("BREWERY_ONE", "BREWERY_ONE_NOTES"), "BEER_ONE",   1.1f, "BEER_ONE_NOTES"));
-        expectedBeers.add(new Beer(new Brewery("BREWERY_TWO", "BREWERY_TWO_NOTES"), "BEER_TWO",   2.2f, "BEER_TWO_NOTES"));
-        expectedBeers.add(new Beer(new Brewery("BREWERY_TWO", "BREWERY_TWO_NOTES"), "BEER_THREE", 3.3f, "BEER_THREE_NOTES"));
+        expectedBeers.add(new Beer(new Brewery("BREWERY_ONE", "BREWERY_ONE_NOTES"), "BEER_ONE",   1.1f, "BEER_ONE_NOTES", "BEER_ONE_STATUS"));
+        expectedBeers.add(new Beer(new Brewery("BREWERY_TWO", "BREWERY_TWO_NOTES"), "BEER_TWO",   2.2f, "BEER_TWO_NOTES", "BEER_TWO_STATUS"));
+        expectedBeers.add(new Beer(new Brewery("BREWERY_TWO", "BREWERY_TWO_NOTES"), "BEER_THREE", 3.3f, "BEER_THREE_NOTES", "BEER_THREE_STATUS"));
 
         JsonBeerList jsonBeerList = new JsonBeerList(inputStream);
         int index = 0;

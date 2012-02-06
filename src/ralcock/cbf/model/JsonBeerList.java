@@ -21,6 +21,7 @@ public class JsonBeerList implements Iterable<Beer> {
     private static final String NOTES = "notes";
     private static final String PRODUCE = "produce";
     private static final String ABV = "abv";
+    private static final String STATUS = "status";
 
     private final InputStream fInputStream;
     private List<Beer> fBeerList;
@@ -63,7 +64,8 @@ public class JsonBeerList implements Iterable<Beer> {
         return new Beer(brewery,
                 product.getString(NAME),
                 (float) product.getDouble(ABV),
-                product.getString(NOTES));
+                product.getString(NOTES),
+                product.getString(STATUS));
     }
 
     private Brewery makeBrewery(final JSONObject producer) throws JSONException {

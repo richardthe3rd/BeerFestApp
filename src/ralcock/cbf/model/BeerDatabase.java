@@ -22,6 +22,7 @@ public final class BeerDatabase {
     public static final String BREWERY_NOTES_COLUMN = "brewery_notes";
     public static final String BEER_ID_COLUMN = "beer_id";
     public static final String BEER_RATING_COLUMN = "beer_rating";
+    public static final String BEER_STATUS_COLUMN = "beer_status";
 
     private final SQLiteDatabase fReadableDatabase;
     private final SQLiteDatabase fWritableDatabase;
@@ -40,6 +41,7 @@ public final class BeerDatabase {
         cv.put(BeerDatabase.BEER_NAME_COLUMN, beer.getName());
         cv.put(BeerDatabase.BEER_NOTES_COLUMN, beer.getNotes());
         cv.put(BeerDatabase.BEER_ABV_COLUMN, beer.getAbv());
+        cv.put(BeerDatabase.BEER_STATUS_COLUMN, beer.getStatus());
         cv.put(BeerDatabase.BREWERY_NAME_COLUMN, beer.getBrewery().getName());
         cv.put(BeerDatabase.BREWERY_NOTES_COLUMN, beer.getBrewery().getDescription());
         fWritableDatabase.insert(BeerDatabase.BEERS_TABLE, BeerDatabase.BEER_NAME_COLUMN, cv);
@@ -60,7 +62,8 @@ public final class BeerDatabase {
             String beerName = cursor.getString(cursor.getColumnIndexOrThrow(BEER_NAME_COLUMN));
             float beerAbv = cursor.getFloat(cursor.getColumnIndexOrThrow(BEER_ABV_COLUMN));
             String beerNotes = cursor.getString(cursor.getColumnIndexOrThrow(BEER_NOTES_COLUMN));
-            Beer beer = new Beer(brewery, beerName, beerAbv, beerNotes);
+            String beerStatus = cursor.getString(cursor.getColumnIndexOrThrow(BEER_STATUS_COLUMN));
+            Beer beer = new Beer(brewery, beerName, beerAbv, beerNotes, beerStatus);
 
             int rating = cursor.getInt(cursor.getColumnIndexOrThrow(BEER_RATING_COLUMN));
             StarRating starRating = new StarRating(rating);
@@ -79,6 +82,7 @@ public final class BeerDatabase {
                 BEER_ABV_COLUMN,
                 BEER_NOTES_COLUMN,
                 BEER_RATING_COLUMN,
+                BEER_STATUS_COLUMN,
                 BREWERY_NAME_COLUMN,
                 BREWERY_NOTES_COLUMN,
         };
@@ -105,6 +109,7 @@ public final class BeerDatabase {
                 BEERS_TABLE + "._id",
                 BEER_NAME_COLUMN,
                 BEER_ABV_COLUMN,
+                BEER_STATUS_COLUMN,
                 BREWERY_NAME_COLUMN,
                 BEER_RATING_COLUMN,
         };

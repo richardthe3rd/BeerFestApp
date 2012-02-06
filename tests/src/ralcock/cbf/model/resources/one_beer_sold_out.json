@@ -10,7 +10,7 @@
                     "name": "BEER_ONE",
                     "notes": "BEER_ONE_NOTES",
                     "abv": 1,
-                    "status": "BEER_ONE_STATUS"
+                    "status": "BEER_ONE_SOLD_OUT"
                 }
             ]
         }
