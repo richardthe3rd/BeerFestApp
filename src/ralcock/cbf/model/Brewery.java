@@ -1,12 +1,34 @@
 package ralcock.cbf.model;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+
 import java.io.Serializable;
 
+@DatabaseTable(tableName = Brewery.TABLE_NAME)
 public final class Brewery implements Serializable {
 
-    private final String fName;
+    public static final String TABLE_NAME = "breweries";
 
-    private final String fDescription;
+    public static final String NAME_FIELD = "name";
+
+    public static final String DESCRIPTION_FIELD = "description";
+
+    public static final String ID_FIELD = "_id";
+
+    @DatabaseField(generatedId = true, columnName = ID_FIELD)
+    private int fId;
+
+    @DatabaseField(columnName = NAME_FIELD)
+    private String fName;
+
+    @DatabaseField(columnName = DESCRIPTION_FIELD)
+    private String fDescription;
+
+    @SuppressWarnings("UnusedDeclaration")
+        // needed by ormlite
+    Brewery() {
+    }
 
     public Brewery(final String name, final String description) {
         fName = name;
@@ -17,8 +39,20 @@ public final class Brewery implements Serializable {
         return fName;
     }
 
+    public void setName(final String name) {
+        fName = name;
+    }
+
     public String getDescription() {
         return fDescription;
+    }
+
+    public void setDescription(final String description) {
+        fDescription = description;
+    }
+
+    public int getId() {
+        return fId;
     }
 
     @Override

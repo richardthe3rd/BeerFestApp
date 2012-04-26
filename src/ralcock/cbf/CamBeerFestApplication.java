@@ -1,11 +1,9 @@
 package ralcock.cbf;
 
 import android.app.AlertDialog;
-import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,18 +16,17 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FilterQueryProvider;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import com.j256.ormlite.android.apptools.OrmLiteBaseListActivity;
 import org.json.JSONException;
 import ralcock.cbf.model.Beer;
-import ralcock.cbf.model.BeerDatabase;
-import ralcock.cbf.model.BeerDatabaseFactory;
-import ralcock.cbf.model.BeerWithRating;
+import ralcock.cbf.model.BeerDatabaseHelper;
+import ralcock.cbf.model.BeerList;
 import ralcock.cbf.model.JsonBeerList;
 import ralcock.cbf.model.SortOrder;
-import ralcock.cbf.view.BeerCursorAdapter;
 import ralcock.cbf.view.BeerDetailsView;
+import ralcock.cbf.view.BeerListAdapter;
 import ralcock.cbf.view.BeerSharer;
 
 import java.io.IOException;
@@ -38,35 +35,35 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
-public class CamBeerFestApplication extends ListActivity implements BeerListView {
+public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabaseHelper> {
     private static final String TAG = CamBeerFestApplication.class.getName();
 
     private static final int SHOW_BEER_DETAILS_REQUEST_CODE = 1;
 
-    private BeerDatabase fBeerDatabase;
-
-    private BeerCursorAdapter fAdapter;
-
     private EditText fFilterTextBox = null;
 
+    private BeerList fBeerList;
     private final BeerSharer fBeerSharer;
 
     private final AppPreferences fAppPreferences;
 
     private final TextWatcher fFilterTextWatcher = new TextWatcher() {
-        public void afterTextChanged(Editable s) {}
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        public void afterTextChanged(Editable s) {
+        }
+
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             filterBy(s.toString());
         }
     };
-    private BeerDatabaseFactory fDatabaseFactory;
 
+    private BeerListAdapter fAdapter;
 
     public CamBeerFestApplication() {
         super();
         fAppPreferences = new AppPreferences(this);
-        fDatabaseFactory = new BeerDatabaseFactory(this);
         fBeerSharer = new BeerSharer(this);
     }
 
@@ -86,38 +83,35 @@ public class CamBeerFestApplication extends ListActivity implements BeerListView
 
         super.onCreate(savedInstanceState);
 
+        fBeerList = new BeerList(getHelper(), fAppPreferences.getSortOrder(), fAppPreferences.getFilterText());
+        fAdapter = new BeerListAdapter(CamBeerFestApplication.this, fBeerList);
+
         setContentView(R.layout.beer_list_view);
 
         fFilterTextBox = (EditText) findViewById(R.id.search);
         fFilterTextBox.setText(fAppPreferences.getFilterText());
         fFilterTextBox.addTextChangedListener(fFilterTextWatcher);
 
-        Button clearFilterButton = (Button)findViewById(R.id.clear_filter_text);
+        Button clearFilterButton = (Button) findViewById(R.id.clear_filter_text);
         clearFilterButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 fFilterTextBox.setText("");
                 filterBy("");
             }
         });
-        
-        setTitle(getResources().getText(R.string.list_title));
 
-        fBeerDatabase = fDatabaseFactory.createDatabase();
-        Cursor cursor = fBeerDatabase.getFilteredBeerListCursor(
-                            fAppPreferences.getSortOrder(),
-                            fAppPreferences.getFilterText());
-        startManagingCursor(cursor);
+        setTitle(getResources().getText(R.string.list_title));
 
         asyncLoadBeers();
 
-        // List adapter setup
-        fAdapter = new BeerCursorAdapter(CamBeerFestApplication.this, cursor);
+        /*
         fAdapter.setFilterQueryProvider(new FilterQueryProvider() {
             public Cursor runQuery(CharSequence filterText) {
                 Log.d(TAG, "FilterQueryProvider.runQuery with filter: " + filterText);
                 return fBeerDatabase.getFilteredBeerListCursor(fAppPreferences.getSortOrder(), filterText);
             }
         });
+        */
         setListAdapter(fAdapter);
 
         configureListView();
@@ -125,7 +119,7 @@ public class CamBeerFestApplication extends ListActivity implements BeerListView
 
     private InputStream inputStream() throws IOException {
         boolean localJson = false;
-        if(localJson){
+        if (localJson) {
             return getAssets().open("beers.json");
         } else {
             // URL is in my Dropbox public folder.
@@ -133,13 +127,14 @@ public class CamBeerFestApplication extends ListActivity implements BeerListView
             return url.openStream();
         }
     }
+
     private void asyncLoadBeers() {
 
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getResources().getText(R.string.loading_message));
         progressDialog.setIndeterminate(true);
 
-        final LoadBeersTask task = new LoadBeersTask(fBeerDatabase, this, progressDialog);
+        final LoadBeersTask task = new LoadBeersTask(getHelper(), fAdapter, fBeerList, progressDialog);
         try {
             final Iterable<Beer> beers = new JsonBeerList(inputStream());
             //noinspection unchecked
@@ -154,7 +149,7 @@ public class CamBeerFestApplication extends ListActivity implements BeerListView
     private void configureListView() {
         ListView lv = getListView();
 
-        lv.setTextFilterEnabled(true);
+        //lv.setTextFilterEnabled(true);
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
@@ -171,8 +166,7 @@ public class CamBeerFestApplication extends ListActivity implements BeerListView
                 shareThisMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo();
-                        BeerWithRating beerToShare = fBeerDatabase.getBeerForId(info.id);
-                        fBeerSharer.shareBeer(beerToShare);
+                        fBeerSharer.shareBeer(getHelper().getBeerWithId(info.id));
                         return true;
                     }
                 });
@@ -204,7 +198,8 @@ public class CamBeerFestApplication extends ListActivity implements BeerListView
                 showSortDialog();
                 return true;
             case R.id.reload_database:
-                fBeerDatabase.clearAll();
+                // delete all beers
+                getHelper().deleteAll();
                 asyncLoadBeers();
                 return true;
             default:
@@ -231,17 +226,15 @@ public class CamBeerFestApplication extends ListActivity implements BeerListView
     }
 
     private void filterBy(String filterText) {
-        fAdapter.getFilter().filter(filterText);
         fAppPreferences.setFilterText(filterText);
+        fBeerList.filterBy(filterText);
+        fAdapter.notifyDataSetChanged();
     }
 
     private void sortBy(SortOrder sortOrder) {
         fAppPreferences.setSortOrder(sortOrder);
-        updateCursor();
+        fBeerList.sortBy(sortOrder);
+        fAdapter.notifyDataSetChanged();
     }
 
-    public void updateCursor() {
-        Cursor c = fBeerDatabase.getFilteredBeerListCursor(fAppPreferences.getSortOrder(), fAppPreferences.getFilterText());
-        fAdapter.changeCursor(c);
-    }
 }

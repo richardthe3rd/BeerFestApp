@@ -3,13 +3,13 @@
         {
             "id": "BREWERY1",
             "name": "BREWERY_ONE",
-            "notes": "BREWERY_ONE_NOTES",
+            "description": "BREWERY_ONE_NOTES",
             "produce": [
                 {
                     "id": "BEER1",
                     "name": "BEER_ONE",
-                    "notes": "BEER_ONE_NOTES",
-                    "abv": 1,
+                    "description": "BEER_ONE_NOTES",
+                    "abv": 1.1,
                     "status": "BEER_ONE_STATUS"
                 }
             ]

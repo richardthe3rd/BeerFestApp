@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import ralcock.cbf.R;
 import ralcock.cbf.model.Beer;
-import ralcock.cbf.model.BeerWithRating;
 
 public final class BeerSharer {
 
@@ -14,9 +13,7 @@ public final class BeerSharer {
         fContext = context;
     }
 
-    public void shareBeer(final BeerWithRating beerWithRating) {
-        Beer beer = beerWithRating.getBeer();
-
+    public void shareBeer(final Beer beer) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
 
@@ -24,7 +21,7 @@ public final class BeerSharer {
         intent.putExtra(Intent.EXTRA_SUBJECT, extraSubject);
 
         String extraText;
-        int rating = beerWithRating.getRating().getNumberOfStars();
+        int rating = 0;//beerWithRating.getRating().getNumberOfStars();
         if (rating > 0) {
             extraText = fContext.getResources().getString(R.string.share_this_rated_beer_text,
                     rating, beer.getBrewery().getName(), beer.getName());

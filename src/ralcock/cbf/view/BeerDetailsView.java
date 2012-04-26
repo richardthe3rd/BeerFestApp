@@ -1,6 +1,5 @@
 package ralcock.cbf.view;
 
-import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
@@ -9,21 +8,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
 import ralcock.cbf.R;
 import ralcock.cbf.model.Beer;
-import ralcock.cbf.model.BeerDatabase;
-import ralcock.cbf.model.BeerDatabaseFactory;
-import ralcock.cbf.model.BeerWithRating;
+import ralcock.cbf.model.BeerDatabaseHelper;
 import ralcock.cbf.model.StarRating;
 
-public final class BeerDetailsView extends Activity {
+import java.sql.SQLException;
+
+public final class BeerDetailsView extends OrmLiteBaseActivity<BeerDatabaseHelper> {
     @SuppressWarnings("UnusedDeclaration")
     private static final String TAG = BeerDetailsView.class.getName();
 
     public static final String EXTRA_BEER_ID = "BEER";
 
-    private BeerDatabase fBeerDatabase;
-    private BeerWithRating fBeerWithRating;
+    private Beer fBeer;
     private long fId;
     private final BeerSharer fBeerSharer;
 
@@ -37,38 +36,37 @@ public final class BeerDetailsView extends Activity {
         fId = getIntent().getExtras().getLong(EXTRA_BEER_ID);
 
         // open DB and make queries on a bg thread
-        final BeerDatabaseFactory databaseFactory = new BeerDatabaseFactory(this);
-        new ShowBeerTask(databaseFactory).execute(fId);
+        new ShowBeerTask().execute(fId);
     }
 
     private void displayBeer() {
-        Beer beer = fBeerWithRating.getBeer();
-        StarRating rating = fBeerWithRating.getRating();
+        Beer beer = fBeer;
+        StarRating rating = new StarRating(0);
 
         setTitle(beer.getBrewery().getName() + " - " + beer.getName());
 
-        TextView beerTitle = (TextView)findViewById(R.id.beer_name);
+        TextView beerTitle = (TextView) findViewById(R.id.beer_name);
         beerTitle.setText(beer.getName());
 
-        TextView beerDetails = (TextView)findViewById(R.id.beer_details);
+        TextView beerDetails = (TextView) findViewById(R.id.beer_details);
 
         String details =
                 getResources().getText(R.string.brewery) + ": " + beer.getBrewery().getName() + "\n" +
-                getResources().getText(R.string.abv)     + ": " + beer.getAbv()        + "%\n";
+                        getResources().getText(R.string.abv) + ": " + beer.getAbv() + "%\n";
         beerDetails.setText(details);
 
-        RatingBar ratingBar = ((RatingBar)findViewById(R.id.beer_rating));
+        RatingBar ratingBar = ((RatingBar) findViewById(R.id.beer_rating));
         ratingBar.setRating(rating.getNumberOfStars());
 
-        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener(){
+        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
                 if (fromUser)
-                    rateBeer( new StarRating((int)rating) );
+                    rateBeer(new StarRating((int) rating));
             }
         });
 
-        TextView beerNotesView = (TextView)findViewById(R.id.beer_notes);
-        beerNotesView.setText(beer.getNotes());
+        TextView beerNotesView = (TextView) findViewById(R.id.beer_notes);
+        beerNotesView.setText(beer.getDescription());
     }
 
     @Override
@@ -82,7 +80,7 @@ public final class BeerDetailsView extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.share_beer:
-                fBeerSharer.shareBeer(fBeerWithRating);
+                fBeerSharer.shareBeer(fBeer);
                 return true;
             case R.id.clear_rating:
                 rateBeer(new StarRating(0));
@@ -93,40 +91,39 @@ public final class BeerDetailsView extends Activity {
     }
 
     private void rateBeer(StarRating rating) {
+        /*
         fBeerDatabase.rateBeer(fId, rating);
         fBeerWithRating = fBeerWithRating.rate(rating);
+        */
         displayBeer();
     }
 
     @SuppressWarnings({"UnusedDeclaration"}) // Called from beer_details_view.xml
     public void shareBeer(View button) {
-        fBeerSharer.shareBeer(fBeerWithRating);
+        fBeerSharer.shareBeer(fBeer);
     }
 
     @Override
     protected void onDestroy() {
-        fBeerDatabase.close();
         super.onDestroy();
     }
 
-    private class ShowBeerTask extends AsyncTask<Long, Void, BeerWithRating>{
-        private BeerDatabaseFactory fDatabaseFactory;
-
-        private ShowBeerTask(BeerDatabaseFactory databaseFactory) {
-            fDatabaseFactory = databaseFactory;
-        }
+    private class ShowBeerTask extends AsyncTask<Long, Void, Beer> {
 
         @Override
-        protected void onPostExecute(BeerWithRating beerWithRating) {
+        protected void onPostExecute(Beer beer) {
             setContentView(R.layout.beer_details_view);
-            fBeerWithRating = beerWithRating;
+            fBeer = beer;
             displayBeer();
         }
 
         @Override
-        protected BeerWithRating doInBackground(Long... ids) {
-            fBeerDatabase = fDatabaseFactory.createDatabase();
-            return fBeerDatabase.getBeerForId(ids[0]);
+        protected Beer doInBackground(Long... ids) {
+            try {
+                return getHelper().getBeerDao().queryForId(ids[0]);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

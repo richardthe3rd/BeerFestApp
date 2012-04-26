@@ -5,29 +5,26 @@ import java.io.Serializable;
 @SuppressWarnings({"UnusedDeclaration"})
 public enum SortOrder implements Serializable {
 
-    BREWERY_NAME_ASC(BeerDatabase.BREWERY_NAME_COLUMN+" ASC", "by Brewery (A-Z)"),
-    BREWERY_NAME_DESC(BeerDatabase.BREWERY_NAME_COLUMN+" DESC", "by Brewery (Z-A)"),
+    BREWERY_NAME_ASC(Beer.BREWERY_FIELD, true, "by Brewery (A-Z)"),
+    BREWERY_NAME_DESC(Beer.BREWERY_FIELD, false, "by Brewery (Z-A)"),
 
-    BEER_NAME_ASC(BeerDatabase.BEER_NAME_COLUMN+" ASC", "by Beer (A-Z)"),
-    BEER_NAME_DESC(BeerDatabase.BEER_NAME_COLUMN+" DESC", "by Beer (Z-A)"),
+    BEER_NAME_ASC(Beer.NAME_FIELD, true, "by Beer (A-Z)"),
+    BEER_NAME_DESC(Beer.NAME_FIELD, false, "by Beer (Z-A)"),
 
-    BEER_ABV_DESC(BeerDatabase.BEER_ABV_COLUMN+" DESC", "by ABV (high to low)"),
-    BEER_ABV_ASC(BeerDatabase.BEER_ABV_COLUMN+" ASC", "by ABV (low to high)"),
+    BEER_ABV_ASC(Beer.ABV_FIELD, true, "by ABV (low to high)"),
+    BEER_ABV_DESC(Beer.ABV_FIELD, false, "by ABV (high to low)");
 
-    BEER_RATING_DESC(BeerDatabase.BEER_RATING_COLUMN+" DESC",  "by Rating (high to low)"),
-    BEER_RATING_ASC(BeerDatabase.BEER_RATING_COLUMN+" ASC",  "by Rating (low to high)");
+    //BEER_RATING_DESC(BeerDatabase.BEER_RATING_COLUMN+" DESC",  "by Rating (high to low)"),
+    //BEER_RATING_ASC(BeerDatabase.BEER_RATING_COLUMN+" ASC",  "by Rating (low to high)");
 
-    private final String fOrderByClause;
-
+    private final String fColumnName;
+    private final boolean fAscending;
     private final String fDescription;
 
-    SortOrder(final String orderByClause, final String description) {
-        fOrderByClause = orderByClause;
+    SortOrder(final String columnName, final boolean ascending, final String description) {
+        fColumnName = columnName;
+        fAscending = ascending;
         fDescription = description;
-    }
-
-    public String getOrderByClause() {
-        return fOrderByClause;
     }
 
     public String getDescription() {
@@ -38,4 +35,11 @@ public enum SortOrder implements Serializable {
         return fDescription;
     }
 
+    public String columnName() {
+        return fColumnName;
+    }
+
+    public boolean ascending() {
+        return fAscending;
+    }
 }

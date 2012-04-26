@@ -1,5 +1,5 @@
 Story 1
- Display list of beers (inc brewery, name, and abv)
+ Display list of beerDatabaseHelper (inc brewery, name, and abv)
 
 Story 2
  Mark beer a drunk
