@@ -39,16 +39,8 @@ public final class Brewery implements Serializable {
         return fName;
     }
 
-    public void setName(final String name) {
-        fName = name;
-    }
-
     public String getDescription() {
         return fDescription;
-    }
-
-    public void setDescription(final String description) {
-        fDescription = description;
     }
 
     public int getId() {

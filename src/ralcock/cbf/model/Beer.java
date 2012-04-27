@@ -76,26 +76,6 @@ public final class Beer implements Serializable {
         return fId;
     }
 
-    public void setBrewery(final Brewery brewery) {
-        fBrewery = brewery;
-    }
-
-    public void setName(final String name) {
-        fName = name;
-    }
-
-    public void setAbv(final float abv) {
-        fAbv = abv;
-    }
-
-    public void setDescription(final String description) {
-        fDescription = description;
-    }
-
-    public void setStatus(final String status) {
-        fStatus = status;
-    }
-
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
