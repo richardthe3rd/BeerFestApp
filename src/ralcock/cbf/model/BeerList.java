@@ -2,22 +2,27 @@ package ralcock.cbf.model;
 
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.Where;
+import ralcock.cbf.model.dao.BeerDao;
+import ralcock.cbf.model.dao.BreweryDao;
 
 import java.sql.SQLException;
 import java.util.List;
 
 public class BeerList {
-    private final BeerDatabaseHelper fBeerDatabaseHelper;
+    private final BeerDao fBeerDao;
+    private final BreweryDao fBreweryDao;
 
     private CharSequence fFilterText;
     private SortOrder fSortOrder;
 
     private List<Beer> fBeerList;
 
-    public BeerList(final BeerDatabaseHelper beerDatabaseHelper,
+    public BeerList(final BeerDao beerDao,
+                    final BreweryDao breweryDao,
                     final SortOrder sortOrder,
                     final CharSequence filterText) {
-        fBeerDatabaseHelper = beerDatabaseHelper;
+        fBeerDao = beerDao;
+        fBreweryDao = breweryDao;
         fSortOrder = sortOrder;
         fFilterText = filterText;
 
@@ -47,7 +52,7 @@ public class BeerList {
     }
 
     private QueryBuilder<Brewery, Long> makeBreweryQuery(final CharSequence charSequence) {
-        QueryBuilder<Brewery, Long> qb = fBeerDatabaseHelper.getBreweryDao().queryBuilder();
+        QueryBuilder<Brewery, Long> qb = fBreweryDao.queryBuilder();
         qb.selectColumns(Brewery.ID_FIELD);
         try {
             qb.where().like(Brewery.NAME_FIELD, "%" + charSequence + "%");
@@ -59,7 +64,7 @@ public class BeerList {
 
     private List<Beer> buildList(final SortOrder sortOrder,
                                  final CharSequence charSequence) {
-        QueryBuilder<Beer, Long> qb = fBeerDatabaseHelper.getBeerDao().queryBuilder();
+        QueryBuilder<Beer, Long> qb = fBeerDao.queryBuilder();
         Where where = qb.where();
         try {
             where.like(Beer.NAME_FIELD, "%" + charSequence + "%");

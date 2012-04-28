@@ -3,13 +3,13 @@ package ralcock.cbf.model;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
-import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
+import ralcock.cbf.model.dao.BeerDao;
+import ralcock.cbf.model.dao.BreweryDao;
 
 import java.sql.SQLException;
-import java.util.List;
 
 public final class BeerDatabaseHelper extends OrmLiteSqliteOpenHelper {
     @SuppressWarnings("UnusedDeclaration")
@@ -47,7 +47,7 @@ public final class BeerDatabaseHelper extends OrmLiteSqliteOpenHelper {
         onCreate(sqLiteDatabase, connectionSource);
     }
 
-    public Dao<Beer, Long> getBeerDao() {
+    public BeerDao getBeerDao() {
         try {
             return DaoManager.createDao(getConnectionSource(), Beer.class);
         } catch (SQLException e) {
@@ -55,25 +55,9 @@ public final class BeerDatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public Dao<Brewery, Long> getBreweryDao() {
+    public BreweryDao getBreweryDao() {
         try {
             return DaoManager.createDao(getConnectionSource(), Brewery.class);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public Beer getBeerWithId(final long beerId) {
-        try {
-            return getBeerDao().queryForId(beerId);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public List<Beer> listAllBeers() {
-        try {
-            return getBeerDao().queryForAll();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -83,14 +67,6 @@ public final class BeerDatabaseHelper extends OrmLiteSqliteOpenHelper {
         try {
             TableUtils.clearTable(getConnectionSource(), Beer.class);
             TableUtils.clearTable(getConnectionSource(), Brewery.class);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void updateBeer(final Beer beer) {
-        try {
-            getBeerDao().update(beer);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

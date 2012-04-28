@@ -7,6 +7,8 @@ import ralcock.cbf.model.BeerDatabaseHelper;
 import ralcock.cbf.model.BeerList;
 import ralcock.cbf.model.Brewery;
 import ralcock.cbf.model.SortOrder;
+import ralcock.cbf.model.dao.BeerDao;
+import ralcock.cbf.model.dao.BreweryDao;
 
 public class BeerListTest extends AndroidTestCase {
 
@@ -14,6 +16,8 @@ public class BeerListTest extends AndroidTestCase {
     private Beer fBeer1;
     private Beer fBeer2;
     private Beer fBeer3;
+    private BeerDao fBeerDao;
+    private BreweryDao fBreweryDao;
 
     @Override
     public void setUp() throws Exception {
@@ -21,23 +25,25 @@ public class BeerListTest extends AndroidTestCase {
         RenamingDelegatingContext context = new RenamingDelegatingContext(getContext(),
                 BeerListTest.class.getSimpleName());
         fBeerDatabaseHelper = new BeerDatabaseHelper(context);
+        fBeerDao = fBeerDatabaseHelper.getBeerDao();
+        fBreweryDao = fBeerDatabaseHelper.getBreweryDao();
 
         Brewery brewery = new Brewery("First Brewery", "y");
-        fBeerDatabaseHelper.getBreweryDao().create(brewery);
+        fBreweryDao.create(brewery);
 
         Brewery brewery2 = new Brewery("Best Brewery", "y");
-        fBeerDatabaseHelper.getBreweryDao().create(brewery2);
+        fBreweryDao.create(brewery2);
 
         fBeer1 = new Beer(brewery, "A Mild", 1f, "", "");
-        fBeerDatabaseHelper.getBeerDao().create(fBeer1);
+        fBeerDao.create(fBeer1);
 
         fBeer2 = new Beer(brewery, "A Best Bitter", 2f, "", "");
-        fBeerDatabaseHelper.getBeerDao().create(fBeer2);
+        fBeerDao.create(fBeer2);
 
         fBeer3 = new Beer(brewery2, "A Stout", 3f, "", "");
-        fBeerDatabaseHelper.getBeerDao().create(fBeer3);
+        fBeerDao.create(fBeer3);
 
-        assertEquals(3, fBeerDatabaseHelper.listAllBeers().size());
+        assertEquals(3, fBeerDao.getNumberOfBeers());
     }
 
     @Override
@@ -47,7 +53,8 @@ public class BeerListTest extends AndroidTestCase {
     }
 
     public void testFiltering() throws Exception {
-        BeerList list = new BeerList(fBeerDatabaseHelper, SortOrder.BEER_NAME_ASC, "mild");
+        BeerList list = new BeerList(fBeerDao, fBreweryDao,
+                SortOrder.BEER_NAME_ASC, "mild");
         assertEquals(1, list.getCount());
         assertEquals(fBeer1, list.getBeerAt(0));
 
@@ -58,7 +65,8 @@ public class BeerListTest extends AndroidTestCase {
     }
 
     public void testSorting() throws Exception {
-        BeerList list = new BeerList(fBeerDatabaseHelper, SortOrder.BEER_ABV_ASC, "");
+        BeerList list = new BeerList(fBeerDao, fBreweryDao,
+                SortOrder.BEER_ABV_ASC, "");
         assertEquals(3, list.getCount());
 
         Beer[] expectedBeers = new Beer[]{fBeer1, fBeer2, fBeer3};

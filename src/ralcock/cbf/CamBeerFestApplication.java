@@ -25,6 +25,8 @@ import ralcock.cbf.model.BeerDatabaseHelper;
 import ralcock.cbf.model.BeerList;
 import ralcock.cbf.model.JsonBeerList;
 import ralcock.cbf.model.SortOrder;
+import ralcock.cbf.model.dao.BeerDao;
+import ralcock.cbf.model.dao.BreweryDao;
 import ralcock.cbf.view.BeerDetailsView;
 import ralcock.cbf.view.BeerListAdapter;
 import ralcock.cbf.view.BeerSharer;
@@ -32,6 +34,7 @@ import ralcock.cbf.view.BeerSharer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -83,7 +86,10 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
 
         super.onCreate(savedInstanceState);
 
-        fBeerList = new BeerList(getHelper(), fAppPreferences.getSortOrder(), fAppPreferences.getFilterText());
+        fBeerList = new BeerList(getBeerDao(), getBreweryDao(),
+                fAppPreferences.getSortOrder(),
+                fAppPreferences.getFilterText());
+
         fAdapter = new BeerListAdapter(CamBeerFestApplication.this, fBeerList);
 
         setContentView(R.layout.beer_list_view);
@@ -117,6 +123,14 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         configureListView();
     }
 
+    private BreweryDao getBreweryDao() {
+        return getHelper().getBreweryDao();
+    }
+
+    private BeerDao getBeerDao() {
+        return getHelper().getBeerDao();
+    }
+
     private InputStream inputStream() throws IOException {
         boolean localJson = false;
         if (localJson) {
@@ -134,7 +148,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         progressDialog.setMessage(getResources().getText(R.string.loading_message));
         progressDialog.setIndeterminate(true);
 
-        final LoadBeersTask task = new LoadBeersTask(getHelper(), fAdapter, fBeerList, progressDialog);
+        final LoadBeersTask task = new LoadBeersTask(getBeerDao(), getBreweryDao(), fAdapter, fBeerList, progressDialog);
         try {
             final Iterable<Beer> beers = new JsonBeerList(inputStream());
             //noinspection unchecked
@@ -166,12 +180,20 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
                 shareThisMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo();
-                        fBeerSharer.shareBeer(getHelper().getBeerWithId(info.id));
+                        fBeerSharer.shareBeer(getBeerWithId(info.id));
                         return true;
                     }
                 });
             }
         });
+    }
+
+    private Beer getBeerWithId(final long id) {
+        try {
+            return getBeerDao().getBeerWithId(id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

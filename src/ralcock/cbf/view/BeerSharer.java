@@ -21,7 +21,7 @@ public final class BeerSharer {
         intent.putExtra(Intent.EXTRA_SUBJECT, extraSubject);
 
         String extraText;
-        int rating = 0;//beerWithRating.getRating().getNumberOfStars();
+        int rating = beer.getRating();
         if (rating > 0) {
             extraText = fContext.getResources().getString(R.string.share_this_rated_beer_text,
                     rating, beer.getBrewery().getName(), beer.getName());

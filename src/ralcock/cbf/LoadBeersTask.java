@@ -4,8 +4,9 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.Log;
 import ralcock.cbf.model.Beer;
-import ralcock.cbf.model.BeerDatabaseHelper;
 import ralcock.cbf.model.BeerList;
+import ralcock.cbf.model.dao.BeerDao;
+import ralcock.cbf.model.dao.BreweryDao;
 import ralcock.cbf.view.BeerListAdapter;
 
 import java.sql.SQLException;
@@ -14,18 +15,20 @@ class LoadBeersTask extends AsyncTask<Iterable<Beer>, Beer, Long> {
 
     private static final String TAG = "cbf." + LoadBeersTask.class.getSimpleName();
 
-    private final ProgressDialog fDialog;
+    private final BeerDao fBeerDao;
+    private final BreweryDao fBreweryDao;
+    private final BeerList fBeerList;
     private final BeerListAdapter fBeerListAdapter;
-    private final BeerDatabaseHelper fBeerDatabase;
-    private BeerList fBeerList;
 
+    private final ProgressDialog fDialog;
     private long fStartTime;
 
-    LoadBeersTask(final BeerDatabaseHelper beerDatabase,
+    LoadBeersTask(final BeerDao beerDao, final BreweryDao breweryDao,
                   final BeerListAdapter beerListAdapter,
                   final BeerList beerList,
                   final ProgressDialog progressDialog) {
-        fBeerDatabase = beerDatabase;
+        fBeerDao = beerDao;
+        fBreweryDao = breweryDao;
         fBeerListAdapter = beerListAdapter;
         fBeerList = beerList;
         fDialog = progressDialog;
@@ -41,7 +44,7 @@ class LoadBeersTask extends AsyncTask<Iterable<Beer>, Beer, Long> {
 
     private long getNumberOfBeers() {
         try {
-            return fBeerDatabase.getBeerDao().countOf();
+            return fBeerDao.getNumberOfBeers();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -79,8 +82,8 @@ class LoadBeersTask extends AsyncTask<Iterable<Beer>, Beer, Long> {
         for (Beer beer : beers) {
             //todo: merge instead of insert
             try {
-                fBeerDatabase.getBreweryDao().create(beer.getBrewery());
-                fBeerDatabase.getBeerDao().create(beer);
+                fBreweryDao.create(beer.getBrewery());
+                fBeerDao.create(beer);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }

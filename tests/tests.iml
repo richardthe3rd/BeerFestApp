@@ -45,7 +45,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="ormlite-4.40" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="ormlite-4.40" level="project" />
   </component>
 </module>
 

@@ -88,9 +88,13 @@ public final class BeerDetailsView extends OrmLiteBaseActivity<BeerDatabaseHelpe
     }
 
     private void rateBeer(StarRating rating) {
-        fBeer.setNumberOfStars(rating);
-        getHelper().updateBeer(fBeer);
-        displayBeer();
+        try {
+            fBeer.setNumberOfStars(rating);
+            getHelper().getBeerDao().update(fBeer);
+            displayBeer();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @SuppressWarnings({"UnusedDeclaration"}) // Called from beer_details_view.xml

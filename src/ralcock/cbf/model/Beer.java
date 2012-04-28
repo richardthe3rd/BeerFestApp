@@ -2,10 +2,11 @@ package ralcock.cbf.model;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import ralcock.cbf.model.dao.BeerDaoImpl;
 
 import java.io.Serializable;
 
-@DatabaseTable(tableName = Beer.TABLE_NAME)
+@DatabaseTable(tableName = Beer.TABLE_NAME, daoClass = BeerDaoImpl.class)
 public final class Beer implements Serializable {
 
     public static final String TABLE_NAME = "beers";
