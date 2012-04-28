@@ -1,7 +1,6 @@
 package ralcock.cbf.model;
 
 import com.j256.ormlite.stmt.QueryBuilder;
-import com.j256.ormlite.stmt.Where;
 import ralcock.cbf.model.dao.BeerDao;
 import ralcock.cbf.model.dao.BreweryDao;
 
@@ -51,31 +50,13 @@ public class BeerList {
         return fBeerList.get(i);
     }
 
-    private QueryBuilder<Brewery, Long> makeBreweryQuery(final CharSequence charSequence) {
-        QueryBuilder<Brewery, Long> qb = fBreweryDao.queryBuilder();
-        qb.selectColumns(Brewery.ID_FIELD);
-        try {
-            qb.where().like(Brewery.NAME_FIELD, "%" + charSequence + "%");
-            return qb;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private List<Beer> buildList(final SortOrder sortOrder,
-                                 final CharSequence charSequence) {
-        QueryBuilder<Beer, Long> qb = fBeerDao.queryBuilder();
-        Where where = qb.where();
+                                 final CharSequence filterText) {
         try {
-            where.like(Beer.NAME_FIELD, "%" + charSequence + "%");
-            where.or();
-            where.in(Beer.BREWERY_FIELD, makeBreweryQuery(charSequence));
-            qb.orderBy(sortOrder.columnName(), sortOrder.ascending());
+            QueryBuilder<Beer, Long> qb = fBeerDao.buildSortedFilteredBeerQuery(fBreweryDao, sortOrder, filterText);
             return qb.query();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
-
-
 }

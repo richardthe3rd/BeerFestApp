@@ -1,12 +1,7 @@
-package ralcock.cbf.view;
+package ralcock.cbf.model;
 
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
-import ralcock.cbf.model.Beer;
-import ralcock.cbf.model.BeerDatabaseHelper;
-import ralcock.cbf.model.BeerList;
-import ralcock.cbf.model.Brewery;
-import ralcock.cbf.model.SortOrder;
 import ralcock.cbf.model.dao.BeerDao;
 import ralcock.cbf.model.dao.BreweryDao;
 
