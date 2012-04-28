@@ -17,7 +17,7 @@ public final class BeerDatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     public static final String DATABASE_NAME = "BEERS";
 
-    private static final int DB_VERSION = 6; // using ormlite, added ratings
+    private static final int DB_VERSION = 8; // using ormlite, added ratings
 
     public BeerDatabaseHelper(final Context context) {
         super(context, DATABASE_NAME, null, DB_VERSION);

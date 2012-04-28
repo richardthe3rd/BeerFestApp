@@ -2,14 +2,16 @@
 <resources>
 
     <string name="app_name">Cambridge Beer Festival</string>
-    <string name="list_title">Cambridge Winter Ale Festival</string>
 
-    <string formatted="false" name="share_this_beer_text">Drinking %s %s @cambeerfest #CWAF #beer</string>
-    <string formatted="false" name="share_this_rated_beer_text">Gave %d stars to %s %s @cambeerfest #CWAF #beer</string>
+    <string name="list_title">Cambridge Beer Festival 39</string>
+    <string name="share_this_beer_subject">Drinking a beer at Cambridge Beer Festival</string>
+    <string formatted="false" name="share_this_beer_text">Drinking %s %s @cambeerfest #cbf39 #beer</string>
+    <string formatted="false" name="share_this_rated_beer_text">Gave %d stars to %s %s @cambeerfest #cbf39 #beer
+    </string>
 
-    <string name="share_this_beer_title">Share this beer...</string>
+    <string name="beer_list_url">http://dl.dropbox.com/u/4457379/cbf39_test.json</string>
 
-    <string name="share_this_beer_subject">Drinking an ale at Cambridge Winter Ale Festival</string>
+    <string name="share_this_beer_title">Share this beer…</string>
 
     <string name="abv">ABV</string>
 
@@ -43,5 +45,5 @@
     <string name="Rating_Love">I loved it</string>
     <string name="filter_hint">type to filter</string>
 
-    <string name="loading_message">Loading beers, please wait...</string>
+    <string name="loading_message">Loading beers, please wait…</string>
 </resources>

@@ -23,10 +23,10 @@ public class BeerListTest extends AndroidTestCase {
         fBeerDao = fBeerDatabaseHelper.getBeerDao();
         fBreweryDao = fBeerDatabaseHelper.getBreweryDao();
 
-        Brewery brewery = new Brewery("First Brewery", "y");
+        Brewery brewery = new Brewery("id1", "First Brewery", "y");
         fBreweryDao.create(brewery);
 
-        Brewery brewery2 = new Brewery("Best Brewery", "y");
+        Brewery brewery2 = new Brewery("id2", "Best Brewery", "y");
         fBreweryDao.create(brewery2);
 
         fBeer1 = new Beer(brewery, "A Mild", 1f, "", "");

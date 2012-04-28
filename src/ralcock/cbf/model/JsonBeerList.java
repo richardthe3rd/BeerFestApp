@@ -17,11 +17,13 @@ public class JsonBeerList implements Iterable<Beer> {
     private static final String TAG = JsonBeerList.class.getName();
 
     private static final String PRODUCERS = "producers";
+    private static final String PRODUCTS = "products";
+
     private static final String NAME = "name";
-    private static final String DESCRIPTION = "description";
-    private static final String PRODUCE = "produce";
+    private static final String DESCRIPTION = "notes";
     private static final String ABV = "abv";
-    private static final String STATUS = "status";
+    private static final String STATUS = "status_text";
+    private static final String IDENTIFIER = "id";
 
     private final InputStream fInputStream;
     private List<Beer> fBeerList;
@@ -51,7 +53,7 @@ public class JsonBeerList implements Iterable<Beer> {
         IterableJSONArray producers = new IterableJSONArray(json.getJSONArray(PRODUCERS));
         for (JSONObject producer : producers) {
             Brewery brewery = makeBrewery(producer);
-            IterableJSONArray produce = new IterableJSONArray(producer.getJSONArray(PRODUCE));
+            IterableJSONArray produce = new IterableJSONArray(producer.getJSONArray(PRODUCTS));
             for (JSONObject product : produce) {
                 Beer beer = makeBeer(brewery, product);
                 beers.add(beer);
@@ -69,7 +71,11 @@ public class JsonBeerList implements Iterable<Beer> {
     }
 
     private Brewery makeBrewery(final JSONObject producer) throws JSONException {
-        return new Brewery(producer.getString(NAME), producer.getString(DESCRIPTION));
+        return new Brewery(
+                producer.getString(IDENTIFIER),
+                producer.getString(NAME),
+                producer.getString(DESCRIPTION)
+        );
     }
 
     private static JSONObject loadJson(final InputStream inputStream) throws IOException, JSONException {

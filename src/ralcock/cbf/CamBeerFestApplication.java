@@ -108,7 +108,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
 
         setTitle(getResources().getText(R.string.list_title));
 
-        asyncLoadBeers();
+        loadBeersInBackground();
 
         /*
         fAdapter.setFilterQueryProvider(new FilterQueryProvider() {
@@ -132,18 +132,12 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     }
 
     private InputStream inputStream() throws IOException {
-        boolean localJson = false;
-        if (localJson) {
-            return getAssets().open("beers.json");
-        } else {
-            // URL is in my Dropbox public folder.
-            URL url = new URL("http://dl.dropbox.com/u/4457379/beers.json");
-            return url.openStream();
-        }
+        String beerJsonURL = getResources().getText(R.string.beer_list_url).toString();
+        URL url = new URL(beerJsonURL);
+        return url.openStream();
     }
 
-    private void asyncLoadBeers() {
-
+    private void loadBeersInBackground() {
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getResources().getText(R.string.loading_message));
         progressDialog.setIndeterminate(true);
@@ -222,7 +216,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
             case R.id.reload_database:
                 // delete all beers
                 getHelper().deleteAll();
-                asyncLoadBeers();
+                loadBeersInBackground();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -3,14 +3,15 @@
         {
             "id": "BREWERY1",
             "name": "BREWERY_ONE",
-            "description": "BREWERY_ONE_NOTES",
-            "produce": [
+            "notes": "BREWERY_ONE_NOTES",
+            "products": [
                 {
                     "id": "BEER1",
                     "name": "BEER_ONE",
-                    "description": "BEER_ONE_NOTES",
+                    "style": null,
+                    "notes": "BEER_ONE_NOTES",
                     "abv": 1.1,
-                    "status": "BEER_ONE_STATUS"
+                    "status_text": "BEER_ONE_STATUS"
                 }
             ]
         }

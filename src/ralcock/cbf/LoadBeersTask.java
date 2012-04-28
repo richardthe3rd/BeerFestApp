@@ -5,11 +5,14 @@ import android.os.AsyncTask;
 import android.util.Log;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerList;
+import ralcock.cbf.model.Brewery;
 import ralcock.cbf.model.dao.BeerDao;
 import ralcock.cbf.model.dao.BreweryDao;
 import ralcock.cbf.view.BeerListAdapter;
 
 import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Set;
 
 class LoadBeersTask extends AsyncTask<Iterable<Beer>, Beer, Long> {
 
@@ -79,11 +82,22 @@ class LoadBeersTask extends AsyncTask<Iterable<Beer>, Beer, Long> {
     }
 
     private void initializeDatabase(Iterable<Beer> beers) {
+        Set<Brewery> breweries = new HashSet<Brewery>();
         for (Beer beer : beers) {
-            //todo: merge instead of insert
             try {
-                fBreweryDao.create(beer.getBrewery());
+
+                final Brewery brewery = beer.getBrewery();
+                if (breweries.add(brewery)) {
+                    if (0 == fBreweryDao.updateFromFestival(brewery)) {
+                        // new brewery
+                        fBreweryDao.create(brewery);
+                    }
+                    fBreweryDao.create(brewery);
+                }
+
+                //todo: merge instead of insert
                 fBeerDao.create(beer);
+
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
