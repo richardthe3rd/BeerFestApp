@@ -23,7 +23,6 @@ public final class BeerDetailsView extends OrmLiteBaseActivity<BeerDatabaseHelpe
     public static final String EXTRA_BEER_ID = "BEER";
 
     private Beer fBeer;
-    private long fId;
     private final BeerSharer fBeerSharer;
 
     public BeerDetailsView() {
@@ -33,15 +32,13 @@ public final class BeerDetailsView extends OrmLiteBaseActivity<BeerDatabaseHelpe
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        fId = getIntent().getExtras().getLong(EXTRA_BEER_ID);
-
         // open DB and make queries on a bg thread
-        new ShowBeerTask().execute(fId);
+        final long id = getIntent().getExtras().getLong(EXTRA_BEER_ID);
+        new ShowBeerTask().execute(id);
     }
 
     private void displayBeer() {
         Beer beer = fBeer;
-        StarRating rating = new StarRating(0);
 
         setTitle(beer.getBrewery().getName() + " - " + beer.getName());
 
@@ -56,12 +53,12 @@ public final class BeerDetailsView extends OrmLiteBaseActivity<BeerDatabaseHelpe
         beerDetails.setText(details);
 
         RatingBar ratingBar = ((RatingBar) findViewById(R.id.beer_rating));
-        ratingBar.setRating(rating.getNumberOfStars());
+        ratingBar.setRating(beer.getNumberOfStars().getNumberOfStars());
 
         ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
                 if (fromUser)
-                    rateBeer(new StarRating((int) rating));
+                    rateBeer(new StarRating(rating));
             }
         });
 
@@ -83,7 +80,7 @@ public final class BeerDetailsView extends OrmLiteBaseActivity<BeerDatabaseHelpe
                 fBeerSharer.shareBeer(fBeer);
                 return true;
             case R.id.clear_rating:
-                rateBeer(new StarRating(0));
+                rateBeer(StarRating.NO_STARS);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -91,10 +88,8 @@ public final class BeerDetailsView extends OrmLiteBaseActivity<BeerDatabaseHelpe
     }
 
     private void rateBeer(StarRating rating) {
-        /*
-        fBeerDatabase.rateBeer(fId, rating);
-        fBeerWithRating = fBeerWithRating.rate(rating);
-        */
+        fBeer.setNumberOfStars(rating);
+        getHelper().updateBeer(fBeer);
         displayBeer();
     }
 

@@ -15,7 +15,7 @@ public final class Beer implements Serializable {
     public static final String ABV_FIELD = "abv";
     public static final String DESCRIPTION_FIELD = "description";
     public static final String STATUS_FIELD = "status";
-
+    public static final String RATING_FIELD = "rating";
 
     @DatabaseField(columnName = "_id", generatedId = true)
     private long fId;
@@ -34,6 +34,9 @@ public final class Beer implements Serializable {
 
     @DatabaseField(columnName = STATUS_FIELD)
     private String fStatus;
+
+    @DatabaseField(columnName = RATING_FIELD)
+    private int fRating;
 
     @SuppressWarnings("UnusedDeclaration")
         // needed by ormlite
@@ -70,6 +73,18 @@ public final class Beer implements Serializable {
 
     public String getStatus() {
         return fStatus;
+    }
+
+    public int getRating() {
+        return fRating;
+    }
+
+    public StarRating getNumberOfStars() {
+        return new StarRating(fRating);
+    }
+
+    public void setNumberOfStars(final StarRating rating) {
+        fRating = rating.getNumberOfStars();
     }
 
     public long getId() {

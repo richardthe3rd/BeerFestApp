@@ -17,7 +17,7 @@ public final class BeerDatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     public static final String DATABASE_NAME = "BEERS";
 
-    private static final int DB_VERSION = 5; // using ormlite
+    private static final int DB_VERSION = 6; // using ormlite, added ratings
 
     public BeerDatabaseHelper(final Context context) {
         super(context, DATABASE_NAME, null, DB_VERSION);
@@ -83,6 +83,14 @@ public final class BeerDatabaseHelper extends OrmLiteSqliteOpenHelper {
         try {
             TableUtils.clearTable(getConnectionSource(), Beer.class);
             TableUtils.clearTable(getConnectionSource(), Brewery.class);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void updateBeer(final Beer beer) {
+        try {
+            getBeerDao().update(beer);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

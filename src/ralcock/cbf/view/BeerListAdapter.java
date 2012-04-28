@@ -35,7 +35,7 @@ public class BeerListAdapter extends BaseAdapter implements Filterable {
         BeerItemView beerItemView = (BeerItemView) view.getTag();
 
         beerItemView.brewery.setText(beer.getBrewery().getName());
-        beerItemView.rating.setRating(0);
+        beerItemView.rating.setRating(beer.getRating());
 
         String beerText = beer.getName() + " (" + beer.getAbv() + "%)";
         beerItemView.beer.setText(beerText);
