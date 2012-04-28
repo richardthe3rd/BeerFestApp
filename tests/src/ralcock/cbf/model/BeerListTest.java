@@ -13,13 +13,13 @@ public class BeerListTest extends AndroidTestCase {
     private Beer fBeer3;
     private BeerDao fBeerDao;
     private BreweryDao fBreweryDao;
+    private RenamingDelegatingContext fContext;
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        RenamingDelegatingContext context = new RenamingDelegatingContext(getContext(),
-                BeerListTest.class.getSimpleName());
-        fBeerDatabaseHelper = new BeerDatabaseHelper(context);
+        fContext = new RenamingDelegatingContext(getContext(), BeerListTest.class.getSimpleName() + ".");
+        fBeerDatabaseHelper = new BeerDatabaseHelper(fContext);
         fBeerDao = fBeerDatabaseHelper.getBeerDao();
         fBreweryDao = fBeerDatabaseHelper.getBreweryDao();
 
@@ -45,6 +45,8 @@ public class BeerListTest extends AndroidTestCase {
     public void tearDown() throws Exception {
         super.tearDown();
         fBeerDatabaseHelper.close();
+        fContext.deleteDatabase(BeerDatabaseHelper.DATABASE_NAME);
+
     }
 
     public void testFiltering() throws Exception {

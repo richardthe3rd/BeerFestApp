@@ -45,7 +45,7 @@ public class BeerDaoImpl extends BaseDaoImpl<Beer, Long> implements BeerDao {
     public int updateFromFestival(final Beer beer) throws SQLException {
         SelectArg beerName = new SelectArg(beer.getName());
         SelectArg beerDescription = new SelectArg(beer.getDescription());
-        SelectArg beerBrewery = new SelectArg(beer.getBrewery());
+        SelectArg beerBrewery = new SelectArg(beer.getBrewery().getId());
         SelectArg beerAbv = new SelectArg(beer.getAbv());
         SelectArg beerStatus = new SelectArg(beer.getStatus());
 

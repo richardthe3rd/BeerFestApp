@@ -10,6 +10,7 @@ import android.widget.Filterable;
 import ralcock.cbf.R;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerList;
+import ralcock.cbf.model.Brewery;
 
 public class BeerListAdapter extends BaseAdapter implements Filterable {
 
@@ -34,7 +35,9 @@ public class BeerListAdapter extends BaseAdapter implements Filterable {
     private void bindView(View view, final Beer beer) {
         BeerItemView beerItemView = (BeerItemView) view.getTag();
 
-        beerItemView.brewery.setText(beer.getBrewery().getName());
+        Brewery brewery = beer.getBrewery();
+        beerItemView.brewery.setText(brewery == null ? "<NULL_BREWERY>" : brewery.getName());
+
         beerItemView.rating.setRating(beer.getRating());
 
         String beerText = beer.getName() + " (" + beer.getAbv() + "%)";

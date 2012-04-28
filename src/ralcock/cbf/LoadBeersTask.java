@@ -40,9 +40,7 @@ class LoadBeersTask extends AsyncTask<Iterable<Beer>, Beer, Long> {
     @Override
     protected void onPreExecute() {
         fStartTime = System.currentTimeMillis();
-        if (getNumberOfBeers() == 0) {
-            fDialog.show();
-        }
+        fDialog.show();
     }
 
     private long getNumberOfBeers() {
@@ -70,15 +68,11 @@ class LoadBeersTask extends AsyncTask<Iterable<Beer>, Beer, Long> {
     @Override
     protected Long doInBackground(Iterable<Beer>... beers) {
         // todo: Need a more intelligent way of deciding to do an update.
-        if (getNumberOfBeers() == 0) {
-            Log.i(TAG, "Starting background initialization of database from " + beers[0]);
-            initializeDatabase(beers[0]);
-            final long count = getNumberOfBeers();
-            Log.i(TAG, "Finished background initialization of database. Loaded " + count);
-            return count;
-        } else {
-            return 0L;
-        }
+        Log.i(TAG, "Starting background initialization of database from " + beers[0]);
+        initializeDatabase(beers[0]);
+        final long count = getNumberOfBeers();
+        Log.i(TAG, "Finished background initialization of database. Loaded " + count);
+        return count;
     }
 
     private void initializeDatabase(Iterable<Beer> beers) {
@@ -91,12 +85,16 @@ class LoadBeersTask extends AsyncTask<Iterable<Beer>, Beer, Long> {
                     if (0 == fBreweryDao.updateFromFestival(brewery)) {
                         // new brewery
                         fBreweryDao.create(brewery);
+                    } else {
+                        fBreweryDao.refresh(brewery);
                     }
                 }
 
                 if (0 == fBeerDao.updateFromFestival(beer)) {
                     // new brewery
                     fBeerDao.create(beer);
+                } else {
+                    fBeerDao.refresh(beer);
                 }
 
             } catch (SQLException e) {

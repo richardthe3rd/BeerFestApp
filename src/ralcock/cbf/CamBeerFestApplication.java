@@ -213,6 +213,9 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
             case R.id.sort:
                 showSortDialog();
                 return true;
+            case R.id.refresh_database:
+                loadBeersInBackground();
+                return true;
             case R.id.reload_database:
                 // delete all beers
                 getHelper().deleteAll();

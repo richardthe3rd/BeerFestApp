@@ -9,13 +9,14 @@ import java.sql.SQLException;
 public class BreweryDaoImplTest extends AndroidTestCase {
     private BeerDatabaseHelper fBeerDatabaseHelper;
     private BreweryDao fBreweryDao;
+    private RenamingDelegatingContext fContext;
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        RenamingDelegatingContext context = new RenamingDelegatingContext(getContext(),
-                BeerListTest.class.getSimpleName());
-        fBeerDatabaseHelper = new BeerDatabaseHelper(context);
+        fContext = new RenamingDelegatingContext(getContext(),
+                BeerListTest.class.getSimpleName() + ".");
+        fBeerDatabaseHelper = new BeerDatabaseHelper(fContext);
         fBreweryDao = fBeerDatabaseHelper.getBreweryDao();
     }
 
@@ -23,6 +24,7 @@ public class BreweryDaoImplTest extends AndroidTestCase {
     public void tearDown() throws Exception {
         super.tearDown();
         fBeerDatabaseHelper.close();
+        fContext.deleteDatabase(BeerDatabaseHelper.DATABASE_NAME);
     }
 
     public void testWithQuote() throws Exception {

@@ -30,7 +30,9 @@
 
     <string name="sort_dialog_title">Sort</string>
 
-    <string name="reload_menu_label">Reload</string>
+    <string name="reload_menu_label">Reload Beers</string>
+    <string name="refresh_menu_label">Update Beers</string>
+
     <string name="sort_menu_label">Sort</string>
     <string name="search_menu_label">Search</string>
 
