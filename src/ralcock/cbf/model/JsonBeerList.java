@@ -63,11 +63,14 @@ public class JsonBeerList implements Iterable<Beer> {
     }
 
     private Beer makeBeer(final Brewery brewery, final JSONObject product) throws JSONException {
-        return new Beer(brewery,
+        return new Beer(
+                product.getString(IDENTIFIER),
                 product.getString(NAME),
                 (float) product.getDouble(ABV),
                 product.getString(DESCRIPTION),
-                product.has(STATUS) ? product.getString(STATUS) : "");
+                product.has(STATUS) ? product.getString(STATUS) : "",
+                brewery)
+                ;
     }
 
     private Brewery makeBrewery(final JSONObject producer) throws JSONException {

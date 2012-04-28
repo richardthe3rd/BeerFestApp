@@ -92,11 +92,12 @@ class LoadBeersTask extends AsyncTask<Iterable<Beer>, Beer, Long> {
                         // new brewery
                         fBreweryDao.create(brewery);
                     }
-                    fBreweryDao.create(brewery);
                 }
 
-                //todo: merge instead of insert
-                fBeerDao.create(beer);
+                if (0 == fBeerDao.updateFromFestival(beer)) {
+                    // new brewery
+                    fBeerDao.create(beer);
+                }
 
             } catch (SQLException e) {
                 throw new RuntimeException(e);

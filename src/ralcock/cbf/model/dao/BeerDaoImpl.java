@@ -1,7 +1,10 @@
 package ralcock.cbf.model.dao;
 
 import com.j256.ormlite.dao.BaseDaoImpl;
+import com.j256.ormlite.stmt.PreparedUpdate;
 import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.SelectArg;
+import com.j256.ormlite.stmt.UpdateBuilder;
 import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 import ralcock.cbf.model.Beer;
@@ -36,6 +39,26 @@ public class BeerDaoImpl extends BaseDaoImpl<Beer, Long> implements BeerDao {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+    }
+
+    public int updateFromFestival(final Beer beer) throws SQLException {
+        SelectArg beerName = new SelectArg(beer.getName());
+        SelectArg beerDescription = new SelectArg(beer.getDescription());
+        SelectArg beerBrewery = new SelectArg(beer.getBrewery());
+        SelectArg beerAbv = new SelectArg(beer.getAbv());
+        SelectArg beerStatus = new SelectArg(beer.getStatus());
+
+        UpdateBuilder<Beer, Long> updateBuilder = updateBuilder();
+        updateBuilder.updateColumnValue(Beer.NAME_FIELD, beerName);
+        updateBuilder.updateColumnValue(Beer.DESCRIPTION_FIELD, beerDescription);
+        updateBuilder.updateColumnValue(Beer.BREWERY_FIELD, beerBrewery);
+        updateBuilder.updateColumnValue(Beer.ABV_FIELD, beerAbv);
+        updateBuilder.updateColumnValue(Beer.STATUS_FIELD, beerStatus);
+
+        updateBuilder.where().eq(Beer.FESTIVAL_ID_FIELD, beer.getFestivalID());
+        PreparedUpdate<Beer> preparedUpdate = updateBuilder.prepare();
+        return update(preparedUpdate);
 
     }
 

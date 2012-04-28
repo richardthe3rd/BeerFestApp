@@ -17,6 +17,7 @@ public final class Beer implements Serializable {
     public static final String DESCRIPTION_FIELD = "description";
     public static final String STATUS_FIELD = "status";
     public static final String RATING_FIELD = "rating";
+    public static final String FESTIVAL_ID_FIELD = "festival_id";
 
     @DatabaseField(columnName = "_id", generatedId = true)
     private long fId;
@@ -39,21 +40,31 @@ public final class Beer implements Serializable {
     @DatabaseField(columnName = RATING_FIELD)
     private int fRating;
 
+    @DatabaseField(columnName = FESTIVAL_ID_FIELD)
+    private String fFestivalID;
+
+
     @SuppressWarnings("UnusedDeclaration")
         // needed by ormlite
     Beer() {
     }
 
-    public Beer(final Brewery brewery,
+    public Beer(final String festivalId,
                 final String name,
                 final float abv,
                 final String description,
-                final String status) {
+                final String status,
+                final Brewery brewery) {
+        fFestivalID = festivalId;
         fBrewery = brewery;
         fName = name;
         fAbv = abv;
         fDescription = description;
         fStatus = status;
+    }
+
+    public String getFestivalID() {
+        return fFestivalID;
     }
 
     public String getName() {

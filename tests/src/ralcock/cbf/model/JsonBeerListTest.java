@@ -8,12 +8,12 @@ import java.util.Vector;
 
 public class JsonBeerListTest extends AndroidTestCase {
 
-    private final Brewery fBrewery1 = new Brewery("BREWERY1", "BREWERY_ONE", "BREWERY_ONE_NOTES");
-    private final Brewery fBrewery2 = new Brewery("BREWERY2", "BREWERY_TWO", "BREWERY_TWO_NOTES");
+    private final Brewery fBrewery1 = new Brewery("1", "BREWERY_ONE", "BREWERY_ONE_NOTES");
+    private final Brewery fBrewery2 = new Brewery("2", "BREWERY_TWO", "BREWERY_TWO_NOTES");
 
-    private final Beer fBrewery1Beer1 = new Beer(fBrewery1, "BEER_ONE", 1.1f, "BEER_ONE_NOTES", "BEER_ONE_STATUS");
-    private final Beer fBrewery1Beer2 = new Beer(fBrewery2, "BEER_TWO", 2.2f, "BEER_TWO_NOTES", "BEER_TWO_STATUS");
-    private final Beer fBrewery2Beer3 = new Beer(fBrewery2, "BEER_THREE", 3.3f, "BEER_THREE_NOTES", "BEER_THREE_STATUS");
+    private final Beer fBrewery1Beer1 = new Beer("1", "BEER_ONE", 1.1f, "BEER_ONE_NOTES", "BEER_ONE_STATUS", fBrewery1);
+    private final Beer fBrewery1Beer2 = new Beer("2", "BEER_TWO", 2.2f, "BEER_TWO_NOTES", "BEER_TWO_STATUS", fBrewery2);
+    private final Beer fBrewery2Beer3 = new Beer("3", "BEER_THREE", 3.3f, "BEER_THREE_NOTES", "BEER_THREE_STATUS", fBrewery2);
 
     public void testLoadBeers() throws Exception {
         InputStream inputStream = JsonBeerListTest.class.getResourceAsStream("resources/one_beer.json");
