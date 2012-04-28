@@ -36,7 +36,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="PROVIDED" name="Android 2.2 Platform" level="application" />
-    <orderEntry type="library" name="ormlite-android-4.40" level="project" />
+    <orderEntry type="library" name="ormlite-4.40" level="project" />
   </component>
 </module>
 
