@@ -1,37 +1,40 @@
 {
     "producers": [
         {
-            "id": "BREWERY1",
+            "id": "1",
             "name": "BREWERY_ONE",
             "notes": "BREWERY_ONE_NOTES",
-            "produce": [
+            "products": [
                 {
-                    "id": "BEER1",
+                    "id": "1",
                     "name": "BEER_ONE",
+                    "style": null,
                     "notes": "BEER_ONE_NOTES",
                     "abv": 1.1,
-                    "status": "BEER_ONE_STATUS"
+                    "status_text": "BEER_ONE_STATUS"
                 }
             ]
         },
         {
-            "id": "BREWERY2",
+            "id": "2",
             "name": "BREWERY_TWO",
             "notes": "BREWERY_TWO_NOTES",
-            "produce": [
+            "products": [
                 {
-                    "id": "BEER2",
+                    "id": "2",
                     "name": "BEER_TWO",
+                    "style": null,
                     "notes": "BEER_TWO_NOTES",
                     "abv": 2.2,
-                    "status": "BEER_TWO_STATUS"
+                    "status_text": "BEER_TWO_STATUS"
                 },
                 {
-                    "id": "BEER3",
+                    "id": "3",
                     "name": "BEER_THREE",
+                    "style": null,
                     "notes": "BEER_THREE_NOTES",
                     "abv": 3.3,
-                    "status": "BEER_THREE_STATUS"
+                    "status_text": "BEER_THREE_STATUS"
                 }
             ]
         }

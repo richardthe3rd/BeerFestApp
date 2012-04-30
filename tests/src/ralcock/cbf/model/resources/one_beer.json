@@ -1,16 +1,17 @@
 {
     "producers": [
         {
-            "id": "BREWERY1",
+            "id": "1",
             "name": "BREWERY_ONE",
             "notes": "BREWERY_ONE_NOTES",
-            "produce": [
+            "products": [
                 {
-                    "id": "BEER1",
+                    "id": "1",
                     "name": "BEER_ONE",
+                    "style": null,
                     "notes": "BEER_ONE_NOTES",
-                    "abv": 1,
-                    "status": "BEER_ONE_STATUS"
+                    "abv": 1.1,
+                    "status_text": "BEER_ONE_STATUS"
                 }
             ]
         }

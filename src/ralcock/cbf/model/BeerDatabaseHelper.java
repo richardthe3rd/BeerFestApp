@@ -2,41 +2,73 @@ package ralcock.cbf.model;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
+import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
+import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.support.ConnectionSource;
+import com.j256.ormlite.table.TableUtils;
+import ralcock.cbf.model.dao.BeerDao;
+import ralcock.cbf.model.dao.BreweryDao;
 
-public final class BeerDatabaseHelper extends SQLiteOpenHelper {
+import java.sql.SQLException;
+
+public final class BeerDatabaseHelper extends OrmLiteSqliteOpenHelper {
     @SuppressWarnings("UnusedDeclaration")
     private static final String TAG = BeerDatabaseHelper.class.getName();
 
-    private static final int DB_VERSION = 4; // Added beer status column
+    public static final String DATABASE_NAME = "BEERS";
 
-    public BeerDatabaseHelper(final Context context, final String databaseName) {
-        super(context, databaseName, null, DB_VERSION);
+    private static final int DB_VERSION = 9; // beer has festival ID
+
+    public BeerDatabaseHelper(final Context context) {
+        super(context, DATABASE_NAME, null, DB_VERSION);
     }
 
     @Override
-    public void onCreate(final SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL("CREATE TABLE " + BeerDatabase.BEERS_TABLE + " " +
-                "(_id INTEGER PRIMARY KEY AUTOINCREMENT, "+
-                BeerDatabase.BEER_NAME_COLUMN + " TEXT, " +
-                BeerDatabase.BEER_NOTES_COLUMN + " TEXT, " +
-                BeerDatabase.BEER_ABV_COLUMN + " REAL, " +
-                BeerDatabase.BEER_STATUS_COLUMN + " TEXT, " +
-                BeerDatabase.BREWERY_NAME_COLUMN + " TEXT, " +
-                BeerDatabase.BREWERY_NOTES_COLUMN + " TEXT" +
-                ")");
-
-        sqLiteDatabase.execSQL("CREATE TABLE " + BeerDatabase.RATINGS_TABLE + " " +
-                "(_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                BeerDatabase.BEER_ID_COLUMN + " INTEGER, " +
-                BeerDatabase.BEER_RATING_COLUMN + " REAL " +
-                ")");
+    public void onCreate(final SQLiteDatabase sqLiteDatabase,
+                         final ConnectionSource connectionSource) {
+        try {
+            TableUtils.createTable(connectionSource, Beer.class);
+            TableUtils.createTable(connectionSource, Brewery.class);
+        } catch (SQLException sqlx) {
+            throw new RuntimeException(sqlx);
+        }
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int old_version, int new_version) {
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + BeerDatabase.BEERS_TABLE);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + BeerDatabase.RATINGS_TABLE);
-        onCreate(sqLiteDatabase);
+    public void onUpgrade(final SQLiteDatabase sqLiteDatabase,
+                          final ConnectionSource connectionSource,
+                          int old_version, int new_version) {
+        try {
+            TableUtils.dropTable(connectionSource, Beer.class, true);
+            TableUtils.dropTable(connectionSource, Brewery.class, true);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        onCreate(sqLiteDatabase, connectionSource);
+    }
+
+    public BeerDao getBeerDao() {
+        try {
+            return DaoManager.createDao(getConnectionSource(), Beer.class);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public BreweryDao getBreweryDao() {
+        try {
+            return DaoManager.createDao(getConnectionSource(), Brewery.class);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void deleteAll() {
+        try {
+            TableUtils.clearTable(getConnectionSource(), Beer.class);
+            TableUtils.clearTable(getConnectionSource(), Brewery.class);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

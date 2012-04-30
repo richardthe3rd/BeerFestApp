@@ -1,14 +1,39 @@
 package ralcock.cbf.model;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+import ralcock.cbf.model.dao.BreweryDaoImpl;
+
 import java.io.Serializable;
 
+@DatabaseTable(tableName = Brewery.TABLE_NAME, daoClass = BreweryDaoImpl.class)
 public final class Brewery implements Serializable {
 
-    private final String fName;
+    public static final String TABLE_NAME = "breweries";
+    public static final String ID_FIELD = "_id";
+    public static final String FESTIVAL_ID_FIELD = "festival_id";
+    public static final String NAME_FIELD = "name";
+    public static final String DESCRIPTION_FIELD = "description";
 
-    private final String fDescription;
+    @DatabaseField(generatedId = true, columnName = ID_FIELD)
+    private long fId;
 
-    public Brewery(final String name, final String description) {
+    @DatabaseField(columnName = FESTIVAL_ID_FIELD)
+    private String fFestivalID;
+
+    @DatabaseField(columnName = NAME_FIELD)
+    private String fName;
+
+    @DatabaseField(columnName = DESCRIPTION_FIELD)
+    private String fDescription;
+
+    @SuppressWarnings("UnusedDeclaration")
+        // needed by ormlite
+    Brewery() {
+    }
+
+    public Brewery(final String festivalId, final String name, final String description) {
+        fFestivalID = festivalId;
         fName = name;
         fDescription = description;
     }
@@ -21,32 +46,51 @@ public final class Brewery implements Serializable {
         return fDescription;
     }
 
-    @Override
-    public String toString() {
-        return "Brewery{" +
-                "fName='" + fName + '\'' +
-                ", fDescription='" + fDescription + '\'' +
-                '}';
+    public String getFestivalID() {
+        return fFestivalID;
     }
 
+    public void setId(final long id) {
+        fId = id;
+    }
+
+    public long getId() {
+        return fId;
+    }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Brewery brewery = (Brewery) o;
+        final Brewery brewery = (Brewery) o;
 
-        if (!fDescription.equals(brewery.fDescription)) return false;
-        if (!fName.equals(brewery.fName)) return false;
+        if (fDescription != null ? !fDescription.equals(brewery.fDescription) : brewery.fDescription != null)
+            return false;
+        if (fFestivalID != null ? !fFestivalID.equals(brewery.fFestivalID) : brewery.fFestivalID != null) return false;
+        if (fName != null ? !fName.equals(brewery.fName) : brewery.fName != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = fName.hashCode();
-        result = 31 * result + fDescription.hashCode();
+        int result = fFestivalID != null ? fFestivalID.hashCode() : 0;
+        result = 31 * result + (fName != null ? fName.hashCode() : 0);
+        result = 31 * result + (fDescription != null ? fDescription.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("Brewery");
+        sb.append("{fId=").append(fId);
+        sb.append(", fFestivalID='").append(fFestivalID).append('\'');
+        sb.append(", fName='").append(fName).append('\'');
+        sb.append(", fDescription='").append(fDescription).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
+
 }
