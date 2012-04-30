@@ -14,7 +14,7 @@ public class BeerSearcher {
     }
 
     public void searchBeer(final Beer beer) {
-        Intent intent = new Intent(Intent.ACTION_SEARCH);
+        Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
         String query = String.format("\"%s\" \"%s\"", beer.getBrewery().getName(), beer.getName());
         intent.putExtra(SearchManager.QUERY, query);
         fContext.startActivity(intent);
