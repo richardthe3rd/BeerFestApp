@@ -26,16 +26,25 @@ public class BreweryDaoImpl extends BaseDaoImpl<Brewery, Long> implements Brewer
         }
     }
 
-    public int updateFromFestival(final Brewery brewery) throws SQLException {
+    public void updateFromFestivalOrCreate(final Brewery brewery) throws SQLException {
         SelectArg breweryName = new SelectArg(brewery.getName());
         SelectArg breweryDescription = new SelectArg(brewery.getDescription());
+        SelectArg breweryFestivalId = new SelectArg(brewery.getFestivalID());
 
         UpdateBuilder<Brewery, Long> updateBuilder = updateBuilder();
         updateBuilder.updateColumnValue(Brewery.NAME_FIELD, breweryName);
         updateBuilder.updateColumnValue(Brewery.DESCRIPTION_FIELD, breweryDescription);
-        updateBuilder.where().eq(Brewery.FESTIVAL_ID_FIELD, brewery.getFestivalID());
+        updateBuilder.where().eq(Brewery.FESTIVAL_ID_FIELD, breweryFestivalId);
         PreparedUpdate<Brewery> preparedUpdate = updateBuilder.prepare();
-        return update(preparedUpdate);
+
+        if (update(preparedUpdate) == 1) {
+            // update the brewery's Id field to match the database
+            QueryBuilder<Brewery, Long> queryBuilder = queryBuilder();
+            updateBuilder.where().eq(Brewery.FESTIVAL_ID_FIELD, breweryFestivalId);
+            brewery.setId(queryBuilder.queryForFirst().getId());
+        } else {
+            create(brewery);
+        }
     }
 
 }

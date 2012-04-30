@@ -11,8 +11,6 @@ import ralcock.cbf.model.dao.BreweryDao;
 import ralcock.cbf.view.BeerListAdapter;
 
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Set;
 
 class LoadBeersTask extends AsyncTask<Iterable<Beer>, Beer, Long> {
 
@@ -76,25 +74,15 @@ class LoadBeersTask extends AsyncTask<Iterable<Beer>, Beer, Long> {
     }
 
     private void initializeDatabase(Iterable<Beer> beers) {
-        Set<Brewery> breweries = new HashSet<Brewery>();
         for (Beer beer : beers) {
             try {
-
                 final Brewery brewery = beer.getBrewery();
-                if (breweries.add(brewery)) {
-                    if (0 == fBreweryDao.updateFromFestival(brewery)) {
-                        // new brewery
-                        fBreweryDao.create(brewery);
-                    } else {
-                        fBreweryDao.refresh(brewery);
-                    }
+                if (brewery.getId() == 0) {
+                    fBreweryDao.updateFromFestivalOrCreate(brewery);
                 }
 
-                if (0 == fBeerDao.updateFromFestival(beer)) {
-                    // new brewery
-                    fBeerDao.create(beer);
-                } else {
-                    fBeerDao.refresh(beer);
+                if (beer.getId() == 0) {
+                    fBeerDao.updateFromFestivalOrCreate(beer);
                 }
 
             } catch (SQLException e) {

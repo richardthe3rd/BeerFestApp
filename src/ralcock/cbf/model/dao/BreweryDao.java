@@ -9,5 +9,5 @@ import java.sql.SQLException;
 public interface BreweryDao extends Dao<Brewery, Long> {
     QueryBuilder<Brewery, Long> buildFilteredBreweryQuery(CharSequence filterText);
 
-    int updateFromFestival(Brewery brewery) throws SQLException;
+    void updateFromFestivalOrCreate(Brewery brewery) throws SQLException;
 }

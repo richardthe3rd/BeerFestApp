@@ -16,7 +16,7 @@ public final class Brewery implements Serializable {
     public static final String DESCRIPTION_FIELD = "description";
 
     @DatabaseField(generatedId = true, columnName = ID_FIELD)
-    private int fId;
+    private long fId;
 
     @DatabaseField(columnName = FESTIVAL_ID_FIELD)
     private String fFestivalID;
@@ -50,7 +50,11 @@ public final class Brewery implements Serializable {
         return fFestivalID;
     }
 
-    public int getId() {
+    public void setId(final long id) {
+        fId = id;
+    }
+
+    public long getId() {
         return fId;
     }
 
@@ -88,4 +92,5 @@ public final class Brewery implements Serializable {
         sb.append('}');
         return sb.toString();
     }
+
 }

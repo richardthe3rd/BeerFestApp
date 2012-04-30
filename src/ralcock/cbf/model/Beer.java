@@ -140,4 +140,7 @@ public final class Beer implements Serializable {
                 '}';
     }
 
+    public void setId(final long id) {
+        fId = id;
+    }
 }

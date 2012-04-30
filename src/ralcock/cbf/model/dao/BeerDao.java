@@ -15,5 +15,5 @@ public interface BeerDao extends Dao<Beer, Long> {
 
     QueryBuilder<Beer, Long> buildSortedFilteredBeerQuery(BreweryDao breweryDao, SortOrder sortOrder, CharSequence filterText);
 
-    int updateFromFestival(Beer beer) throws SQLException;
+    void updateFromFestivalOrCreate(Beer beer) throws SQLException;
 }
