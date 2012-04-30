@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -233,6 +234,10 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
                 getHelper().deleteAll();
                 loadBeersInBackground();
                 return true;
+            case R.id.visit_festival_website:
+                Uri festivalUri = Uri.parse(getResources().getString(R.string.festival_website_url));
+                Intent launchBrowser = new Intent(Intent.ACTION_VIEW, festivalUri);
+                startActivity(launchBrowser);
             default:
                 return super.onOptionsItemSelected(item);
         }

@@ -10,6 +10,8 @@
     </string>
 
     <string name="beer_list_url">http://dl.dropbox.com/u/4457379/cbf39_test.json</string>
+    <string name="festival_website_url">http://www.cambridgebeerfestival.com/viewnode.php?id=3</string>
+
 
     <string name="search_this_beer_title">Search for this beer…</string>
     <string name="share_this_beer_title">Share this beer…</string>
@@ -33,6 +35,7 @@
 
     <string name="reload_menu_label">Reload Beers</string>
     <string name="refresh_menu_label">Update Beers</string>
+    <string name="visit_festival_website_label">Visit Festival Website</string>
 
     <string name="sort_menu_label">Sort</string>
     <string name="search_menu_label">Search</string>
