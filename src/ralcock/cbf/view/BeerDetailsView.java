@@ -24,9 +24,11 @@ public final class BeerDetailsView extends OrmLiteBaseActivity<BeerDatabaseHelpe
 
     private Beer fBeer;
     private final BeerSharer fBeerSharer;
+    private final BeerSearcher fBeerSearcher;
 
     public BeerDetailsView() {
         fBeerSharer = new BeerSharer(this);
+        fBeerSearcher = new BeerSearcher(this);
     }
 
     public void onCreate(Bundle savedInstanceState) {
@@ -78,6 +80,9 @@ public final class BeerDetailsView extends OrmLiteBaseActivity<BeerDatabaseHelpe
         switch (item.getItemId()) {
             case R.id.share_beer:
                 fBeerSharer.shareBeer(fBeer);
+                return true;
+            case R.id.search_beer:
+                fBeerSearcher.searchBeer(fBeer);
                 return true;
             case R.id.clear_rating:
                 rateBeer(StarRating.NO_STARS);

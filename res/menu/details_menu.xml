@@ -5,7 +5,11 @@
           android:title="@string/share_this_beer_title"
           android:icon="@android:drawable/ic_menu_send"
             />
+    <item android:id="@+id/search_beer"
+          android:title="@string/search_this_beer_title"
+          android:icon="@android:drawable/ic_menu_search"
+            />
     <item android:id="@+id/clear_rating"
           android:title="@string/oops_this_beer"
-          android:icon="@android:drawable/ic_menu_close_clear_cancel" />
+          android:icon="@android:drawable/ic_menu_close_clear_cancel"/>
 </menu>

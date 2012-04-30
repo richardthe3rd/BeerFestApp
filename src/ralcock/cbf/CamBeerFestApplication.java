@@ -10,6 +10,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -29,6 +30,7 @@ import ralcock.cbf.model.dao.BeerDao;
 import ralcock.cbf.model.dao.BreweryDao;
 import ralcock.cbf.view.BeerDetailsView;
 import ralcock.cbf.view.BeerListAdapter;
+import ralcock.cbf.view.BeerSearcher;
 import ralcock.cbf.view.BeerSharer;
 
 import java.io.IOException;
@@ -47,6 +49,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
 
     private BeerList fBeerList;
     private final BeerSharer fBeerSharer;
+    private final BeerSearcher fBeerSearcher;
 
     private final AppPreferences fAppPreferences;
 
@@ -68,6 +71,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         super();
         fAppPreferences = new AppPreferences(this);
         fBeerSharer = new BeerSharer(this);
+        fBeerSearcher = new BeerSearcher(this);
     }
 
     @Override
@@ -169,17 +173,24 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
 
         lv.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
             public void onCreateContextMenu(ContextMenu contextMenu, final View view, final ContextMenu.ContextMenuInfo contextMenuInfo) {
-                MenuItem shareThisMenu = contextMenu.add(0, Menu.FIRST, 0, R.string.share_this_beer_title);
-                shareThisMenu.setIcon(android.R.drawable.ic_menu_send);
-                shareThisMenu.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                    public boolean onMenuItemClick(MenuItem menuItem) {
-                        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuItem.getMenuInfo();
-                        fBeerSharer.shareBeer(getBeerWithId(info.id));
-                        return true;
-                    }
-                });
+                MenuInflater inflater = new MenuInflater(getApplicationContext());
+                inflater.inflate(R.menu.list_context_menu, contextMenu);
             }
         });
+    }
+
+    @Override
+    public boolean onMenuItemSelected(final int featureId, final MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.search_beer:
+                fBeerSearcher.searchBeer(getBeerWithId(info.id));
+                return true;
+            case R.id.share_beer:
+                fBeerSharer.shareBeer(getBeerWithId(info.id));
+                return true;
+        }
+        return super.onMenuItemSelected(featureId, item);
     }
 
     private Beer getBeerWithId(final long id) {

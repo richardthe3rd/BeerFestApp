@@ -5,4 +5,9 @@
           android:title="@string/share_this_beer_title"
           android:icon="@android:drawable/ic_menu_send"
             />
+    <item android:id="@+id/search_beer"
+          android:title="@string/search_this_beer_title"
+          android:icon="@android:drawable/ic_menu_search"
+            />
+
 </menu>

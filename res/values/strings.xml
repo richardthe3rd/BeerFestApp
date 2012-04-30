@@ -11,6 +11,7 @@
 
     <string name="beer_list_url">http://dl.dropbox.com/u/4457379/cbf39_test.json</string>
 
+    <string name="search_this_beer_title">Search for this beer…</string>
     <string name="share_this_beer_title">Share this beer…</string>
 
     <string name="abv">ABV</string>
