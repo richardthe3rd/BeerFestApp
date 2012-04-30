@@ -4,12 +4,16 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import ralcock.cbf.model.SortOrder;
 
+import java.util.Date;
+
 public final class AppPreferences {
 
     private static final String PREFERENCES_NAME = CamBeerFestApplication.class.getSimpleName();
     private static final SortOrder DEFAULT_SORT_ORDER = SortOrder.BREWERY_NAME_ASC;
+
     private static final String SORT_ORDER_KEY = "sortOrder";
     private static final String FILTER_TEXT_KEY = "filterText";
+    private static final String LAST_UPDATE_TIME_KEY = "lastUpdateTime";
 
     private final Context fContext;
 
@@ -17,7 +21,7 @@ public final class AppPreferences {
         fContext = context;
     }
 
-    public void setSortOrder(final SortOrder sortOrder){
+    public void setSortOrder(final SortOrder sortOrder) {
         setPreference(SORT_ORDER_KEY, sortOrder.name());
     }
 
@@ -25,20 +29,40 @@ public final class AppPreferences {
         String sortOrderName = getPreference(SORT_ORDER_KEY, DEFAULT_SORT_ORDER.name());
         return SortOrder.valueOf(sortOrderName);
     }
-    
-    public void setFilterText(String filterText){
+
+    public void setFilterText(String filterText) {
         setPreference(FILTER_TEXT_KEY, filterText);
     }
-    
-    public String getFilterText(){
+
+    public String getFilterText() {
         return getPreference(FILTER_TEXT_KEY, "");
     }
 
-    private String getPreference(final String key, final String def){
+    public Date getLastUpdateTime() {
+        return getPreference(LAST_UPDATE_TIME_KEY, new Date(0));
+    }
+
+    private Date getPreference(final String key, final Date date) {
+        SharedPreferences settings = getSharedPreferences();
+        return new Date(settings.getLong(key, date.getTime()));
+    }
+
+    public void setLastUpdateTime(final Date date) {
+        setPreference(LAST_UPDATE_TIME_KEY, date);
+    }
+
+    private void setPreference(final String key, final Date date) {
+        SharedPreferences settings = getSharedPreferences();
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putLong(key, date.getTime());
+        editor.commit();
+    }
+
+    private String getPreference(final String key, final String def) {
         SharedPreferences settings = getSharedPreferences();
         return settings.getString(key, def);
     }
-    
+
     private void setPreference(final String key, final String value) {
         SharedPreferences settings = getSharedPreferences();
         SharedPreferences.Editor editor = settings.edit();

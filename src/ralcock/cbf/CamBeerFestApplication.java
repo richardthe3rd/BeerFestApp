@@ -39,7 +39,9 @@ import java.io.InputStream;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabaseHelper> {
     private static final String TAG = CamBeerFestApplication.class.getName();
@@ -91,13 +93,15 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
 
         super.onCreate(savedInstanceState);
 
+        setContentView(R.layout.beer_list_view);
+
+        setTitle(getResources().getText(R.string.list_title));
+
         fBeerList = new BeerList(getBeerDao(), getBreweryDao(),
                 fAppPreferences.getSortOrder(),
                 fAppPreferences.getFilterText());
 
         fAdapter = new BeerListAdapter(CamBeerFestApplication.this, fBeerList);
-
-        setContentView(R.layout.beer_list_view);
 
         fFilterTextBox = (EditText) findViewById(R.id.search);
         fFilterTextBox.setText(fAppPreferences.getFilterText());
@@ -111,21 +115,26 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
             }
         });
 
-        setTitle(getResources().getText(R.string.list_title));
+        if (beerUpdateNeeded()) {
+            Log.i(TAG, "Updating beers as last updated at " + fAppPreferences.getLastUpdateTime());
+            loadBeersInBackground();
+        }
 
-        loadBeersInBackground();
-
-        /*
-        fAdapter.setFilterQueryProvider(new FilterQueryProvider() {
-            public Cursor runQuery(CharSequence filterText) {
-                Log.d(TAG, "FilterQueryProvider.runQuery with filter: " + filterText);
-                return fBeerDatabase.getFilteredBeerListCursor(fAppPreferences.getSortOrder(), filterText);
-            }
-        });
-        */
         setListAdapter(fAdapter);
 
         configureListView();
+    }
+
+    private boolean beerUpdateNeeded() {
+        Date currentTime = new Date();
+        Date lastUpdate = fAppPreferences.getLastUpdateTime();
+        long deltaInMilliSec = currentTime.getTime() - lastUpdate.getTime();
+        long deltaInSec = TimeUnit.MILLISECONDS.toSeconds(deltaInMilliSec);
+        return deltaInSec > hoursInSeconds(12);
+    }
+
+    private long hoursInSeconds(final long hours) {
+        return hours * 60 * 20;
     }
 
     private BreweryDao getBreweryDao() {
@@ -153,6 +162,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
             final Iterable<Beer> beers = new JsonBeerList(inputStream());
             //noinspection unchecked
             task.execute(beers);
+            fAppPreferences.setLastUpdateTime(new Date());
         } catch (IOException iox) {
             Log.e(TAG, "Failed to load beers.", iox);
         } catch (JSONException jsx) {
