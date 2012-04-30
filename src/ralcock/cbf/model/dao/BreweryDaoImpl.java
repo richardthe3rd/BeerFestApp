@@ -6,6 +6,7 @@ import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.SelectArg;
 import com.j256.ormlite.stmt.UpdateBuilder;
 import com.j256.ormlite.support.ConnectionSource;
+import com.j256.ormlite.table.DatabaseTableConfig;
 import ralcock.cbf.model.Brewery;
 
 import java.sql.SQLException;
@@ -14,6 +15,11 @@ public class BreweryDaoImpl extends BaseDaoImpl<Brewery, Long> implements Brewer
     public BreweryDaoImpl(final ConnectionSource connectionSource) throws SQLException {
         super(connectionSource, Brewery.class);
     }
+
+    public BreweryDaoImpl(final ConnectionSource connectionSource, DatabaseTableConfig<Brewery> config) throws SQLException {
+        super(connectionSource, config);
+    }
+
 
     public QueryBuilder<Brewery, Long> buildFilteredBreweryQuery(final CharSequence filterText) {
         QueryBuilder<Brewery, Long> qb = queryBuilder();

@@ -7,6 +7,7 @@ import com.j256.ormlite.stmt.SelectArg;
 import com.j256.ormlite.stmt.UpdateBuilder;
 import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
+import com.j256.ormlite.table.DatabaseTableConfig;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.Brewery;
 import ralcock.cbf.model.SortOrder;
@@ -16,6 +17,10 @@ import java.sql.SQLException;
 public class BeerDaoImpl extends BaseDaoImpl<Beer, Long> implements BeerDao {
     public BeerDaoImpl(final ConnectionSource connectionSource) throws SQLException {
         super(connectionSource, Beer.class);
+    }
+
+    public BeerDaoImpl(final ConnectionSource connectionSource, DatabaseTableConfig<Beer> config) throws SQLException {
+        super(connectionSource, config);
     }
 
     public Beer getBeerWithId(final long id) throws SQLException {

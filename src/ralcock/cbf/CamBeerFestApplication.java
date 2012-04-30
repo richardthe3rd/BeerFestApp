@@ -146,7 +146,8 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         progressDialog.setMessage(getResources().getText(R.string.loading_message));
         progressDialog.setIndeterminate(true);
 
-        final LoadBeersTask task = new LoadBeersTask(getBeerDao(), getBreweryDao(), fAdapter, fBeerList, progressDialog);
+        final LoadBeersTask task = new LoadBeersTask(getHelper().getConnectionSource(),
+                getBeerDao(), getBreweryDao(), fAdapter, fBeerList, progressDialog);
         try {
             final Iterable<Beer> beers = new JsonBeerList(inputStream());
             //noinspection unchecked

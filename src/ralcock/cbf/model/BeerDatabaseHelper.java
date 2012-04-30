@@ -6,6 +6,7 @@ import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
+import ralcock.cbf.R;
 import ralcock.cbf.model.dao.BeerDao;
 import ralcock.cbf.model.dao.BreweryDao;
 
@@ -19,8 +20,11 @@ public final class BeerDatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     private static final int DB_VERSION = 9; // beer has festival ID
 
+    private BreweryDao fBreweryDao;
+    private BeerDao fBeerDao;
+
     public BeerDatabaseHelper(final Context context) {
-        super(context, DATABASE_NAME, null, DB_VERSION);
+        super(context, DATABASE_NAME, null, DB_VERSION, R.raw.ormlite_config);
     }
 
     @Override
@@ -49,7 +53,10 @@ public final class BeerDatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     public BeerDao getBeerDao() {
         try {
-            return DaoManager.createDao(getConnectionSource(), Beer.class);
+            if (fBeerDao == null) {
+                fBeerDao = DaoManager.createDao(getConnectionSource(), Beer.class);
+            }
+            return fBeerDao;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -57,7 +64,10 @@ public final class BeerDatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     public BreweryDao getBreweryDao() {
         try {
-            return DaoManager.createDao(getConnectionSource(), Brewery.class);
+            if (fBreweryDao == null) {
+                fBreweryDao = DaoManager.createDao(getConnectionSource(), Brewery.class);
+            }
+            return fBreweryDao;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
