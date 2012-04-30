@@ -40,7 +40,7 @@ public class BreweryDaoImpl extends BaseDaoImpl<Brewery, Long> implements Brewer
         if (update(preparedUpdate) == 1) {
             // update the brewery's Id field to match the database
             QueryBuilder<Brewery, Long> queryBuilder = queryBuilder();
-            updateBuilder.where().eq(Brewery.FESTIVAL_ID_FIELD, breweryFestivalId);
+            queryBuilder.where().eq(Brewery.FESTIVAL_ID_FIELD, breweryFestivalId);
             brewery.setId(queryBuilder.queryForFirst().getId());
         } else {
             create(brewery);

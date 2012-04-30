@@ -64,7 +64,7 @@ public class BeerDaoImpl extends BaseDaoImpl<Beer, Long> implements BeerDao {
         if (update(preparedUpdate) == 1) {
             // update the brewery's Id field to match the database
             QueryBuilder<Beer, Long> queryBuilder = queryBuilder();
-            updateBuilder.where().eq(Brewery.FESTIVAL_ID_FIELD, beerFestivalId);
+            queryBuilder.where().eq(Brewery.FESTIVAL_ID_FIELD, beerFestivalId);
             beer.setId(queryBuilder.queryForFirst().getId());
         } else {
             create(beer);

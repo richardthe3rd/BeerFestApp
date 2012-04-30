@@ -38,8 +38,7 @@ public class BreweryDaoImplTest extends AndroidTestCase {
         fBreweryDao.create(brewery);
 
         Brewery brewery2 = new Brewery("ID1", "NAME2", "DESCRIPTION2");
-        int numUpdated = fBreweryDao.updateFromFestivalOrCreate(brewery2);
-        assertEquals(1, numUpdated);
+        fBreweryDao.updateFromFestivalOrCreate(brewery2);
 
         fBreweryDao.refresh(brewery);
         assertEquals(brewery.getName(), "NAME2");
@@ -48,7 +47,7 @@ public class BreweryDaoImplTest extends AndroidTestCase {
 
     public void testUpdateFromFestivalNew() throws SQLException {
         Brewery brewery = new Brewery("ID", "NAME", "DESCRIPTION");
-        int numUpdated = fBreweryDao.updateFromFestivalOrCreate(brewery);
-        assertEquals(0, numUpdated);
+        fBreweryDao.updateFromFestivalOrCreate(brewery);
+        assertEquals(brewery.getName(), "NAME");
     }
 }
