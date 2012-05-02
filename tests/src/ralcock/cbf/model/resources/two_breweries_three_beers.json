@@ -8,7 +8,7 @@
                 {
                     "id": "1",
                     "name": "BEER_ONE",
-                    "style": null,
+                    "style": "STYLE1",
                     "notes": "BEER_ONE_NOTES",
                     "abv": 1.1,
                     "status_text": "BEER_ONE_STATUS"
@@ -23,7 +23,7 @@
                 {
                     "id": "2",
                     "name": "BEER_TWO",
-                    "style": null,
+                    "style": "STYLE2",
                     "notes": "BEER_TWO_NOTES",
                     "abv": 2.2,
                     "status_text": "BEER_TWO_STATUS"
@@ -31,7 +31,7 @@
                 {
                     "id": "3",
                     "name": "BEER_THREE",
-                    "style": null,
+                    "style": "STYLE2",
                     "notes": "BEER_THREE_NOTES",
                     "abv": 3.3,
                     "status_text": "BEER_THREE_STATUS"

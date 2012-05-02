@@ -9,7 +9,7 @@
     <string formatted="false" name="share_this_rated_beer_text">Gave %d stars to %s %s @cambeerfest #cbf39 #beer
     </string>
 
-    <string name="beer_list_url">http://dl.dropbox.com/u/4457379/cbf39_test.json</string>
+    <string name="beer_list_url">http://dl.dropbox.com/u/4457379/cbf39.json</string>
     <string name="festival_website_url">http://www.cambridgebeerfestival.com/viewnode.php?id=3</string>
 
 
@@ -17,18 +17,11 @@
     <string name="share_this_beer_title">Share this beer…</string>
 
     <string name="abv">ABV</string>
-
     <string name="brewery">Brewery</string>
     <string name="rating">Rating</string>
+    <string name="style">Style</string>
+    <string name="status">Status</string>
 
-    <string name="like_this_beer">Like</string>
-    <string name="dislike_this_beer">Dislike</string>
-    <string name="rate_this_beer">Rate this beer</string>
-
-    <string name="love_this_beer">I loved it</string>
-    <string name="ok_this_beer">It was OK</string>
-
-    <string name="hate_this_beer">I hated it</string>
     <string name="oops_this_beer">Forget Rating</string>
 
     <string name="sort_dialog_title">Sort</string>
@@ -45,10 +38,6 @@
     <string name="sort_by_abv">Sort by ABV</string>
     <string name="sort_by_rating">Sort by Rating</string>
 
-    <string name="Rating_Unrated">Unrated</string>
-    <string name="Rating_Horrible">I hated it</string>
-    <string name="Rating_OK">It was OK</string>
-    <string name="Rating_Love">I loved it</string>
     <string name="filter_hint">type to filter</string>
 
     <string name="loading_message">Loading beers, please wait…</string>

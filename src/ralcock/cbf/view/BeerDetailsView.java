@@ -51,6 +51,8 @@ public final class BeerDetailsView extends OrmLiteBaseActivity<BeerDatabaseHelpe
 
         String details =
                 getResources().getText(R.string.brewery) + ": " + beer.getBrewery().getName() + "\n" +
+                        getResources().getText(R.string.style) + ": " + beer.getStyle() + "\n" +
+                        getResources().getText(R.string.status) + ": " + beer.getStatus() + "\n" +
                         getResources().getText(R.string.abv) + ": " + beer.getAbv() + "%\n";
         beerDetails.setText(details);
 

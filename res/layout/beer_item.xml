@@ -1,42 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_height="fill_parent"
-        android:layout_width="fill_parent"
-        android:layout_weight="1"
-        android:orientation="horizontal" >
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:layout_height="fill_parent"
-                  android:layout_width="fill_parent"
-                  android:layout_weight="1"
-                  android:orientation="vertical"
+              android:layout_height="fill_parent"
+              android:layout_width="fill_parent"
+              android:layout_weight="1"
+              android:baselineAligned="true"
+              android:orientation="horizontal">
+
+    <LinearLayout
+            android:layout_height="fill_parent"
+            android:layout_width="0dip"
+            android:layout_weight="3"
+            android:orientation="vertical"
+            android:layout_marginLeft="1sp"
+            android:layout_marginTop="1sp"
             >
-        <TextView android:id="@+id/brewery"
-                android:layout_height="wrap_content"
-                android:layout_width="fill_parent"
-                android:textStyle="bold"
-                android:textSize="24sp"
-                android:layout_weight="1"
+        <TextView android:id="@+id/beer_name"
+                  android:layout_height="wrap_content"
+                  android:layout_width="wrap_content"
+                  android:textStyle="bold"
+                  android:textSize="18sp"
                 />
-        <TextView android:id="@+id/beer"
-                android:layout_height="wrap_content"
-                android:layout_width="fill_parent"
-                android:textSize="20sp"
-                android:layout_weight="1"
-                android:layout_marginLeft="10dp"
+
+        <TextView android:id="@+id/brewery_name"
+                  android:layout_height="wrap_content"
+                  android:layout_width="wrap_content"
+                  android:textSize="14sp"
+                />
+
+        <RatingBar android:id="@+id/beer_rating"
+                   android:layout_height="fill_parent"
+                   android:layout_width="wrap_content"
+                   android:gravity="left|center_vertical"
+                   android:textSize="14sp"
+                   android:layout_marginRight="10dp"
+                   android:isIndicator="true"
+                   android:numStars="5"
+                   style="?android:attr/ratingBarStyleSmall"
                 />
     </LinearLayout>
 
-    <RatingBar android:id="@+id/rating"
-               android:layout_height="fill_parent"
-               android:layout_width="wrap_content"
-               android:gravity="right|center_vertical"
-               android:textSize="14sp"
-               android:layout_weight="0"
-               android:layout_marginRight="10dp"
-               android:isIndicator="true"
-               style="?android:attr/ratingBarStyleSmall"
-               />
+    <LinearLayout
+            android:layout_height="fill_parent"
+            android:layout_width="0dip"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="right"
+            android:layout_marginTop="1sp"
+            android:layout_marginRight="1sp"
+            >
 
+        <TextView android:id="@+id/beer_style"
+                  android:layout_height="wrap_content"
+                  android:layout_width="wrap_content"
+                  android:textSize="14sp"
+                  android:layout_gravity="top|right"
+                />
+        <TextView android:id="@+id/beer_status"
+                  android:layout_height="fill_parent"
+                  android:layout_width="wrap_content"
+                  android:textSize="12sp"
+                  android:layout_gravity="bottom|right"
+                />
+    </LinearLayout>
 </LinearLayout>
 

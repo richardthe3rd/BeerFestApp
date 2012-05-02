@@ -8,7 +8,7 @@
                 {
                     "id": "1",
                     "name": "BEER_ONE",
-                    "style": null,
+                    "style": "STYLE1",
                     "notes": "BEER_ONE_NOTES",
                     "abv": 1.1,
                     "status_text": "BEER_ONE_STATUS"

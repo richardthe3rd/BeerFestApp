@@ -15,10 +15,13 @@ import ralcock.cbf.model.SortOrder;
 import java.sql.SQLException;
 
 public class BeerDaoImpl extends BaseDaoImpl<Beer, Long> implements BeerDao {
+
+    @SuppressWarnings("UnusedDeclaration")
     public BeerDaoImpl(final ConnectionSource connectionSource) throws SQLException {
         super(connectionSource, Beer.class);
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public BeerDaoImpl(final ConnectionSource connectionSource, DatabaseTableConfig<Beer> config) throws SQLException {
         super(connectionSource, config);
     }
@@ -54,6 +57,7 @@ public class BeerDaoImpl extends BaseDaoImpl<Beer, Long> implements BeerDao {
         SelectArg beerBrewery = new SelectArg(beer.getBrewery());
         SelectArg beerAbv = new SelectArg(beer.getAbv());
         SelectArg beerStatus = new SelectArg(beer.getStatus());
+        SelectArg beerStyle = new SelectArg(beer.getStyle());
         SelectArg beerFestivalId = new SelectArg(beer.getFestivalID());
 
         UpdateBuilder<Beer, Long> updateBuilder = updateBuilder();
@@ -62,6 +66,7 @@ public class BeerDaoImpl extends BaseDaoImpl<Beer, Long> implements BeerDao {
         updateBuilder.updateColumnValue(Beer.BREWERY_FIELD, beerBrewery);
         updateBuilder.updateColumnValue(Beer.ABV_FIELD, beerAbv);
         updateBuilder.updateColumnValue(Beer.STATUS_FIELD, beerStatus);
+        updateBuilder.updateColumnValue(Beer.STYLE_FIELD, beerStyle);
 
         updateBuilder.where().eq(Beer.FESTIVAL_ID_FIELD, beerFestivalId);
         PreparedUpdate<Beer> preparedUpdate = updateBuilder.prepare();
