@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Cambridge Beer Festival</string>
+    <string name="list_title">39th Cambridge Beer Festival</string>
+    <string name="share_this_beer_subject">Drinking a beer at the 39th Cambridge Beer Festival</string>
+    <string formatted="false" name="share_this_beer_text">Drinking %s %s #cbf39 #beer</string>
+    <string formatted="false" name="share_this_rated_beer_text">Gave %d stars to %s %s #cbf39 #beer</string>
+
+    <string name="beer_list_url">http://dl.dropbox.com/u/4457379/cbf39.json</string>
+    <string name="festival_website_url">http://www.cambridgebeerfestival.com/viewnode.php?id=3</string>
+</resources>

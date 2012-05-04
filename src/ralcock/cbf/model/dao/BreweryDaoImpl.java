@@ -12,14 +12,16 @@ import ralcock.cbf.model.Brewery;
 import java.sql.SQLException;
 
 public class BreweryDaoImpl extends BaseDaoImpl<Brewery, Long> implements BreweryDao {
+
+    @SuppressWarnings("UnusedDeclaration")
     public BreweryDaoImpl(final ConnectionSource connectionSource) throws SQLException {
         super(connectionSource, Brewery.class);
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public BreweryDaoImpl(final ConnectionSource connectionSource, DatabaseTableConfig<Brewery> config) throws SQLException {
         super(connectionSource, config);
     }
-
 
     public QueryBuilder<Brewery, Long> buildFilteredBreweryQuery(final CharSequence filterText) {
         QueryBuilder<Brewery, Long> qb = queryBuilder();

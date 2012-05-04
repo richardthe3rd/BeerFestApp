@@ -42,6 +42,8 @@ public class BeerDaoImpl extends BaseDaoImpl<Beer, Long> implements BeerDao {
         try {
             where.like(Beer.NAME_FIELD, "%" + filterText + "%");
             where.or();
+            where.like(Beer.STYLE_FIELD, "%" + filterText + "%");
+            where.or();
             where.in(Beer.BREWERY_FIELD, breweryDao.buildFilteredBreweryQuery(filterText));
             qb.orderBy(sortOrder.columnName(), sortOrder.ascending());
             return qb;

@@ -126,6 +126,13 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     }
 
     private boolean beerUpdateNeeded() {
+        try {
+            if (0 == getBeerDao().getNumberOfBeers()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         Date currentTime = new Date();
         Date lastUpdate = fAppPreferences.getLastUpdateTime();
         long deltaInMilliSec = currentTime.getTime() - lastUpdate.getTime();

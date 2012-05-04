@@ -18,10 +18,10 @@ public final class Brewery implements Serializable {
     @DatabaseField(generatedId = true, columnName = ID_FIELD)
     private long fId;
 
-    @DatabaseField(columnName = FESTIVAL_ID_FIELD)
+    @DatabaseField(columnName = FESTIVAL_ID_FIELD, index = true, unique = true)
     private String fFestivalID;
 
-    @DatabaseField(columnName = NAME_FIELD)
+    @DatabaseField(columnName = NAME_FIELD, index = true)
     private String fName;
 
     @DatabaseField(columnName = DESCRIPTION_FIELD)

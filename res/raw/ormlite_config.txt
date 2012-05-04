@@ -1,0 +1,80 @@
+#
+# generated on 2012/05/04 08:03:59
+#
+# --table-start--
+dataClass=ralcock.cbf.model.Beer
+tableName=beers
+# --table-fields-start--
+# --field-start--
+fieldName=fId
+columnName=_id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=fBrewery
+columnName=brewery
+foreign=true
+foreignAutoRefresh=true
+# --field-end--
+# --field-start--
+fieldName=fName
+columnName=name
+indexName=beers_name_idx
+# --field-end--
+# --field-start--
+fieldName=fAbv
+columnName=abv
+# --field-end--
+# --field-start--
+fieldName=fDescription
+columnName=description
+# --field-end--
+# --field-start--
+fieldName=fStatus
+columnName=status
+# --field-end--
+# --field-start--
+fieldName=fRating
+columnName=rating
+# --field-end--
+# --field-start--
+fieldName=fFestivalID
+columnName=festival_id
+unique=true
+indexName=beers_festival_id_idx
+# --field-end--
+# --field-start--
+fieldName=fStyle
+columnName=style
+indexName=beers_style_idx
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=ralcock.cbf.model.Brewery
+tableName=breweries
+# --table-fields-start--
+# --field-start--
+fieldName=fId
+columnName=_id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=fFestivalID
+columnName=festival_id
+unique=true
+indexName=breweries_festival_id_idx
+# --field-end--
+# --field-start--
+fieldName=fName
+columnName=name
+indexName=breweries_name_idx
+# --field-end--
+# --field-start--
+fieldName=fDescription
+columnName=description
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################

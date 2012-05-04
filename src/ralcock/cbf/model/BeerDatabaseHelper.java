@@ -18,7 +18,7 @@ public final class BeerDatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     public static final String DATABASE_NAME = "BEERS";
 
-    private static final int DB_VERSION = 10; // beer has style
+    private static final int DB_VERSION = 11; // added indices + unique
 
     private BreweryDao fBreweryDao;
     private BeerDao fBeerDao;

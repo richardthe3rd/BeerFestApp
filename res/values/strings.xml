@@ -1,19 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Cambridge Beer Festival</string>
-
-    <string name="list_title">Cambridge Beer Festival 39</string>
-    <string name="share_this_beer_subject">Drinking a beer at Cambridge Beer Festival</string>
-    <string formatted="false" name="share_this_beer_text">Drinking %s %s @cambeerfest #cbf39 #beer</string>
-    <string formatted="false" name="share_this_rated_beer_text">Gave %d stars to %s %s @cambeerfest #cbf39 #beer
-    </string>
-
-    <string name="beer_list_url">http://dl.dropbox.com/u/4457379/cbf39.json</string>
-    <string name="festival_website_url">http://www.cambridgebeerfestival.com/viewnode.php?id=3</string>
-
-
-    <string name="search_this_beer_title">Search for this beer…</string>
+    <string name="search_this_beer_title">Search for this beer online…</string>
     <string name="share_this_beer_title">Share this beer…</string>
 
     <string name="abv">ABV</string>

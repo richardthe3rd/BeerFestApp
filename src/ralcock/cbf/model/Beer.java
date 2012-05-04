@@ -26,7 +26,7 @@ public final class Beer implements Serializable {
     @DatabaseField(columnName = BREWERY_FIELD, foreign = true, foreignAutoRefresh = true)
     private Brewery fBrewery;
 
-    @DatabaseField(columnName = NAME_FIELD)
+    @DatabaseField(columnName = NAME_FIELD, index = true)
     private String fName;
 
     @DatabaseField(columnName = ABV_FIELD)
@@ -41,10 +41,10 @@ public final class Beer implements Serializable {
     @DatabaseField(columnName = RATING_FIELD)
     private int fRating;
 
-    @DatabaseField(columnName = FESTIVAL_ID_FIELD)
+    @DatabaseField(columnName = FESTIVAL_ID_FIELD, index = true, unique = true)
     private String fFestivalID;
 
-    @DatabaseField(columnName = STYLE_FIELD)
+    @DatabaseField(columnName = STYLE_FIELD, index = true)
     private String fStyle;
 
 
