@@ -16,17 +16,18 @@ import ralcock.cbf.model.StarRating;
 
 import java.sql.SQLException;
 
-public final class BeerDetailsView extends OrmLiteBaseActivity<BeerDatabaseHelper> {
+public final class BeerDetailsActivity extends OrmLiteBaseActivity<BeerDatabaseHelper> {
     @SuppressWarnings("UnusedDeclaration")
-    private static final String TAG = BeerDetailsView.class.getName();
+    private static final String TAG = BeerDetailsActivity.class.getName();
 
     public static final String EXTRA_BEER_ID = "BEER";
 
     private Beer fBeer;
     private final BeerSharer fBeerSharer;
     private final BeerSearcher fBeerSearcher;
+    private BeerDetailsView fBeerDetailsView = null;
 
-    public BeerDetailsView() {
+    public BeerDetailsActivity() {
         fBeerSharer = new BeerSharer(this);
         fBeerSearcher = new BeerSearcher(this);
     }
@@ -35,39 +36,31 @@ public final class BeerDetailsView extends OrmLiteBaseActivity<BeerDatabaseHelpe
         super.onCreate(savedInstanceState);
 
         // open DB and make queries on a bg thread
-        final long id = getIntent().getExtras().getLong(EXTRA_BEER_ID);
-        new ShowBeerTask().execute(id);
+        new ShowBeerTask().execute(getIntent().getExtras().getLong(EXTRA_BEER_ID));
     }
 
     private void displayBeer() {
-        Beer beer = fBeer;
+        if (fBeerDetailsView == null)
+            fBeerDetailsView = new BeerDetailsView();
 
-        setTitle(beer.getBrewery().getName() + " - " + beer.getName());
+        setTitle(fBeer.getBrewery().getName() + " - " + fBeer.getName());
 
-        TextView beerTitle = (TextView) findViewById(R.id.beer_name);
-        beerTitle.setText(beer.getName());
+        fBeerDetailsView.BeerNameAndAbv.setText(String.format("%s (%.1f%%)", fBeer.getName(), fBeer.getAbv()));
+        fBeerDetailsView.BeerDescription.setText(fBeer.getDescription());
+        fBeerDetailsView.BeerStyle.setText(fBeer.getStyle());
 
-        TextView beerDetails = (TextView) findViewById(R.id.beer_details);
+        fBeerDetailsView.Status.setText(fBeer.getStatus());
 
-        String details =
-                getResources().getText(R.string.brewery) + ": " + beer.getBrewery().getName() + "\n" +
-                        getResources().getText(R.string.style) + ": " + beer.getStyle() + "\n" +
-                        getResources().getText(R.string.status) + ": " + beer.getStatus() + "\n" +
-                        getResources().getText(R.string.abv) + ": " + beer.getAbv() + "%\n";
-        beerDetails.setText(details);
+        fBeerDetailsView.BreweryName.setText(fBeer.getBrewery().getName());
+        fBeerDetailsView.BreweryDescription.setText(fBeer.getBrewery().getDescription());
 
-        RatingBar ratingBar = ((RatingBar) findViewById(R.id.beer_rating));
-        ratingBar.setRating(beer.getNumberOfStars().getNumberOfStars());
-
-        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+        fBeerDetailsView.BeerRating.setNumStars(fBeer.getRating());
+        fBeerDetailsView.BeerRating.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
                 if (fromUser)
                     rateBeer(new StarRating(rating));
             }
         });
-
-        TextView beerNotesView = (TextView) findViewById(R.id.beer_notes);
-        beerNotesView.setText(beer.getDescription());
     }
 
     @Override
@@ -130,6 +123,26 @@ public final class BeerDetailsView extends OrmLiteBaseActivity<BeerDatabaseHelpe
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
+        }
+    }
+
+    final class BeerDetailsView {
+        final TextView BeerNameAndAbv;
+        final TextView BeerStyle;
+        final TextView BeerDescription;
+        final RatingBar BeerRating;
+        final TextView BreweryName;
+        final TextView BreweryDescription;
+        final TextView Status;
+
+        public BeerDetailsView() {
+            BeerNameAndAbv = (TextView) findViewById(R.id.details_view_beer_name_and_abv);
+            BeerStyle = (TextView) findViewById(R.id.details_view_beer_style);
+            BeerDescription = (TextView) findViewById(R.id.details_view_beer_description);
+            BreweryName = (TextView) findViewById(R.id.details_view_brewery_name);
+            BreweryDescription = (TextView) findViewById(R.id.details_view_brewery_description);
+            BeerRating = (RatingBar) findViewById(R.id.details_view_beer_rating);
+            Status = (TextView) findViewById(R.id.details_view_beer_status);
         }
     }
 }

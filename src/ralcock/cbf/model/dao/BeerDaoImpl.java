@@ -1,6 +1,7 @@
 package ralcock.cbf.model.dao;
 
 import com.j256.ormlite.dao.BaseDaoImpl;
+import com.j256.ormlite.dao.GenericRawResults;
 import com.j256.ormlite.stmt.PreparedUpdate;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.SelectArg;
@@ -13,6 +14,9 @@ import ralcock.cbf.model.Brewery;
 import ralcock.cbf.model.SortOrder;
 
 import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class BeerDaoImpl extends BaseDaoImpl<Beer, Long> implements BeerDao {
 
@@ -34,17 +38,44 @@ public class BeerDaoImpl extends BaseDaoImpl<Beer, Long> implements BeerDao {
         return countOf();
     }
 
+    public Set<String> getAvailableStyles() throws SQLException {
+        QueryBuilder<Beer, Long> qb = queryBuilder();
+        qb.selectColumns(Beer.STYLE_FIELD);
+        qb.distinct();
+        qb.orderBy(Beer.STYLE_FIELD, true);
+
+        GenericRawResults<String[]> results = queryRaw(qb.prepareStatementString());
+        try {
+            Set<String> styles = new HashSet<String>();
+            List<String[]> resultList = results.getResults();
+            for (String[] array : resultList) {
+                styles.add(array[0]);
+            }
+            return styles;
+        } finally {
+            results.close();
+        }
+
+    }
+
     public QueryBuilder<Beer, Long> buildSortedFilteredBeerQuery(final BreweryDao breweryDao,
                                                                  final SortOrder sortOrder,
-                                                                 final CharSequence filterText) {
+                                                                 final CharSequence filterText,
+                                                                 final Set<String> stylesToHide) {
         QueryBuilder<Beer, Long> qb = queryBuilder();
         Where where = qb.where();
         try {
-            where.like(Beer.NAME_FIELD, "%" + filterText + "%");
-            where.or();
-            where.like(Beer.STYLE_FIELD, "%" + filterText + "%");
-            where.or();
-            where.in(Beer.BREWERY_FIELD, breweryDao.buildFilteredBreweryQuery(filterText));
+            //noinspection unchecked
+            where.and(
+                    where.not().in(Beer.STYLE_FIELD, stylesToHide),
+                    where.or(
+                            where.or(
+                                    where.like(Beer.NAME_FIELD, "%" + filterText + "%"),
+                                    where.like(Beer.STYLE_FIELD, "%" + filterText + "%")
+                            ),
+                            where.in(Beer.BREWERY_FIELD, breweryDao.buildFilteredBreweryQuery(filterText))
+                    )
+            );
             qb.orderBy(sortOrder.columnName(), sortOrder.ascending());
             return qb;
         } catch (SQLException e) {

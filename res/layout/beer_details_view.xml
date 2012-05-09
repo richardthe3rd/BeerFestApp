@@ -11,36 +11,68 @@
                   android:layout_weight="1"
                   android:padding="10dp"
             >
-        <TextView
-                android:id="@+id/beer_name"
+        <TableLayout
+                android:layout_height="fill_parent"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                />
-        <TextView
-                android:id="@+id/beer_details"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginLeft="10dp"
-                />
-        <TextView
-                android:id="@+id/beer_notes"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:layout_marginBottom="20dp"
-                />
+                android:stretchColumns="1"
+                >
+            <TableRow>
+                <TextView
+                        android:id="@+id/details_view_beer_name_and_abv"
+                        android:textStyle="bold"
+                        android:text="Beer1 (3.6%)"
+                        />
+                <TextView
+                        android:id="@+id/details_view_beer_style"
+                        android:text="Stout"
+                        android:layout_gravity="center_horizontal"
+                        />
+                <TextView
+                        android:id="@+id/details_view_beer_status"
+                        android:text="Plenty Left"
+                        android:textStyle="italic"
+                        android:layout_gravity="right"
+                        />
+            </TableRow>
+            <TableRow>
+                <TextView
+                        android:id="@+id/details_view_beer_description"
+                        android:padding="3dip"
+                        android:layout_width="fill_parent"
+                        android:layout_span="33"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dp"
+                        android:text="dry stout crystal malt lauter tun abbey enzymes secondary fermentation. scotch ale wort scotch ale lagering becher lauter. real ale dry stout, secondary fermentation krug krausen dunkle lauter tun. original gravity bunghole saccharification degrees plato malt dry hopping."
+                        />
+            </TableRow>
+            <TableRow>
+                <TextView
+                        android:id="@+id/details_view_brewery_name"
+                        android:textStyle="bold"
+                        android:text="Milton"
+                        />
+            </TableRow>
+            <TableRow>
+                <TextView
+                        android:id="@+id/details_view_brewery_description"
+                        android:layout_width="fill_parent"
+                        android:layout_span="3"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dp"
+                        android:padding="3dip"
+                        android:text="dry stout crystal malt lauter."
+                        />
+            </TableRow>
+        </TableLayout>
+
 
         <RatingBar
-            android:id="@+id/beer_rating"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:numStars="5"
-            android:stepSize="1"
-            />
+                android:id="@+id/details_view_beer_rating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:numStars="5"
+                android:stepSize="1"
+                />
     </LinearLayout>
 
 </ScrollView>

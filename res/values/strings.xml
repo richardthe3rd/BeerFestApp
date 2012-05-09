@@ -21,6 +21,8 @@
     <string name="sort_menu_label">Sort</string>
     <string name="search_menu_label">Search</string>
 
+    <string name="show_only_style_label">Filter by style</string>
+
     <string name="sort_by_brewery">Sort by Brewery</string>
     <string name="sort_by_beer">Sort by Beer</string>
     <string name="sort_by_abv">Sort by ABV</string>
@@ -29,4 +31,9 @@
     <string name="filter_hint">type to filter</string>
 
     <string name="loading_message">Loading beers, please wait…</string>
+
+    <string name="filter_style_dialog_title">Show only...</string>
+
+    <string name="OK">OK</string>
+    <string name="CANCEL">Cancel</string>
 </resources>

@@ -60,6 +60,7 @@
                   android:layout_height="fill_parent"
                   android:layout_width="wrap_content"
                   android:textSize="12sp"
+                  android:textStyle="italic"
                   android:layout_gravity="bottom|right"
                 />
     </LinearLayout>

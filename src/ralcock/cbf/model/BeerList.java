@@ -6,6 +6,7 @@ import ralcock.cbf.model.dao.BreweryDao;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
 public class BeerList {
     private final BeerDao fBeerDao;
@@ -15,16 +16,24 @@ public class BeerList {
     private SortOrder fSortOrder;
 
     private List<Beer> fBeerList;
+    private Set<String> fFilterStyles;
 
     public BeerList(final BeerDao beerDao,
                     final BreweryDao breweryDao,
                     final SortOrder sortOrder,
-                    final CharSequence filterText) {
+                    final CharSequence filterText,
+                    final Set<String> filterStyles) {
         fBeerDao = beerDao;
         fBreweryDao = breweryDao;
         fSortOrder = sortOrder;
         fFilterText = filterText;
+        fFilterStyles = filterStyles;
 
+        updateBeerList();
+    }
+
+    public void stylesToHide(final Set<String> stylesToShow) {
+        fFilterStyles = stylesToShow;
         updateBeerList();
     }
 
@@ -39,7 +48,7 @@ public class BeerList {
     }
 
     public void updateBeerList() {
-        fBeerList = buildList(fSortOrder, fFilterText);
+        fBeerList = buildList(fSortOrder, fFilterText, fFilterStyles);
     }
 
     public int getCount() {
@@ -51,12 +60,14 @@ public class BeerList {
     }
 
     private List<Beer> buildList(final SortOrder sortOrder,
-                                 final CharSequence filterText) {
+                                 final CharSequence filterText,
+                                 final Set<String> stylesToHide) {
         try {
-            QueryBuilder<Beer, Long> qb = fBeerDao.buildSortedFilteredBeerQuery(fBreweryDao, sortOrder, filterText);
+            QueryBuilder<Beer, Long> qb = fBeerDao.buildSortedFilteredBeerQuery(fBreweryDao, sortOrder, filterText, stylesToHide);
             return qb.query();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
+
 }

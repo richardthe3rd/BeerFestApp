@@ -6,6 +6,7 @@ import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.SortOrder;
 
 import java.sql.SQLException;
+import java.util.Set;
 
 public interface BeerDao extends Dao<Beer, Long> {
 
@@ -13,7 +14,9 @@ public interface BeerDao extends Dao<Beer, Long> {
 
     long getNumberOfBeers() throws SQLException;
 
-    QueryBuilder<Beer, Long> buildSortedFilteredBeerQuery(BreweryDao breweryDao, SortOrder sortOrder, CharSequence filterText);
+    QueryBuilder<Beer, Long> buildSortedFilteredBeerQuery(BreweryDao breweryDao, SortOrder sortOrder, CharSequence filterText, final Set<String> filterStyles);
 
     void updateFromFestivalOrCreate(Beer beer) throws SQLException;
+
+    Set<String> getAvailableStyles() throws SQLException;
 }

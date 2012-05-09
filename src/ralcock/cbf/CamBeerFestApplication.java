@@ -1,6 +1,7 @@
 package ralcock.cbf;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -29,7 +30,7 @@ import ralcock.cbf.model.JsonBeerList;
 import ralcock.cbf.model.SortOrder;
 import ralcock.cbf.model.dao.BeerDao;
 import ralcock.cbf.model.dao.BreweryDao;
-import ralcock.cbf.view.BeerDetailsView;
+import ralcock.cbf.view.BeerDetailsActivity;
 import ralcock.cbf.view.BeerListAdapter;
 import ralcock.cbf.view.BeerSearcher;
 import ralcock.cbf.view.BeerSharer;
@@ -41,12 +42,16 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabaseHelper> {
     private static final String TAG = CamBeerFestApplication.class.getName();
 
     private static final int SHOW_BEER_DETAILS_REQUEST_CODE = 1;
+
+    private static final int SORT_DIALOG_ID = 0;
+    private static final int FILTER_BY_STYLE_DIALOG_ID = 1;
 
     private EditText fFilterTextBox = null;
 
@@ -99,7 +104,8 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
 
         fBeerList = new BeerList(getBeerDao(), getBreweryDao(),
                 fAppPreferences.getSortOrder(),
-                fAppPreferences.getFilterText());
+                fAppPreferences.getFilterText(),
+                fAppPreferences.getStylesToHide());
 
         fAdapter = new BeerListAdapter(CamBeerFestApplication.this, fBeerList);
 
@@ -180,12 +186,10 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     private void configureListView() {
         ListView lv = getListView();
 
-        //lv.setTextFilterEnabled(true);
-
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Intent intent = new Intent(CamBeerFestApplication.this, BeerDetailsView.class);
-                intent.putExtra(BeerDetailsView.EXTRA_BEER_ID, id);
+                Intent intent = new Intent(CamBeerFestApplication.this, BeerDetailsActivity.class);
+                intent.putExtra(BeerDetailsActivity.EXTRA_BEER_ID, id);
                 startActivityForResult(intent, SHOW_BEER_DETAILS_REQUEST_CODE);
             }
         });
@@ -241,26 +245,54 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.sort:
-                showSortDialog();
+                showDialog(SORT_DIALOG_ID);
+                return true;
+            case R.id.show_only_style:
+                showDialog(FILTER_BY_STYLE_DIALOG_ID);
                 return true;
             case R.id.refresh_database:
                 loadBeersInBackground();
                 return true;
             case R.id.reload_database:
-                // delete all beers
-                getHelper().deleteAll();
-                loadBeersInBackground();
+                doReloadDatabase();
                 return true;
             case R.id.visit_festival_website:
-                Uri festivalUri = Uri.parse(getResources().getString(R.string.festival_website_url));
-                Intent launchBrowser = new Intent(Intent.ACTION_VIEW, festivalUri);
-                startActivity(launchBrowser);
+                goToFestivalWebsite();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void showSortDialog() {
+    private void goToFestivalWebsite() {
+        Uri festivalUri = Uri.parse(getResources().getString(R.string.festival_website_url));
+        Intent launchBrowser = new Intent(Intent.ACTION_VIEW, festivalUri);
+        startActivity(launchBrowser);
+    }
+
+    private void doReloadDatabase() {
+        // delete all beers
+        getHelper().deleteAll();
+        loadBeersInBackground();
+    }
+
+    @Override
+    protected Dialog onCreateDialog(final int id) {
+        Dialog dialog;
+        switch (id) {
+            case SORT_DIALOG_ID:
+                dialog = createSortDialog();
+                break;
+            case FILTER_BY_STYLE_DIALOG_ID:
+                dialog = createStylesToHideDialog();
+                break;
+            default:
+                dialog = null;
+        }
+        return dialog;
+    }
+
+    private Dialog createSortDialog() {
         final List<SortOrder> items = Arrays.asList(SortOrder.values());
 
         ListAdapter listAdapter = new ArrayAdapter<SortOrder>(this, R.layout.sort_by_dialog_list_item, items);
@@ -274,8 +306,77 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
                 dialogInterface.dismiss();
             }
         });
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        return builder.create();
+    }
+
+    private Dialog createStylesToHideDialog() {
+        final Set<String> stylesToHide = fAppPreferences.getStylesToHide();
+
+        Set<String> allStyles;
+        try {
+            allStyles = getBeerDao().getAvailableStyles();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        final String[] styleArray = allStyles.toArray(new String[allStyles.size()]);
+
+        boolean[] checked = new boolean[allStyles.size()];
+        for (int i = 0; i < styleArray.length; i++) {
+            checked[i] = !stylesToHide.contains(styleArray[i]);
+        }
+
+        final String[] itemArray = new String[styleArray.length + 1];
+        itemArray[0] = "Show All";
+        System.arraycopy(styleArray, 0, itemArray, 1, styleArray.length);
+
+        final boolean[] itemChecked = new boolean[styleArray.length + 1];
+        itemChecked[0] = !stylesToHide.isEmpty();
+        System.arraycopy(checked, 0, itemChecked, 1, checked.length);
+        // TODO: Use a custom list adapter (builder.setAdapter())
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.filter_style_dialog_title);
+        builder.setMultiChoiceItems(itemArray, itemChecked, new DialogInterface.OnMultiChoiceClickListener() {
+            public void onClick(final DialogInterface dialogInterface, final int i, final boolean selected) {
+                if (selected) {
+                    if (i == 0) {
+                        // Show All
+                        stylesToHide.clear();
+                        // Re-set all the boxes
+                        ListView lv = ((AlertDialog) dialogInterface).getListView();
+                        for (int idx = 1; idx < itemChecked.length; idx++) {
+                            lv.setItemChecked(idx, true);
+                        }
+                    } else {
+                        stylesToHide.remove(itemArray[i]);
+                    }
+                } else {
+                    stylesToHide.add(itemArray[i]);
+                }
+
+                ListView lv = ((AlertDialog) dialogInterface).getListView();
+                lv.setItemChecked(0, false);
+            }
+        });
+        builder.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
+            public void onClick(final DialogInterface dialogInterface, final int i) {
+                filterByStyle(stylesToHide);
+            }
+        });
+
+        builder.setNegativeButton(R.string.CANCEL, new DialogInterface.OnClickListener() {
+            public void onClick(final DialogInterface dialogInterface, final int i) {
+            }
+        });
+
+        return builder.create();
+    }
+
+    private void filterByStyle(Set<String> stylesToHide) {
+        fAppPreferences.setStylesToHide(stylesToHide);
+        fBeerList.stylesToHide(stylesToHide);
+        fAdapter.notifyDataSetChanged();
     }
 
     private void filterBy(String filterText) {

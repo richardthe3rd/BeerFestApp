@@ -69,7 +69,6 @@ class LoadBeersTask extends AsyncTask<Iterable<Beer>, Beer, Long> {
     @Override
     protected Long doInBackground(Iterable<Beer>... beers) {
         final Iterable<Beer> beerList = beers[0];
-        // todo: Need a more intelligent way of deciding to do an update.
         try {
             Log.i(TAG, "Starting background initialization of database from " + beers[0]);
             final long count = TransactionManager.callInTransaction(fConnectionSource, new Callable<Long>() {
