@@ -65,7 +65,6 @@
             </TableRow>
         </TableLayout>
 
-
         <RatingBar
                 android:id="@+id/details_view_beer_rating"
                 android:layout_width="wrap_content"
