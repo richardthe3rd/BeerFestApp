@@ -55,7 +55,7 @@ public class BeerStyleListAdapter extends BaseAdapter {
         }
 
         if (i == 0) {
-            itemView.StyleTextView.setText(R.string.filter_style_dialog_title);
+            itemView.StyleTextView.setText(R.string.filter_style_dialog_show_all);
             itemView.StyleTextView.setTypeface(Typeface.DEFAULT_BOLD);
             itemView.ShowStyleCheck.setChecked(fStylesToHide.isEmpty());
             itemView.ShowStyleCheck.setOnClickListener(new View.OnClickListener() {

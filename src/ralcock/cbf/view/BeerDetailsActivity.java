@@ -54,7 +54,7 @@ public final class BeerDetailsActivity extends OrmLiteBaseActivity<BeerDatabaseH
         fBeerDetailsView.BreweryName.setText(fBeer.getBrewery().getName());
         fBeerDetailsView.BreweryDescription.setText(fBeer.getBrewery().getDescription());
 
-        fBeerDetailsView.BeerRating.setNumStars(fBeer.getRating());
+        fBeerDetailsView.BeerRating.setRating(fBeer.getRating());
         fBeerDetailsView.BeerRating.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
                 if (fromUser)

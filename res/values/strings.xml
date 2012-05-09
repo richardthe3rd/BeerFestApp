@@ -33,6 +33,7 @@
     <string name="loading_message">Loading beers, please wait…</string>
 
     <string name="filter_style_dialog_title">Show only...</string>
+    <string name="filter_style_dialog_show_all">Show All</string>
 
     <string name="OK">OK</string>
     <string name="CANCEL">Cancel</string>
