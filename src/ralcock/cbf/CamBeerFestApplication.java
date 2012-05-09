@@ -34,6 +34,7 @@ import ralcock.cbf.view.BeerDetailsActivity;
 import ralcock.cbf.view.BeerListAdapter;
 import ralcock.cbf.view.BeerSearcher;
 import ralcock.cbf.view.BeerSharer;
+import ralcock.cbf.view.BeerStyleListAdapter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -310,6 +311,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     }
 
     private Dialog createStylesToHideDialog() {
+        /*
         final Set<String> stylesToHide = fAppPreferences.getStylesToHide();
 
         Set<String> allStyles;
@@ -333,37 +335,32 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         final boolean[] itemChecked = new boolean[styleArray.length + 1];
         itemChecked[0] = !stylesToHide.isEmpty();
         System.arraycopy(checked, 0, itemChecked, 1, checked.length);
+        */
         // TODO: Use a custom list adapter (builder.setAdapter())
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.filter_style_dialog_title);
-        builder.setMultiChoiceItems(itemArray, itemChecked, new DialogInterface.OnMultiChoiceClickListener() {
-            public void onClick(final DialogInterface dialogInterface, final int i, final boolean selected) {
-                if (selected) {
-                    if (i == 0) {
-                        // Show All
-                        stylesToHide.clear();
-                        // Re-set all the boxes
-                        ListView lv = ((AlertDialog) dialogInterface).getListView();
-                        for (int idx = 1; idx < itemChecked.length; idx++) {
-                            lv.setItemChecked(idx, true);
-                        }
-                    } else {
-                        stylesToHide.remove(itemArray[i]);
-                    }
-                } else {
-                    stylesToHide.add(itemArray[i]);
-                }
 
-                ListView lv = ((AlertDialog) dialogInterface).getListView();
-                lv.setItemChecked(0, false);
-            }
-        });
-        builder.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
-            public void onClick(final DialogInterface dialogInterface, final int i) {
-                filterByStyle(stylesToHide);
-            }
-        });
+        try {
+            final Set<String> stylesToHide = fAppPreferences.getStylesToHide();
+            final Set<String> allStyles = getBeerDao().getAvailableStyles();
+            ;
+
+            final BeerStyleListAdapter listAdapter = new BeerStyleListAdapter(this, allStyles, stylesToHide);
+            builder.setAdapter(listAdapter, new DialogInterface.OnClickListener() {
+                public void onClick(final DialogInterface dialogInterface, final int i) {
+                }
+            });
+
+            builder.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
+                public void onClick(final DialogInterface dialogInterface, final int i) {
+                    filterByStyle(listAdapter.getStylesToHide());
+                }
+            });
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
         builder.setNegativeButton(R.string.CANCEL, new DialogInterface.OnClickListener() {
             public void onClick(final DialogInterface dialogInterface, final int i) {

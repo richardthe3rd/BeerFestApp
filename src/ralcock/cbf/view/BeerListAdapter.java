@@ -70,5 +70,4 @@ public class BeerListAdapter extends BaseAdapter implements Filterable {
     public Filter getFilter() {
         return fFilter;
     }
-
 }
