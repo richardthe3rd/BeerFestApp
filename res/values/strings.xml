@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="sort_dialog_title">Sort</string>
     <string name="search_this_beer_title">Search for this beer online</string>
     <string name="share_this_beer_title">Share this beer</string>
 
@@ -12,17 +13,15 @@
 
     <string name="oops_this_beer">Forget Rating</string>
 
-    <string name="sort_dialog_title">Sort</string>
-
-    <string name="reload_menu_label">Reload Beers</string>
-    <string name="refresh_menu_label">Update Beers</string>
-    <string name="visit_festival_website_label">Visit Festival website</string>
-
     <string name="sort_menu_label">Sort</string>
-    <string name="search_menu_label">Search</string>
-
     <string name="show_only_style_label">Filter by style</string>
     <string name="show_only_available_label">Filter by availability</string>
+    <string name="export_label">Export as CSV</string>
+    <string name="visit_festival_website_label">Visit Festival website</string>
+    <string name="reload_menu_label">Reload Beers</string>
+    <string name="refresh_menu_label">Update Beers</string>
+
+    <string name="search_menu_label">Search</string>
 
     <string name="sort_by_brewery">Sort by Brewery</string>
     <string name="sort_by_beer">Sort by Beer</string>
@@ -33,11 +32,14 @@
 
     <string name="loading_message">Downloading beers, please wait…</string>
 
-    <string name="filter_style_dialog_title">Show styles</string>
+    <string name="filter_style_dialog_title">Select beer styles to show</string>
     <string name="filter_style_dialog_show_all">Show All</string>
+
+    <string name="filter_available_dialog_title">Select beers to show</string>
+    <string name="filter_available_all">Show all beers</string>
+    <string name="filter_available_hide">Hide unavailable beers</string>
 
     <string name="OK">OK</string>
     <string name="CANCEL">Cancel</string>
 
-    <string name="export_label">Export as CSV</string>
 </resources>

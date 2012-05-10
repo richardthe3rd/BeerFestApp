@@ -20,6 +20,7 @@
             />
 
     <item android:id="@+id/export"
+          android:visible="false"
           android:title="@string/export_label"
             />
 
@@ -29,7 +30,7 @@
             />
 
     <item android:id="@+id/reload_database"
-          android:visible="true"
+          android:visible="false"
           android:title="@string/reload_menu_label"
             />
 </menu>

@@ -76,7 +76,7 @@ class LoadBeersTask extends AsyncTask<LoadBeersTask.Source, String, JsonBeerList
             final String jsonString = readStream(digestStream);
             String md5 = toHashText(digest);
             if (md5.equals(source.MD5)) {
-                Log.i(TAG, "MD5 streams match - nothing has changed, not parsing JSON.");
+                Log.i(TAG, "MD5 streams match - nothing has changed, not parsing JSON or updating database.");
                 return null;
             } else {
                 Log.i(TAG, "Previous MD5 was " + source.MD5 + ", new MD5 is " + md5);
