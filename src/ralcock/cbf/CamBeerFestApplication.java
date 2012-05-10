@@ -162,15 +162,14 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
                 getBreweryDao(), getBeerDao(), fBeerList, fAdapter, updateProgressDialog);
 
         final ProgressDialog loadProgressDialog = new ProgressDialog(this);
-        final LoadBeersTask loadBeersTask = new LoadBeersTask(loadProgressDialog, updateBeersTask);
+        final LoadBeersTask loadBeersTask = new LoadBeersTask(loadProgressDialog, updateBeersTask, fAppPreferences);
         try {
-            final LoadBeersTask.Source source = new LoadBeersTask.Source(beerListUrl());
+            String md5 = fAppPreferences.getLastUpdateMD5();
+            final LoadBeersTask.Source source = new LoadBeersTask.Source(beerListUrl(), md5);
 
             //noinspection unchecked
             loadBeersTask.execute(source);
 
-            // 6 hours time
-            fAppPreferences.setNextUpdateTime(System.currentTimeMillis() + (6 * 60 * 60 * 1000));
         } catch (IOException iox) {
             Log.e(TAG, "Failed to load beers.", iox);
         }
@@ -284,6 +283,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     private void doReloadDatabase() {
         // delete all beers
         getHelper().deleteAll();
+        fAppPreferences.setLastUpdateMD5("");
         loadBeersInBackground();
     }
 

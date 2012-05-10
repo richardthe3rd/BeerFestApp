@@ -25,6 +25,7 @@ public final class AppPreferences {
     private static final String NEXT_UPDATE_TIME_KEY = "lastUpdateTime";
     private static final String HIDE_UNAVAILABLE_KEY = "hideUnavailable";
     private static final String STYLES_TO_HIDE_KEY = "stylesToHide";
+    private static final String LAST_UPDATE_MD5_KEY = "lastUpdateMD5";
 
     private final Context fContext;
 
@@ -142,4 +143,11 @@ public final class AppPreferences {
         return getPreference(HIDE_UNAVAILABLE_KEY, DEFAULT_HIDE_UNAVAILABLE);
     }
 
+    public void setLastUpdateMD5(final String md5) {
+        setPreference(LAST_UPDATE_MD5_KEY, md5);
+    }
+
+    public String getLastUpdateMD5() {
+        return getPreference(LAST_UPDATE_MD5_KEY, "");
+    }
 }

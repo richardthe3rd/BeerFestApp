@@ -10,7 +10,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.math.BigInteger;
 import java.net.URL;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 class LoadBeersTask extends AsyncTask<LoadBeersTask.Source, String, JsonBeerList> {
 
@@ -19,11 +23,13 @@ class LoadBeersTask extends AsyncTask<LoadBeersTask.Source, String, JsonBeerList
     private final ProgressDialog fDialog;
     private final UpdateBeersTask fUpdateBeersTask;
     private long fStartTime;
+    private AppPreferences fAppPreferences;
 
     LoadBeersTask(final ProgressDialog progressDialog,
-                  final UpdateBeersTask updateBeersTask) {
+                  final UpdateBeersTask updateBeersTask, final AppPreferences appPreferences) {
         fDialog = progressDialog;
         fUpdateBeersTask = updateBeersTask;
+        fAppPreferences = appPreferences;
     }
 
     @Override
@@ -42,16 +48,20 @@ class LoadBeersTask extends AsyncTask<LoadBeersTask.Source, String, JsonBeerList
 
     @Override
     protected void onPostExecute(JsonBeerList beerList) {
-        final long time = (System.currentTimeMillis() - fStartTime) / 1000;
+        if (beerList == null) {
+            fDialog.dismiss();
+        } else {
+            final long time = (System.currentTimeMillis() - fStartTime) / 1000;
 
-        final String message = "Downloaded " + beerList.size() + " beers in " + time + " seconds.";
-        fDialog.setMessage(message);
-        Log.i(TAG, message);
+            final String message = "Downloaded " + beerList.size() + " beers in " + time + " seconds.";
+            fDialog.setMessage(message);
+            Log.i(TAG, message);
 
-        fDialog.dismiss();
+            fDialog.dismiss();
 
-        fUpdateBeersTask.setNumberOfBeers(beerList.size());
-        fUpdateBeersTask.execute(beerList);
+            fUpdateBeersTask.setNumberOfBeers(beerList.size());
+            fUpdateBeersTask.execute(beerList);
+        }
     }
 
     @Override
@@ -60,15 +70,36 @@ class LoadBeersTask extends AsyncTask<LoadBeersTask.Source, String, JsonBeerList
         try {
             Log.i(TAG, "Starting background initialization of database");
 
+            MessageDigest digest = MessageDigest.getInstance("MD5");
             final InputStream inputStream = source.URL.openStream();
-            final String jsonString = readStream(inputStream);
-            return new JsonBeerList(jsonString);
+            DigestInputStream digestStream = new DigestInputStream(inputStream, digest);
+            final String jsonString = readStream(digestStream);
+            String md5 = toHashText(digest);
+            if (md5.equals(source.MD5)) {
+                Log.i(TAG, "MD5 streams match - nothing has changed, not parsing JSON.");
+                return null;
+            } else {
+                Log.i(TAG, "Previous MD5 was " + source.MD5 + ", new MD5 is " + md5);
+                // 3 hours time
+                int hoursToNextUpdate = 3;
+                fAppPreferences.setNextUpdateTime(System.currentTimeMillis() + (hoursToNextUpdate * 60 * 60 * 1000));
+                fAppPreferences.setLastUpdateMD5(md5);
+
+                return new JsonBeerList(jsonString);
+            }
 
         } catch (JSONException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    private String toHashText(final MessageDigest digest) {
+        BigInteger bigInt = new BigInteger(1, digest.digest());
+        return bigInt.toString(16);
     }
 
     private static String readStream(final InputStream inputStream) throws IOException, JSONException {
@@ -89,9 +120,11 @@ class LoadBeersTask extends AsyncTask<LoadBeersTask.Source, String, JsonBeerList
 
     static class Source {
         final URL URL;
+        final String MD5;
 
-        Source(URL url) {
+        Source(URL url, final String md5) {
             URL = url;
+            MD5 = md5;
         }
     }
 }
