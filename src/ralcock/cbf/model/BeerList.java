@@ -5,6 +5,8 @@ import ralcock.cbf.model.dao.BeerDao;
 import ralcock.cbf.model.dao.BreweryDao;
 
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -17,17 +19,26 @@ public class BeerList {
 
     private List<Beer> fBeerList;
     private Set<String> fFilterStyles;
+    private Set<String> fStatusToHide;
+
+    private static final Set<String> UNAVAILABLE_STATUS_SET = new HashSet<String>() {{
+        add("Ordered");
+        add("Arrived");
+        add("Sold Out");
+    }};
 
     public BeerList(final BeerDao beerDao,
                     final BreweryDao breweryDao,
                     final SortOrder sortOrder,
                     final CharSequence filterText,
-                    final Set<String> filterStyles) {
+                    final Set<String> filterStyles,
+                    final boolean hideUnavailableBeers) {
         fBeerDao = beerDao;
         fBreweryDao = breweryDao;
         fSortOrder = sortOrder;
         fFilterText = filterText;
         fFilterStyles = filterStyles;
+        fStatusToHide = statusToHide(hideUnavailableBeers);
 
         updateBeerList();
     }
@@ -47,8 +58,22 @@ public class BeerList {
         updateBeerList();
     }
 
+    public void hideUnavailableBeers(final boolean hideUnavailable) {
+        fStatusToHide = statusToHide(hideUnavailable);
+        updateBeerList();
+    }
+
+    private Set<String> statusToHide(final boolean hideUnavailable) {
+        if (hideUnavailable) {
+            return UNAVAILABLE_STATUS_SET;
+        } else {
+            // Hide nothing
+            return Collections.emptySet();
+        }
+    }
+
     public void updateBeerList() {
-        fBeerList = buildList(fSortOrder, fFilterText, fFilterStyles);
+        fBeerList = buildList(fSortOrder, fFilterText, fFilterStyles, fStatusToHide);
     }
 
     public int getCount() {
@@ -61,9 +86,10 @@ public class BeerList {
 
     private List<Beer> buildList(final SortOrder sortOrder,
                                  final CharSequence filterText,
-                                 final Set<String> stylesToHide) {
+                                 final Set<String> stylesToHide,
+                                 final Set<String> statusToHide) {
         try {
-            QueryBuilder<Beer, Long> qb = fBeerDao.buildSortedFilteredBeerQuery(fBreweryDao, sortOrder, filterText, stylesToHide);
+            QueryBuilder<Beer, Long> qb = fBeerDao.buildSortedFilteredBeerQuery(fBreweryDao, sortOrder, filterText, stylesToHide, statusToHide);
             return qb.query();
         } catch (SQLException e) {
             throw new RuntimeException(e);

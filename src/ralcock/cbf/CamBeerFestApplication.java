@@ -22,11 +22,9 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import com.j256.ormlite.android.apptools.OrmLiteBaseListActivity;
-import org.json.JSONException;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerDatabaseHelper;
 import ralcock.cbf.model.BeerList;
-import ralcock.cbf.model.JsonBeerList;
 import ralcock.cbf.model.SortOrder;
 import ralcock.cbf.model.dao.BeerDao;
 import ralcock.cbf.model.dao.BreweryDao;
@@ -37,14 +35,12 @@ import ralcock.cbf.view.BeerSharer;
 import ralcock.cbf.view.BeerStyleListAdapter;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabaseHelper> {
     private static final String TAG = CamBeerFestApplication.class.getName();
@@ -53,7 +49,9 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
 
     private static final int SORT_DIALOG_ID = 0;
     private static final int FILTER_BY_STYLE_DIALOG_ID = 1;
+    private static final int FILTER_BY_AVAILABLE_DIALOG_ID = 2;
 
+    private BeerListAdapter fAdapter;
     private EditText fFilterTextBox = null;
 
     private BeerList fBeerList;
@@ -73,8 +71,6 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
             filterBy(s.toString());
         }
     };
-
-    private BeerListAdapter fAdapter;
 
     public CamBeerFestApplication() {
         super();
@@ -106,7 +102,8 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         fBeerList = new BeerList(getBeerDao(), getBreweryDao(),
                 fAppPreferences.getSortOrder(),
                 fAppPreferences.getFilterText(),
-                fAppPreferences.getStylesToHide());
+                fAppPreferences.getStylesToHide(),
+                fAppPreferences.getHideUnavailableBeers());
 
         fAdapter = new BeerListAdapter(CamBeerFestApplication.this, fBeerList);
 
@@ -123,7 +120,6 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         });
 
         if (beerUpdateNeeded()) {
-            Log.i(TAG, "Updating beers as last updated at " + fAppPreferences.getLastUpdateTime());
             loadBeersInBackground();
         }
 
@@ -132,23 +128,19 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         configureListView();
     }
 
-    private boolean beerUpdateNeeded() {
+    private long getBeerCount() {
         try {
-            if (0 == getBeerDao().getNumberOfBeers()) {
-                return true;
-            }
+            return getBeerDao().getNumberOfBeers();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        Date currentTime = new Date();
-        Date lastUpdate = fAppPreferences.getLastUpdateTime();
-        long deltaInMilliSec = currentTime.getTime() - lastUpdate.getTime();
-        long deltaInSec = TimeUnit.MILLISECONDS.toSeconds(deltaInMilliSec);
-        return deltaInSec > hoursInSeconds(12);
     }
 
-    private long hoursInSeconds(final long hours) {
-        return hours * 60 * 20;
+    private boolean beerUpdateNeeded() {
+        Date nextUpdate = fAppPreferences.getNextUpdateTime();
+        Log.i(TAG, "Beer update due after " + nextUpdate);
+        Date currentTime = new Date();
+        return getBeerCount() == 0 || currentTime.after(nextUpdate);
     }
 
     private BreweryDao getBreweryDao() {
@@ -159,28 +151,28 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         return getHelper().getBeerDao();
     }
 
-    private InputStream inputStream() throws IOException {
+    private URL beerListUrl() throws IOException {
         String beerJsonURL = getResources().getText(R.string.beer_list_url).toString();
-        URL url = new URL(beerJsonURL);
-        return url.openStream();
+        return new URL(beerJsonURL);
     }
 
     private void loadBeersInBackground() {
-        final ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage(getResources().getText(R.string.loading_message));
-        progressDialog.setIndeterminate(true);
+        final ProgressDialog updateProgressDialog = new ProgressDialog(this);
+        final UpdateBeersTask updateBeersTask = new UpdateBeersTask(getHelper().getConnectionSource(),
+                getBreweryDao(), getBeerDao(), fBeerList, fAdapter, updateProgressDialog);
 
-        final LoadBeersTask task = new LoadBeersTask(getHelper().getConnectionSource(),
-                getBeerDao(), getBreweryDao(), fAdapter, fBeerList, progressDialog);
+        final ProgressDialog loadProgressDialog = new ProgressDialog(this);
+        final LoadBeersTask loadBeersTask = new LoadBeersTask(loadProgressDialog, updateBeersTask);
         try {
-            final Iterable<Beer> beers = new JsonBeerList(inputStream());
+            final LoadBeersTask.Source source = new LoadBeersTask.Source(beerListUrl());
+
             //noinspection unchecked
-            task.execute(beers);
-            fAppPreferences.setLastUpdateTime(new Date());
+            loadBeersTask.execute(source);
+
+            // 6 hours time
+            fAppPreferences.setNextUpdateTime(System.currentTimeMillis() + (6 * 60 * 60 * 1000));
         } catch (IOException iox) {
             Log.e(TAG, "Failed to load beers.", iox);
-        } catch (JSONException jsx) {
-            Log.e(TAG, "Failed to load beers.", jsx);
         }
     }
 
@@ -251,6 +243,9 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
             case R.id.show_only_style:
                 showDialog(FILTER_BY_STYLE_DIALOG_ID);
                 return true;
+            case R.id.show_only_available:
+                showDialog(FILTER_BY_AVAILABLE_DIALOG_ID);
+                return true;
             case R.id.refresh_database:
                 loadBeersInBackground();
                 return true;
@@ -287,10 +282,35 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
             case FILTER_BY_STYLE_DIALOG_ID:
                 dialog = createStylesToHideDialog();
                 break;
+            case FILTER_BY_AVAILABLE_DIALOG_ID:
+                dialog = createAvailabilityDialog();
+                break;
             default:
                 dialog = null;
         }
         return dialog;
+    }
+
+    private Dialog createAvailabilityDialog() {
+        boolean hideUnavailable = fAppPreferences.getHideUnavailableBeers();
+        int selectedChoice = hideUnavailable ? 1 : 0;
+
+        String[] choices = new String[]{"Show unavailable beers", "Hide unavailable beers"};
+
+        ListAdapter listAdapter = new ArrayAdapter<String>(this, R.layout.sort_by_dialog_list_item, choices);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("Filter by availability");
+
+        builder.setSingleChoiceItems(listAdapter, selectedChoice, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialogInterface, int i) {
+                hideUnavailableBeers(i == 1);
+                dialogInterface.dismiss();
+            }
+        });
+
+        return builder.create();
     }
 
     private Dialog createSortDialog() {
@@ -311,33 +331,6 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     }
 
     private Dialog createStylesToHideDialog() {
-        /*
-        final Set<String> stylesToHide = fAppPreferences.getStylesToHide();
-
-        Set<String> allStyles;
-        try {
-            allStyles = getBeerDao().getAvailableStyles();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        final String[] styleArray = allStyles.toArray(new String[allStyles.size()]);
-
-        boolean[] checked = new boolean[allStyles.size()];
-        for (int i = 0; i < styleArray.length; i++) {
-            checked[i] = !stylesToHide.contains(styleArray[i]);
-        }
-
-        final String[] itemArray = new String[styleArray.length + 1];
-        itemArray[0] = "Show All";
-        System.arraycopy(styleArray, 0, itemArray, 1, styleArray.length);
-
-        final boolean[] itemChecked = new boolean[styleArray.length + 1];
-        itemChecked[0] = !stylesToHide.isEmpty();
-        System.arraycopy(checked, 0, itemChecked, 1, checked.length);
-        */
-        // TODO: Use a custom list adapter (builder.setAdapter())
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.filter_style_dialog_title);
 
@@ -368,6 +361,12 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         });
 
         return builder.create();
+    }
+
+    private void hideUnavailableBeers(boolean hide) {
+        fAppPreferences.setHideUnavailableBeers(hide);
+        fBeerList.hideUnavailableBeers(hide);
+        fAdapter.notifyDataSetChanged();
     }
 
     private void filterByStyle(Set<String> stylesToHide) {

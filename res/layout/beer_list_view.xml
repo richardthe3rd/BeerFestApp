@@ -14,7 +14,8 @@
                 android:id="@+id/search"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:paddingRight="35dip"
+                android:hint="@string/filter_hint"
+                android:singleLine="true"
                 android:inputType="textFilter"/>
 
         <Button

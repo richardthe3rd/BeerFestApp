@@ -16,14 +16,17 @@ public final class AppPreferences {
     private static final String TAG = AppPreferences.class.getName();
 
     private static final String PREFERENCES_NAME = CamBeerFestApplication.class.getSimpleName();
+
     private static final SortOrder DEFAULT_SORT_ORDER = SortOrder.BREWERY_NAME_ASC;
+    private static final boolean DEFAULT_HIDE_UNAVAILABLE = false;
 
     private static final String SORT_ORDER_KEY = "sortOrder";
     private static final String FILTER_TEXT_KEY = "filterText";
-    private static final String LAST_UPDATE_TIME_KEY = "lastUpdateTime";
+    private static final String NEXT_UPDATE_TIME_KEY = "lastUpdateTime";
+    private static final String HIDE_UNAVAILABLE_KEY = "hideUnavailable";
+    private static final String STYLES_TO_HIDE_KEY = "stylesToHide";
 
     private final Context fContext;
-    private static final String STYLES_TO_HIDE_KEY = "stylesToHide";
 
     public AppPreferences(final Context context) {
         fContext = context;
@@ -54,17 +57,9 @@ public final class AppPreferences {
         return getPreference(FILTER_TEXT_KEY, "");
     }
 
-    public Date getLastUpdateTime() {
-        return getPreference(LAST_UPDATE_TIME_KEY, new Date(0));
-    }
-
     private Date getPreference(final String key, final Date date) {
         SharedPreferences settings = getSharedPreferences();
         return new Date(settings.getLong(key, date.getTime()));
-    }
-
-    public void setLastUpdateTime(final Date date) {
-        setPreference(LAST_UPDATE_TIME_KEY, date);
     }
 
     private void setPreference(final String key, final Date date) {
@@ -77,6 +72,11 @@ public final class AppPreferences {
     private String getPreference(final String key, final String def) {
         SharedPreferences settings = getSharedPreferences();
         return settings.getString(key, def);
+    }
+
+    private boolean getPreference(final String key, final boolean def) {
+        SharedPreferences settings = getSharedPreferences();
+        return settings.getBoolean(key, def);
     }
 
     private void setPreference(final String key, final String value) {
@@ -93,6 +93,14 @@ public final class AppPreferences {
         editor.putString(key, json.toString());
         editor.commit();
     }
+
+    private void setPreference(final String key, final boolean value) {
+        SharedPreferences settings = getSharedPreferences();
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean(key, value);
+        editor.commit();
+    }
+
 
     private Set<String> getPreference(final String key, final Set<String> strings) {
         SharedPreferences settings = getSharedPreferences();
@@ -112,6 +120,26 @@ public final class AppPreferences {
 
     private SharedPreferences getSharedPreferences() {
         return fContext.getSharedPreferences(PREFERENCES_NAME, 0);
+    }
+
+    public Date getNextUpdateTime() {
+        return getPreference(NEXT_UPDATE_TIME_KEY, new Date(0));
+    }
+
+    public void setNextUpdateTime(Date nextUpdateTime) {
+        setPreference(NEXT_UPDATE_TIME_KEY, nextUpdateTime);
+    }
+
+    public void setNextUpdateTime(final long nextUpdateTime) {
+        setNextUpdateTime(new Date(nextUpdateTime));
+    }
+
+    public void setHideUnavailableBeers(final boolean hide) {
+        setPreference(HIDE_UNAVAILABLE_KEY, hide);
+    }
+
+    public boolean getHideUnavailableBeers() {
+        return getPreference(HIDE_UNAVAILABLE_KEY, DEFAULT_HIDE_UNAVAILABLE);
     }
 
 }

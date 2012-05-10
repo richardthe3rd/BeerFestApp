@@ -3,106 +3,95 @@ package ralcock.cbf;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.util.Log;
-import com.j256.ormlite.misc.TransactionManager;
-import com.j256.ormlite.support.ConnectionSource;
-import ralcock.cbf.model.Beer;
-import ralcock.cbf.model.BeerList;
-import ralcock.cbf.model.Brewery;
-import ralcock.cbf.model.dao.BeerDao;
-import ralcock.cbf.model.dao.BreweryDao;
-import ralcock.cbf.view.BeerListAdapter;
+import org.json.JSONException;
+import ralcock.cbf.model.JsonBeerList;
 
-import java.sql.SQLException;
-import java.util.concurrent.Callable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
 
-class LoadBeersTask extends AsyncTask<Iterable<Beer>, Beer, Long> {
+class LoadBeersTask extends AsyncTask<LoadBeersTask.Source, String, JsonBeerList> {
 
     private static final String TAG = "cbf." + LoadBeersTask.class.getSimpleName();
 
-    private ConnectionSource fConnectionSource;
-    private final BeerDao fBeerDao;
-    private final BreweryDao fBreweryDao;
-    private final BeerList fBeerList;
-    private final BeerListAdapter fBeerListAdapter;
-
     private final ProgressDialog fDialog;
+    private final UpdateBeersTask fUpdateBeersTask;
     private long fStartTime;
 
-    LoadBeersTask(final ConnectionSource connectionSource,
-                  final BeerDao beerDao,
-                  final BreweryDao breweryDao,
-                  final BeerListAdapter beerListAdapter,
-                  final BeerList beerList,
-                  final ProgressDialog progressDialog) {
-        fConnectionSource = connectionSource;
-        fBeerDao = beerDao;
-        fBreweryDao = breweryDao;
-        fBeerListAdapter = beerListAdapter;
-        fBeerList = beerList;
+    LoadBeersTask(final ProgressDialog progressDialog,
+                  final UpdateBeersTask updateBeersTask) {
         fDialog = progressDialog;
+        fUpdateBeersTask = updateBeersTask;
     }
 
     @Override
     protected void onPreExecute() {
         fStartTime = System.currentTimeMillis();
+        fDialog.setMessage(fDialog.getContext().getText(R.string.loading_message));
+        fDialog.setIndeterminate(true);
+        fDialog.setCancelable(false);
         fDialog.show();
     }
 
     @Override
-    protected void onProgressUpdate(Beer... beers) {
-        fDialog.setMessage("Loaded " + beers[0].getName());
+    protected void onProgressUpdate(String... msg) {
+        fDialog.setMessage(msg[0]);
     }
 
     @Override
-    protected void onPostExecute(Long count) {
+    protected void onPostExecute(JsonBeerList beerList) {
         final long time = (System.currentTimeMillis() - fStartTime) / 1000;
 
-        final String message = "Loaded " + count + " beers in " + time + " seconds.";
+        final String message = "Downloaded " + beerList.size() + " beers in " + time + " seconds.";
         fDialog.setMessage(message);
         Log.i(TAG, message);
 
-        fBeerList.updateBeerList();
-        fBeerListAdapter.notifyDataSetChanged();
         fDialog.dismiss();
+
+        fUpdateBeersTask.setNumberOfBeers(beerList.size());
+        fUpdateBeersTask.execute(beerList);
     }
 
     @Override
-    protected Long doInBackground(Iterable<Beer>... beers) {
-        final Iterable<Beer> beerList = beers[0];
+    protected JsonBeerList doInBackground(Source... sources) {
+        final Source source = sources[0];
         try {
-            Log.i(TAG, "Starting background initialization of database from " + beers[0]);
-            final long count = TransactionManager.callInTransaction(fConnectionSource, new Callable<Long>() {
-                public Long call() throws Exception {
-                    return initializeDatabase(beerList);
-                }
-            });
-            Log.i(TAG, "Finished background initialization of database.");
-            return count;
-        } catch (SQLException e) {
+            Log.i(TAG, "Starting background initialization of database");
+
+            final InputStream inputStream = source.URL.openStream();
+            final String jsonString = readStream(inputStream);
+            return new JsonBeerList(jsonString);
+
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private long initializeDatabase(Iterable<Beer> beers) {
-        long count = 0;
-        for (Beer beer : beers) {
-            try {
-                final Brewery brewery = beer.getBrewery();
-                if (brewery.getId() == 0) {
-                    fBreweryDao.updateFromFestivalOrCreate(brewery);
-                }
-
-                if (beer.getId() == 0) {
-                    fBeerDao.updateFromFestivalOrCreate(beer);
-                }
-
-                count++;
-
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
+    private static String readStream(final InputStream inputStream) throws IOException, JSONException {
+        Log.i(TAG, "Loading beer list from input stream.");
+        Reader reader = new InputStreamReader(inputStream);
+        StringBuilder builder = new StringBuilder();
+        final char[] buffer = new char[0x10000];
+        int read;
+        do {
+            read = reader.read(buffer);
+            if (read > 0) {
+                builder.append(buffer, 0, read);
             }
-            publishProgress(beer);
+        } while (read >= 0);
+
+        return builder.toString();
+    }
+
+    static class Source {
+        final URL URL;
+
+        Source(URL url) {
+            URL = url;
         }
-        return count;
     }
 }

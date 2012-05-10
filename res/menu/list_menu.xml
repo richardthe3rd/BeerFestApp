@@ -4,19 +4,28 @@
 
     <item android:id="@+id/sort"
           android:icon="@android:drawable/ic_menu_sort_by_size"
-          android:title="@string/sort_menu_label"/>
+          android:title="@string/sort_menu_label"
+            />
 
     <item android:id="@+id/show_only_style"
-          android:title="@string/show_only_style_label"/>
+          android:title="@string/show_only_style_label"
+            />
+
+    <item android:id="@+id/show_only_available"
+          android:title="@string/show_only_available_label"
+            />
 
     <item android:id="@+id/visit_festival_website"
-          android:title="@string/visit_festival_website_label"/>
+          android:title="@string/visit_festival_website_label"
+            />
 
     <item android:id="@+id/refresh_database"
           android:visible="false"
-          android:title="@string/refresh_menu_label"/>
+          android:title="@string/refresh_menu_label"
+            />
 
     <item android:id="@+id/reload_database"
-          android:visible="false"
-          android:title="@string/reload_menu_label"/>
+          android:visible="true"
+          android:title="@string/reload_menu_label"
+            />
 </menu>

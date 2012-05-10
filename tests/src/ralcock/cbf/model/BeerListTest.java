@@ -58,7 +58,7 @@ public class BeerListTest extends AndroidTestCase {
     public void testFiltering() throws Exception {
         Set<String> emptySet = Collections.emptySet();
         BeerList list = new BeerList(fBeerDao, fBreweryDao,
-                SortOrder.BEER_NAME_ASC, "mild", emptySet);
+                SortOrder.BEER_NAME_ASC, "mild", emptySet, false);
         assertEquals(1, list.getCount());
         assertEquals(fBeer1, list.getBeerAt(0));
 
@@ -71,7 +71,7 @@ public class BeerListTest extends AndroidTestCase {
     public void testSorting() throws Exception {
         Set<String> emptySet = Collections.emptySet();
         BeerList list = new BeerList(fBeerDao, fBreweryDao,
-                SortOrder.BEER_ABV_ASC, "", emptySet);
+                SortOrder.BEER_ABV_ASC, "", emptySet, false);
         assertEquals(3, list.getCount());
 
         Beer[] expectedBeers = new Beer[]{fBeer1, fBeer2, fBeer3};
@@ -93,7 +93,7 @@ public class BeerListTest extends AndroidTestCase {
         stylesToHide.add(fStyle2);
 
         BeerList list = new BeerList(fBeerDao, fBreweryDao,
-                SortOrder.BEER_ABV_ASC, "", stylesToHide);
+                SortOrder.BEER_ABV_ASC, "", stylesToHide, false);
 
         assertEquals(1, list.getCount());
 

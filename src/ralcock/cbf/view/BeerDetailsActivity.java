@@ -43,7 +43,7 @@ public final class BeerDetailsActivity extends OrmLiteBaseActivity<BeerDatabaseH
         if (fBeerDetailsView == null)
             fBeerDetailsView = new BeerDetailsView();
 
-        setTitle(fBeer.getBrewery().getName() + " - " + fBeer.getName());
+        setTitle(fBeer.getName() + " - " + fBeer.getBrewery().getName());
 
         fBeerDetailsView.BeerNameAndAbv.setText(String.format("%s (%.1f%%)", fBeer.getName(), fBeer.getAbv()));
         fBeerDetailsView.BeerDescription.setText(fBeer.getDescription());

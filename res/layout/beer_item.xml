@@ -5,6 +5,7 @@
               android:layout_width="fill_parent"
               android:layout_weight="1"
               android:baselineAligned="true"
+              android:padding="5dip"
               android:orientation="horizontal">
 
     <LinearLayout
@@ -12,9 +13,8 @@
             android:layout_width="0dip"
             android:layout_weight="3"
             android:orientation="vertical"
-            android:layout_marginLeft="1sp"
-            android:layout_marginTop="1sp"
             >
+
         <TextView android:id="@+id/beer_name"
                   android:layout_height="wrap_content"
                   android:layout_width="wrap_content"
@@ -45,9 +45,7 @@
             android:layout_width="0dip"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:gravity="right"
-            android:layout_marginTop="1sp"
-            android:layout_marginRight="1sp"
+            android:paddingRight="2dip"
             >
 
         <TextView android:id="@+id/beer_style"
@@ -55,6 +53,7 @@
                   android:layout_width="wrap_content"
                   android:textSize="14sp"
                   android:layout_gravity="top|right"
+                  android:text="Stout"
                 />
         <TextView android:id="@+id/beer_status"
                   android:layout_height="fill_parent"
@@ -62,6 +61,7 @@
                   android:textSize="12sp"
                   android:textStyle="italic"
                   android:layout_gravity="bottom|right"
+                  android:text="Ordered"
                 />
     </LinearLayout>
 </LinearLayout>

@@ -1,13 +1,8 @@
 package ralcock.cbf.model;
 
-import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -26,26 +21,18 @@ public class JsonBeerList implements Iterable<Beer> {
     private static final String STATUS = "status_text";
     private static final String IDENTIFIER = "id";
 
-    private final InputStream fInputStream;
     private List<Beer> fBeerList;
 
-    public JsonBeerList(final InputStream inputStream) throws IOException, JSONException {
-        assert inputStream != null;
-        fInputStream = inputStream;
+    public JsonBeerList(final String jsonString) throws JSONException {
+        fBeerList = makeBeerList(new JSONObject(jsonString));
     }
 
     public Iterator<Beer> iterator() {
-        try {
-            if (fBeerList == null) {
-                JSONObject jsonObject = loadJson(fInputStream);
-                fBeerList = makeBeerList(jsonObject);
-            }
-            return fBeerList.iterator();
-        } catch (JSONException jsx) {
-            throw new RuntimeException(jsx);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return fBeerList.iterator();
+    }
+
+    public int size() {
+        return fBeerList.size();
     }
 
     private List<Beer> makeBeerList(final JSONObject json) throws JSONException {
@@ -81,21 +68,5 @@ public class JsonBeerList implements Iterable<Beer> {
                 producer.getString(NAME),
                 producer.getString(DESCRIPTION)
         );
-    }
-
-    private static JSONObject loadJson(final InputStream inputStream) throws IOException, JSONException {
-        Log.i(TAG, "Loading beer list from input stream.");
-        Reader reader = new InputStreamReader(inputStream);
-        StringBuilder builder = new StringBuilder();
-        final char[] buffer = new char[0x10000];
-        int read;
-        do {
-            read = reader.read(buffer);
-            if (read > 0) {
-                builder.append(buffer, 0, read);
-            }
-        } while (read >= 0);
-
-        return new JSONObject(builder.toString());
     }
 }

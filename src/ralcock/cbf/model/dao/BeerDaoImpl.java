@@ -61,12 +61,14 @@ public class BeerDaoImpl extends BaseDaoImpl<Beer, Long> implements BeerDao {
     public QueryBuilder<Beer, Long> buildSortedFilteredBeerQuery(final BreweryDao breweryDao,
                                                                  final SortOrder sortOrder,
                                                                  final CharSequence filterText,
-                                                                 final Set<String> stylesToHide) {
+                                                                 final Set<String> stylesToHide,
+                                                                 final Set<String> statusToHide) {
         QueryBuilder<Beer, Long> qb = queryBuilder();
         Where where = qb.where();
         try {
             //noinspection unchecked
             where.and(
+                    where.not().in(Beer.STATUS_FIELD, statusToHide),
                     where.not().in(Beer.STYLE_FIELD, stylesToHide),
                     where.or(
                             where.or(

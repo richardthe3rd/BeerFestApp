@@ -15,10 +15,18 @@ public class JsonBeerListTest extends AndroidTestCase {
     private final Beer fBrewery1Beer2 = new Beer("2", "BEER_TWO", 2.2f, "BEER_TWO_NOTES", "STYLE2", "BEER_TWO_STATUS", fBrewery2);
     private final Beer fBrewery2Beer3 = new Beer("3", "BEER_THREE", 3.3f, "BEER_THREE_NOTES", "STYLE2", "BEER_THREE_STATUS", fBrewery2);
 
+    private static String convertStreamToString(InputStream is) {
+        try {
+            return new java.util.Scanner(is).useDelimiter("\\A").next();
+        } catch (java.util.NoSuchElementException e) {
+            return "";
+        }
+    }
+
     public void testLoadBeers() throws Exception {
         InputStream inputStream = JsonBeerListTest.class.getResourceAsStream("resources/one_beer.json");
         final Beer expectedBeer = fBrewery1Beer1;
-        JsonBeerList jsonBeerList = new JsonBeerList(inputStream);
+        JsonBeerList jsonBeerList = new JsonBeerList(convertStreamToString(inputStream));
         for (Beer beer : jsonBeerList) {
             assertEquals(expectedBeer, beer);
         }
@@ -32,7 +40,7 @@ public class JsonBeerListTest extends AndroidTestCase {
         expectedBeers.add(fBrewery1Beer2);
         expectedBeers.add(fBrewery2Beer3);
 
-        JsonBeerList jsonBeerList = new JsonBeerList(inputStream);
+        JsonBeerList jsonBeerList = new JsonBeerList(convertStreamToString(inputStream));
         int index = 0;
         for (Beer beer : jsonBeerList) {
             assertEquals(expectedBeers.get(index++), beer);
