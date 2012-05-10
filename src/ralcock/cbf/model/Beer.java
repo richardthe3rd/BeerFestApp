@@ -35,7 +35,7 @@ public final class Beer implements Serializable {
     @DatabaseField(columnName = DESCRIPTION_FIELD)
     private String fDescription;
 
-    @DatabaseField(columnName = STATUS_FIELD)
+    @DatabaseField(columnName = STATUS_FIELD, index = true)
     private String fStatus;
 
     @DatabaseField(columnName = RATING_FIELD)
