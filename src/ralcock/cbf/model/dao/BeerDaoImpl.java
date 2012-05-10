@@ -58,6 +58,13 @@ public class BeerDaoImpl extends BaseDaoImpl<Beer, Long> implements BeerDao {
 
     }
 
+    public List<Beer> getRatedBeers() throws SQLException {
+        QueryBuilder<Beer, Long> qb = queryBuilder();
+        Where where = qb.where();
+        where.gt(Beer.RATING_FIELD, 0);
+        return qb.query();
+    }
+
     public QueryBuilder<Beer, Long> buildSortedFilteredBeerQuery(final BreweryDao breweryDao,
                                                                  final SortOrder sortOrder,
                                                                  final CharSequence filterText,

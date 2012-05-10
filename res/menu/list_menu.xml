@@ -19,6 +19,10 @@
           android:title="@string/visit_festival_website_label"
             />
 
+    <item android:id="@+id/export"
+          android:title="@string/export_label"
+            />
+
     <item android:id="@+id/refresh_database"
           android:visible="false"
           android:title="@string/refresh_menu_label"

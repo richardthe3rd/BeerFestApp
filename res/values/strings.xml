@@ -38,4 +38,6 @@
 
     <string name="OK">OK</string>
     <string name="CANCEL">Cancel</string>
+
+    <string name="export_label">Export as CSV</string>
 </resources>

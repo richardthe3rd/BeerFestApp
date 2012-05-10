@@ -246,6 +246,9 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
             case R.id.show_only_available:
                 showDialog(FILTER_BY_AVAILABLE_DIALOG_ID);
                 return true;
+            case R.id.export:
+                doExport();
+                return true;
             case R.id.refresh_database:
                 loadBeersInBackground();
                 return true;
@@ -257,6 +260,18 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void doExport() {
+        try {
+            List<Beer> ratedBeers = getBeerDao().getRatedBeers();
+            BeerExporter exporter = new BeerExporter(this);
+            exporter.export(ratedBeers);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
