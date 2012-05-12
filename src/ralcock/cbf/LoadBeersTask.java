@@ -1,8 +1,10 @@
 package ralcock.cbf;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 import org.json.JSONException;
 import ralcock.cbf.model.JsonBeerList;
 
@@ -17,25 +19,26 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
-class LoadBeersTask extends AsyncTask<LoadBeersTask.Source, String, JsonBeerList> {
+final class LoadBeersTask extends AsyncTask<LoadBeersTask.Source, String, LoadBeersTask.Result> {
 
     private static final String TAG = "cbf." + LoadBeersTask.class.getSimpleName();
 
+    private final Context fContext;
     private final ProgressDialog fDialog;
+    private final AppPreferences fAppPreferences;
     private final UpdateBeersTask fUpdateBeersTask;
-    private long fStartTime;
-    private AppPreferences fAppPreferences;
 
-    LoadBeersTask(final ProgressDialog progressDialog,
-                  final UpdateBeersTask updateBeersTask, final AppPreferences appPreferences) {
-        fDialog = progressDialog;
+    LoadBeersTask(final Context context,
+                  final UpdateBeersTask updateBeersTask,
+                  final AppPreferences appPreferences) {
+        fContext = context;
+        fDialog = new ProgressDialog(context);
         fUpdateBeersTask = updateBeersTask;
         fAppPreferences = appPreferences;
     }
 
     @Override
     protected void onPreExecute() {
-        fStartTime = System.currentTimeMillis();
         fDialog.setMessage(fDialog.getContext().getText(R.string.loading_message));
         fDialog.setIndeterminate(true);
         fDialog.setCancelable(false);
@@ -48,16 +51,18 @@ class LoadBeersTask extends AsyncTask<LoadBeersTask.Source, String, JsonBeerList
     }
 
     @Override
-    protected void onPostExecute(JsonBeerList beerList) {
+    protected void onPostExecute(Result result) {
+        JsonBeerList beerList = result.BeerList;
         if (beerList == null) {
+            Throwable t = result.Throwable;
+            if (t != null) {
+                Log.e(TAG, "Exception while downloading beer list. " + t.getMessage(), t);
+                Toast.makeText(fContext, "Failed to download beers. " + t.getMessage(),
+                        Toast.LENGTH_LONG).show();
+            }
             fDialog.dismiss();
         } else {
-            final long time = (System.currentTimeMillis() - fStartTime) / 1000;
-
-            final String message = "Downloaded " + beerList.size() + " beers in " + time + " seconds.";
-            fDialog.setMessage(message);
-            Log.i(TAG, message);
-
+            Toast.makeText(fContext, "Updated beer list", Toast.LENGTH_LONG).show();
             fDialog.dismiss();
 
             fUpdateBeersTask.setNumberOfBeers(beerList.size());
@@ -66,7 +71,7 @@ class LoadBeersTask extends AsyncTask<LoadBeersTask.Source, String, JsonBeerList
     }
 
     @Override
-    protected JsonBeerList doInBackground(Source... sources) {
+    protected Result doInBackground(Source... sources) {
         final Source source = sources[0];
         try {
             Log.i(TAG, "Starting background initialization of database");
@@ -79,20 +84,20 @@ class LoadBeersTask extends AsyncTask<LoadBeersTask.Source, String, JsonBeerList
             if (md5.equals(source.MD5)) {
                 Log.i(TAG, "MD5 streams match - nothing has changed, not parsing JSON or updating database.");
                 setNextUpdateTime();
-                return null;
+                return new Result();
             } else {
                 Log.i(TAG, "Previous MD5 was " + source.MD5 + ", new MD5 is " + md5);
                 fAppPreferences.setLastUpdateMD5(md5);
                 setNextUpdateTime();
-                return new JsonBeerList(jsonString);
+                return new Result(new JsonBeerList(jsonString));
             }
 
         } catch (JSONException e) {
-            throw new RuntimeException(e);
+            return new Result(e);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            return new Result(e);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            return new Result(e);
         }
     }
 
@@ -132,6 +137,26 @@ class LoadBeersTask extends AsyncTask<LoadBeersTask.Source, String, JsonBeerList
         Source(URL url, final String md5) {
             URL = url;
             MD5 = md5;
+        }
+    }
+
+    static class Result {
+        final JsonBeerList BeerList;
+        final Throwable Throwable;
+
+        private Result() {
+            BeerList = null;
+            Throwable = null;
+        }
+
+        private Result(final JsonBeerList beerList) {
+            BeerList = beerList;
+            Throwable = null;
+        }
+
+        public Result(final Throwable throwable) {
+            BeerList = null;
+            Throwable = throwable;
         }
     }
 }

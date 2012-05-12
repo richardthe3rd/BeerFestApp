@@ -32,33 +32,32 @@ public class BeerList {
                     final SortOrder sortOrder,
                     final CharSequence filterText,
                     final Set<String> filterStyles,
-                    final boolean hideUnavailableBeers) {
+                    final boolean hideUnavailableBeers) throws SQLException {
         fBeerDao = beerDao;
         fBreweryDao = breweryDao;
         fSortOrder = sortOrder;
         fFilterText = filterText;
         fFilterStyles = filterStyles;
         fStatusToHide = statusToHide(hideUnavailableBeers);
-
         updateBeerList();
     }
 
-    public void stylesToHide(final Set<String> stylesToShow) {
+    public void stylesToHide(final Set<String> stylesToShow) throws SQLException {
         fFilterStyles = stylesToShow;
         updateBeerList();
     }
 
-    public void filterBy(CharSequence filterText) {
+    public void filterBy(CharSequence filterText) throws SQLException {
         fFilterText = filterText;
         updateBeerList();
     }
 
-    public void sortBy(SortOrder sortOrder) {
+    public void sortBy(SortOrder sortOrder) throws SQLException {
         fSortOrder = sortOrder;
         updateBeerList();
     }
 
-    public void hideUnavailableBeers(final boolean hideUnavailable) {
+    public void hideUnavailableBeers(final boolean hideUnavailable) throws SQLException {
         fStatusToHide = statusToHide(hideUnavailable);
         updateBeerList();
     }
@@ -72,7 +71,7 @@ public class BeerList {
         }
     }
 
-    public void updateBeerList() {
+    public void updateBeerList() throws SQLException {
         fBeerList = buildList(fSortOrder, fFilterText, fFilterStyles, fStatusToHide);
     }
 
@@ -87,13 +86,10 @@ public class BeerList {
     private List<Beer> buildList(final SortOrder sortOrder,
                                  final CharSequence filterText,
                                  final Set<String> stylesToHide,
-                                 final Set<String> statusToHide) {
-        try {
-            QueryBuilder<Beer, Long> qb = fBeerDao.buildSortedFilteredBeerQuery(fBreweryDao, sortOrder, filterText, stylesToHide, statusToHide);
-            return qb.query();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+                                 final Set<String> statusToHide) throws SQLException {
+        QueryBuilder<Beer, Long> qb = fBeerDao.buildSortedFilteredBeerQuery(fBreweryDao,
+                sortOrder, filterText, stylesToHide, statusToHide);
+        return qb.query();
     }
 
 }

@@ -11,6 +11,7 @@ import ralcock.cbf.R;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerList;
 import ralcock.cbf.model.Brewery;
+import ralcock.cbf.util.ExceptionReporter;
 
 public class BeerListAdapter extends BaseAdapter implements Filterable {
 
@@ -21,7 +22,7 @@ public class BeerListAdapter extends BaseAdapter implements Filterable {
     public BeerListAdapter(final Context context, final BeerList beerList) {
         fContext = context;
         fBeerList = beerList;
-        fFilter = new BeerFilter(this, fBeerList);
+        fFilter = new BeerFilter(this, fBeerList, new ExceptionReporter(context));
     }
 
     private View newView(ViewGroup viewGroup) {

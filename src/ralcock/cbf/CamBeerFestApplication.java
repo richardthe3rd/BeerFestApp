@@ -2,9 +2,11 @@ package ralcock.cbf;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -21,6 +23,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 import com.j256.ormlite.android.apptools.OrmLiteBaseListActivity;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerDatabaseHelper;
@@ -28,6 +31,7 @@ import ralcock.cbf.model.BeerList;
 import ralcock.cbf.model.SortOrder;
 import ralcock.cbf.model.dao.BeerDao;
 import ralcock.cbf.model.dao.BreweryDao;
+import ralcock.cbf.util.ExceptionReporter;
 import ralcock.cbf.view.BeerDetailsActivity;
 import ralcock.cbf.view.BeerListAdapter;
 import ralcock.cbf.view.BeerSearcher;
@@ -35,6 +39,7 @@ import ralcock.cbf.view.BeerSharer;
 import ralcock.cbf.view.BeerStyleListAdapter;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -55,8 +60,10 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     private EditText fFilterTextBox = null;
 
     private BeerList fBeerList;
+
     private final BeerSharer fBeerSharer;
     private final BeerSearcher fBeerSearcher;
+    private final ExceptionReporter fExceptionReporter;
 
     private final AppPreferences fAppPreferences;
 
@@ -77,6 +84,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         fAppPreferences = new AppPreferences(this);
         fBeerSharer = new BeerSharer(this);
         fBeerSearcher = new BeerSearcher(this);
+        fExceptionReporter = new ExceptionReporter(this);
     }
 
     @Override
@@ -96,17 +104,29 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.beer_list_view);
-
         setTitle(getResources().getText(R.string.list_title));
 
-        fBeerList = new BeerList(getBeerDao(), getBreweryDao(),
-                fAppPreferences.getSortOrder(),
-                fAppPreferences.getFilterText(),
-                fAppPreferences.getStylesToHide(),
-                fAppPreferences.getHideUnavailableBeers());
+        try {
+            fBeerList = new BeerList(getBeerDao(),
+                    getBreweryDao(),
+                    fAppPreferences.getSortOrder(),
+                    fAppPreferences.getFilterText(),
+                    fAppPreferences.getStylesToHide(),
+                    fAppPreferences.getHideUnavailableBeers());
+            fAdapter = new BeerListAdapter(CamBeerFestApplication.this, fBeerList);
+            setListAdapter(fAdapter);
+            configureListView();
+            if (beerUpdateNeeded()) {
+                loadBeersInBackground();
+            }
+            configureFilterTextBox();
+        } catch (SQLException e) {
+            fExceptionReporter.report(TAG, e.getMessage(), e);
+            return;
+        }
+    }
 
-        fAdapter = new BeerListAdapter(CamBeerFestApplication.this, fBeerList);
-
+    private void configureFilterTextBox() {
         fFilterTextBox = (EditText) findViewById(R.id.search);
         fFilterTextBox.setText(fAppPreferences.getFilterText());
         fFilterTextBox.addTextChangedListener(fFilterTextWatcher);
@@ -118,14 +138,6 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
                 filterBy("");
             }
         });
-
-        if (beerUpdateNeeded()) {
-            loadBeersInBackground();
-        }
-
-        setListAdapter(fAdapter);
-
-        configureListView();
     }
 
     private long getBeerCount() {
@@ -151,28 +163,61 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         return getHelper().getBeerDao();
     }
 
-    private URL beerListUrl() throws IOException {
+    private URL beerListUrl() {
         String beerJsonURL = getResources().getText(R.string.beer_list_url).toString();
-        return new URL(beerJsonURL);
+        try {
+            return new URL(beerJsonURL);
+        } catch (MalformedURLException e) {
+            // My fault
+            throw new RuntimeException(e);
+        }
+    }
+
+    private boolean haveNetworkConnection() {
+        boolean haveConnectedWifi = false;
+        boolean haveConnectedMobile = false;
+
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo[] netInfo = cm.getAllNetworkInfo();
+        for (NetworkInfo ni : netInfo) {
+            if (ni.getTypeName().equalsIgnoreCase("WIFI")) {
+                if (ni.isConnected()) {
+                    haveConnectedWifi = true;
+                    break;
+                }
+            }
+            if (ni.getTypeName().equalsIgnoreCase("MOBILE")) {
+                if (ni.isConnected()) {
+                    haveConnectedMobile = true;
+                    break;
+                }
+            }
+        }
+        return haveConnectedWifi || haveConnectedMobile;
     }
 
     private void loadBeersInBackground() {
-        final ProgressDialog updateProgressDialog = new ProgressDialog(this);
-        final UpdateBeersTask updateBeersTask = new UpdateBeersTask(getHelper().getConnectionSource(),
-                getBreweryDao(), getBeerDao(), fBeerList, fAdapter, updateProgressDialog);
 
-        final ProgressDialog loadProgressDialog = new ProgressDialog(this);
-        final LoadBeersTask loadBeersTask = new LoadBeersTask(loadProgressDialog, updateBeersTask, fAppPreferences);
-        try {
-            String md5 = fAppPreferences.getLastUpdateMD5();
-            final LoadBeersTask.Source source = new LoadBeersTask.Source(beerListUrl(), md5);
-
-            //noinspection unchecked
-            loadBeersTask.execute(source);
-
-        } catch (IOException iox) {
-            Log.e(TAG, "Failed to load beers.", iox);
+        if (!haveNetworkConnection()) {
+            Toast.makeText(this,
+                    "Not updating beers as there is no internet connection.", Toast.LENGTH_LONG).show();
+            return;
         }
+
+        final UpdateBeersTask updateBeersTask = new UpdateBeersTask(this,
+                getHelper().getConnectionSource(),
+                getBreweryDao(), getBeerDao(),
+                this);
+
+        final LoadBeersTask loadBeersTask = new LoadBeersTask(this,
+                updateBeersTask, fAppPreferences);
+
+        String md5 = fAppPreferences.getLastUpdateMD5();
+        final LoadBeersTask.Source source = new LoadBeersTask.Source(beerListUrl(), md5);
+
+        //noinspection unchecked
+        loadBeersTask.execute(source);
+
     }
 
     private void configureListView() {
@@ -196,33 +241,44 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
 
     @Override
     public boolean onMenuItemSelected(final int featureId, final MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        switch (item.getItemId()) {
-            case R.id.search_beer:
-                fBeerSearcher.searchBeer(getBeerWithId(info.id));
-                return true;
-            case R.id.share_beer:
-                fBeerSharer.shareBeer(getBeerWithId(info.id));
-                return true;
+        try {
+            switch (item.getItemId()) {
+                case R.id.search_beer:
+                    fBeerSearcher.searchBeer(getBeerFromMenuItem(item));
+                    return true;
+                case R.id.share_beer:
+                    fBeerSharer.shareBeer(getBeerFromMenuItem(item));
+                    return true;
+            }
+            return super.onMenuItemSelected(featureId, item);
+        } catch (SQLException e) {
+            // getBeerFromMenuItem failed
+            fExceptionReporter.report(TAG, e.getMessage(), e);
+            return true;
         }
-        return super.onMenuItemSelected(featureId, item);
     }
 
-    private Beer getBeerWithId(final long id) {
-        try {
-            return getBeerDao().getBeerWithId(id);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    // Helper for onMenuItemSelected
+    private Beer getBeerFromMenuItem(final MenuItem item) throws SQLException {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        return getBeerDao().getBeerWithId(info.id);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == SHOW_BEER_DETAILS_REQUEST_CODE) {
-            sortBy(fAppPreferences.getSortOrder());
-            filterBy(fAppPreferences.getFilterText());
+            notifyBeersChanged();
         } else {
             super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    public void notifyBeersChanged() {
+        try {
+            fBeerList.updateBeerList();
+            fAdapter.notifyDataSetChanged();
+        } catch (SQLException e) {
+            fExceptionReporter.report(TAG, e.getMessage(), e);
         }
     }
 
@@ -268,9 +324,9 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
             BeerExporter exporter = new BeerExporter(this);
             exporter.export(ratedBeers);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            fExceptionReporter.report(TAG, e.getMessage(), e);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            fExceptionReporter.report(TAG, e.getMessage(), e);
         }
     }
 
@@ -355,7 +411,6 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         try {
             final Set<String> stylesToHide = fAppPreferences.getStylesToHide();
             final Set<String> allStyles = getBeerDao().getAvailableStyles();
-            ;
 
             final BeerStyleListAdapter listAdapter = new BeerStyleListAdapter(this, allStyles, stylesToHide);
             builder.setAdapter(listAdapter, new DialogInterface.OnClickListener() {
@@ -370,7 +425,8 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
             });
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            fExceptionReporter.report(TAG, e.getMessage(), e);
+            return null;
         }
 
         builder.setNegativeButton(R.string.CANCEL, new DialogInterface.OnClickListener() {
@@ -382,27 +438,42 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     }
 
     private void hideUnavailableBeers(boolean hide) {
-        fAppPreferences.setHideUnavailableBeers(hide);
-        fBeerList.hideUnavailableBeers(hide);
-        fAdapter.notifyDataSetChanged();
+        try {
+            fBeerList.hideUnavailableBeers(hide);
+            fAppPreferences.setHideUnavailableBeers(hide);
+            fAdapter.notifyDataSetChanged();
+        } catch (SQLException e) {
+            fExceptionReporter.report(TAG, e.getMessage(), e);
+        }
     }
 
     private void filterByStyle(Set<String> stylesToHide) {
-        fAppPreferences.setStylesToHide(stylesToHide);
-        fBeerList.stylesToHide(stylesToHide);
-        fAdapter.notifyDataSetChanged();
+        try {
+            fBeerList.stylesToHide(stylesToHide);
+            fAppPreferences.setStylesToHide(stylesToHide);
+            fAdapter.notifyDataSetChanged();
+        } catch (SQLException e) {
+            fExceptionReporter.report(TAG, e.getMessage(), e);
+        }
     }
 
     private void filterBy(String filterText) {
-        fAppPreferences.setFilterText(filterText);
-        fBeerList.filterBy(filterText);
-        fAdapter.notifyDataSetChanged();
+        try {
+            fBeerList.filterBy(filterText);
+            fAppPreferences.setFilterText(filterText);
+            fAdapter.notifyDataSetChanged();
+        } catch (SQLException e) {
+            fExceptionReporter.report(TAG, e.getMessage(), e);
+        }
     }
 
     private void sortBy(SortOrder sortOrder) {
-        fAppPreferences.setSortOrder(sortOrder);
-        fBeerList.sortBy(sortOrder);
-        fAdapter.notifyDataSetChanged();
+        try {
+            fBeerList.sortBy(sortOrder);
+            fAppPreferences.setSortOrder(sortOrder);
+            fAdapter.notifyDataSetChanged();
+        } catch (SQLException e) {
+            fExceptionReporter.report(TAG, e.getMessage(), e);
+        }
     }
-
 }
