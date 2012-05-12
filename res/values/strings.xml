@@ -14,10 +14,11 @@
     <string name="oops_this_beer">Forget Rating</string>
 
     <string name="sort_menu_label">Order by…</string>
-    <string name="show_only_style_label">Filter by style</string>
-    <string name="show_only_available_label">Filter by availability</string>
+    <string name="show_only_style_label">Filter by style…</string>
+    <string name="show_only_available_label">Filter by availability…</string>
     <string name="export_label">Export as CSV</string>
     <string name="visit_festival_website_label">Visit Festival website</string>
+
     <string name="reload_menu_label">Reload Beers</string>
     <string name="refresh_menu_label">Update Beers</string>
 
@@ -25,7 +26,7 @@
 
     <string name="filter_hint">search</string>
 
-    <string name="loading_message">Downloading beers, please wait…</string>
+    <string name="loading_message">Checking for updates to beers, please wait…</string>
 
     <string name="filter_style_dialog_title">Select beer styles to show</string>
     <string name="filter_style_dialog_show_all">Show All</string>
