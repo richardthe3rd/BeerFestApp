@@ -15,6 +15,7 @@ import java.net.URL;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 
 class LoadBeersTask extends AsyncTask<LoadBeersTask.Source, String, JsonBeerList> {
 
@@ -77,14 +78,12 @@ class LoadBeersTask extends AsyncTask<LoadBeersTask.Source, String, JsonBeerList
             String md5 = toHashText(digest);
             if (md5.equals(source.MD5)) {
                 Log.i(TAG, "MD5 streams match - nothing has changed, not parsing JSON or updating database.");
+                setNextUpdateTime();
                 return null;
             } else {
                 Log.i(TAG, "Previous MD5 was " + source.MD5 + ", new MD5 is " + md5);
-                // 3 hours time
-                int hoursToNextUpdate = 3;
-                fAppPreferences.setNextUpdateTime(System.currentTimeMillis() + (hoursToNextUpdate * 60 * 60 * 1000));
                 fAppPreferences.setLastUpdateMD5(md5);
-
+                setNextUpdateTime();
                 return new JsonBeerList(jsonString);
             }
 
@@ -95,6 +94,14 @@ class LoadBeersTask extends AsyncTask<LoadBeersTask.Source, String, JsonBeerList
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void setNextUpdateTime() {
+        // 3 hours time
+        int hoursToNextUpdate = 3;
+        final Date nextUpdateTime = new Date(System.currentTimeMillis() + (hoursToNextUpdate * 60 * 60 * 1000));
+        Log.i(TAG, "Will next check for updates after " + nextUpdateTime);
+        fAppPreferences.setNextUpdateTime(nextUpdateTime);
     }
 
     private String toHashText(final MessageDigest digest) {
