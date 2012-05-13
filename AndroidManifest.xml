@@ -3,7 +3,7 @@
           package="ralcock.cbf"
           android:versionCode="5"
           android:versionName="3.0 Beta1"
-          android:installLocation="internalOnly">
+          android:installLocation="auto">
 
     <uses-permission
             android:name="android.permission.INTERNET"/>

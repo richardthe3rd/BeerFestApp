@@ -2,6 +2,7 @@ package ralcock.cbf;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,6 +29,7 @@ import com.j256.ormlite.android.apptools.OrmLiteBaseListActivity;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerDatabaseHelper;
 import ralcock.cbf.model.BeerList;
+import ralcock.cbf.model.JsonBeerList;
 import ralcock.cbf.model.SortOrder;
 import ralcock.cbf.model.dao.BeerDao;
 import ralcock.cbf.model.dao.BreweryDao;
@@ -206,15 +208,12 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
             return;
         }
 
-        final UpdateBeersTask updateBeersTask = new UpdateBeersTask(this,
-                getHelper().getConnectionSource(),
-                getBreweryDao(), getBeerDao(),
-                this);
-
-        final LoadBeersTask loadBeersTask = new LoadBeersTask(this,
-                updateBeersTask, fAppPreferences);
+        final LoadBeersTask loadBeersTask = new MyLoadBeersTask(fAppPreferences);
 
         String md5 = fAppPreferences.getLastUpdateMD5();
+        if (getBeerCount() == 0) {
+            md5 = "EMPTY_DATABASE";
+        }
         final LoadBeersTask.Source source = new LoadBeersTask.Source(beerListUrl(), md5);
 
         //noinspection unchecked
@@ -476,6 +475,88 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
             fAdapter.notifyDataSetChanged();
         } catch (SQLException e) {
             fExceptionReporter.report(TAG, e.getMessage(), e);
+        }
+    }
+
+    private class MyLoadBeersTask extends LoadBeersTask {
+        private final ProgressDialog fLoadProgressDialog;
+
+        public MyLoadBeersTask(AppPreferences appPreferences) {
+            super(appPreferences);
+            fLoadProgressDialog = new ProgressDialog(CamBeerFestApplication.this);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            fLoadProgressDialog.setMessage(CamBeerFestApplication.this.getText(R.string.loading_message));
+            fLoadProgressDialog.setIndeterminate(true);
+            fLoadProgressDialog.setCancelable(false);
+            fLoadProgressDialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(final Result result) {
+            JsonBeerList beerList = result.BeerList;
+            if (beerList == null) {
+                Throwable t = result.Throwable;
+                if (t != null) {
+                    Log.e(TAG, "Exception while downloading beer list. " + t.getMessage(), t);
+                    Toast.makeText(getApplicationContext(),
+                            "Failed to download beers. " + t.getMessage(),
+                            Toast.LENGTH_LONG).show();
+                }
+                fLoadProgressDialog.dismiss();
+            } else {
+                fLoadProgressDialog.dismiss();
+
+                final UpdateBeersTask updateBeersTask = new MyUpdateBeersTask(beerList.size());
+                updateBeersTask.execute(beerList);
+            }
+        }
+
+        @Override
+        protected void onProgressUpdate(final String... msg) {
+            fLoadProgressDialog.setMessage(msg[0]);
+        }
+    }
+
+    private class MyUpdateBeersTask extends UpdateBeersTask {
+        private final ProgressDialog fUpdateProgressDialog;
+        private final int fNumberOfBeers;
+
+        private MyUpdateBeersTask(final int numberOfBeers) {
+            super(getApplicationContext(), getConnectionSource(), getBreweryDao(), getBeerDao());
+            fUpdateProgressDialog = new ProgressDialog(CamBeerFestApplication.this);
+            fNumberOfBeers = numberOfBeers;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            fUpdateProgressDialog.setMessage("Updating database");
+            fUpdateProgressDialog.setProgress(0);
+            fUpdateProgressDialog.setMax(fNumberOfBeers);
+            fUpdateProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            fUpdateProgressDialog.setIndeterminate(false);
+            fUpdateProgressDialog.setCancelable(false);
+            fUpdateProgressDialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(final Long aLong) {
+            CamBeerFestApplication.this.notifyBeersChanged();
+            fUpdateProgressDialog.dismiss();
+        }
+
+        @Override
+        protected void onProgressUpdate(final Beer... values) {
+            String name = values[0].getName();
+            int maxLength = 12;
+            if (name.length() > maxLength) {
+                name = name.substring(0, maxLength - 3);
+                name = name + "...";
+            }
+            fUpdateProgressDialog.setMessage("Updated " + name);
+            fUpdateProgressDialog.incrementProgressBy(1);
         }
     }
 }

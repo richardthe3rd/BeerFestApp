@@ -1,6 +1,5 @@
 package ralcock.cbf;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -15,7 +14,7 @@ import ralcock.cbf.model.dao.BreweryDao;
 import java.sql.SQLException;
 import java.util.concurrent.Callable;
 
-final class UpdateBeersTask extends AsyncTask<Iterable<Beer>, Beer, Long> {
+class UpdateBeersTask extends AsyncTask<Iterable<Beer>, Beer, Long> {
 
     private static final String TAG = LoadBeersTask.class.getName();
 
@@ -23,54 +22,15 @@ final class UpdateBeersTask extends AsyncTask<Iterable<Beer>, Beer, Long> {
     private final BreweryDao fBreweryDao;
     private final BeerDao fBeerDao;
     private final Context fContext;
-    private final CamBeerFestApplication fApplication;
-    private final ProgressDialog fDialog;
-    private int fNumberOfBeers;
 
     UpdateBeersTask(final Context context,
                     final ConnectionSource connectionSource,
                     final BreweryDao breweryDao,
-                    final BeerDao beerDao,
-                    final CamBeerFestApplication application) {
+                    final BeerDao beerDao) {
         fContext = context;
         fConnectionSource = connectionSource;
         fBreweryDao = breweryDao;
         fBeerDao = beerDao;
-        fApplication = application;
-        fDialog = new ProgressDialog(context);
-    }
-
-    void setNumberOfBeers(int numberOfBeers) {
-        fNumberOfBeers = numberOfBeers;
-    }
-
-    @Override
-    protected void onPreExecute() {
-        fDialog.setMessage("Updating database");
-        fDialog.setProgress(0);
-        fDialog.setMax(fNumberOfBeers);
-        fDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        fDialog.setIndeterminate(false);
-        fDialog.setCancelable(false);
-        fDialog.show();
-    }
-
-    @Override
-    protected void onProgressUpdate(final Beer... values) {
-        String name = values[0].getName();
-        int maxLength = 12;
-        if (name.length() > maxLength) {
-            name = name.substring(0, maxLength - 3);
-            name = name + "...";
-        }
-        fDialog.setMessage("Updated " + name);
-        fDialog.incrementProgressBy(1);
-    }
-
-    @Override
-    protected void onPostExecute(final Long numBeersUpdated) {
-        fApplication.notifyBeersChanged();
-        fDialog.dismiss();
     }
 
     @Override

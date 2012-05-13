@@ -1,10 +1,7 @@
 package ralcock.cbf;
 
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 import org.json.JSONException;
 import ralcock.cbf.model.JsonBeerList;
 
@@ -19,59 +16,18 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
-final class LoadBeersTask extends AsyncTask<LoadBeersTask.Source, String, LoadBeersTask.Result> {
+class LoadBeersTask extends AsyncTask<LoadBeersTask.Source, String, LoadBeersTask.Result> {
 
     private static final String TAG = "cbf." + LoadBeersTask.class.getSimpleName();
 
-    private final Context fContext;
-    private final ProgressDialog fDialog;
     private final AppPreferences fAppPreferences;
-    private final UpdateBeersTask fUpdateBeersTask;
 
-    LoadBeersTask(final Context context,
-                  final UpdateBeersTask updateBeersTask,
-                  final AppPreferences appPreferences) {
-        fContext = context;
-        fDialog = new ProgressDialog(context);
-        fUpdateBeersTask = updateBeersTask;
+    LoadBeersTask(final AppPreferences appPreferences) {
         fAppPreferences = appPreferences;
     }
 
     @Override
-    protected void onPreExecute() {
-        fDialog.setMessage(fDialog.getContext().getText(R.string.loading_message));
-        fDialog.setIndeterminate(true);
-        fDialog.setCancelable(false);
-        fDialog.show();
-    }
-
-    @Override
-    protected void onProgressUpdate(String... msg) {
-        fDialog.setMessage(msg[0]);
-    }
-
-    @Override
-    protected void onPostExecute(Result result) {
-        JsonBeerList beerList = result.BeerList;
-        if (beerList == null) {
-            Throwable t = result.Throwable;
-            if (t != null) {
-                Log.e(TAG, "Exception while downloading beer list. " + t.getMessage(), t);
-                Toast.makeText(fContext, "Failed to download beers. " + t.getMessage(),
-                        Toast.LENGTH_LONG).show();
-            }
-            fDialog.dismiss();
-        } else {
-            Toast.makeText(fContext, "Updated beer list", Toast.LENGTH_LONG).show();
-            fDialog.dismiss();
-
-            fUpdateBeersTask.setNumberOfBeers(beerList.size());
-            fUpdateBeersTask.execute(beerList);
-        }
-    }
-
-    @Override
-    protected Result doInBackground(Source... sources) {
+    protected final Result doInBackground(Source... sources) {
         final Source source = sources[0];
         try {
             Log.i(TAG, "Starting background initialization of database");
