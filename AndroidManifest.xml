@@ -13,7 +13,7 @@
 
     <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="15"/>
 
-    <application android:label="CamBeerFest" android:icon="@drawable/caskman">
+    <application android:label="Cambridge Beer Festival" android:icon="@drawable/caskman">
 
         <activity android:name=".CamBeerFestApplication"
                   android:windowSoftInputMode="stateAlwaysHidden"
