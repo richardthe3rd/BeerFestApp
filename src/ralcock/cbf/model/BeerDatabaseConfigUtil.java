@@ -9,6 +9,7 @@ public class BeerDatabaseConfigUtil extends OrmLiteConfigUtil {
 
     public static void main(String[] args) throws IOException, SQLException {
         String configFile = args[0];
-        writeConfigFile(configFile);
+        final Class<?>[] classes = {Beer.class, Brewery.class};
+        writeConfigFile(configFile, classes);
     }
 }

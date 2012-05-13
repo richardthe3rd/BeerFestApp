@@ -1,5 +1,5 @@
 #
-# generated on 2012/05/04 08:03:59
+# generated on 2012/05/13 12:55:44
 #
 # --table-start--
 dataClass=ralcock.cbf.model.Beer
@@ -32,6 +32,7 @@ columnName=description
 # --field-start--
 fieldName=fStatus
 columnName=status
+indexName=beers_status_idx
 # --field-end--
 # --field-start--
 fieldName=fRating
@@ -47,6 +48,15 @@ indexName=beers_festival_id_idx
 fieldName=fStyle
 columnName=style
 indexName=beers_style_idx
+# --field-end--
+# --field-start--
+fieldName=fIsOnWishList
+columnName=on_wish_list
+indexName=beers_on_wish_list_idx
+# --field-end--
+# --field-start--
+fieldName=fUserComments
+columnName=user_comments
 # --field-end--
 # --table-fields-end--
 # --table-end--

@@ -16,9 +16,12 @@ public final class Beer implements Serializable {
     public static final String ABV_FIELD = "abv";
     public static final String DESCRIPTION_FIELD = "description";
     public static final String STATUS_FIELD = "status";
-    public static final String RATING_FIELD = "rating";
     public static final String FESTIVAL_ID_FIELD = "festival_id";
     public static final String STYLE_FIELD = "style";
+
+    public static final String RATING_FIELD = "rating";
+    public static final String ON_WISH_LIST_FIELD = "on_wish_list";
+    public static final String USER_COMMENTS_FIELD = "user_comments";
 
     @DatabaseField(columnName = "_id", generatedId = true)
     private long fId;
@@ -47,6 +50,11 @@ public final class Beer implements Serializable {
     @DatabaseField(columnName = STYLE_FIELD, index = true)
     private String fStyle;
 
+    @DatabaseField(columnName = ON_WISH_LIST_FIELD, index = true)
+    private boolean fIsOnWishList;
+
+    @DatabaseField(columnName = USER_COMMENTS_FIELD)
+    private String fUserComments;
 
     @SuppressWarnings("UnusedDeclaration")
         // needed by ormlite
@@ -117,6 +125,22 @@ public final class Beer implements Serializable {
         return fStyle;
     }
 
+    public boolean isIsOnWishList() {
+        return fIsOnWishList;
+    }
+
+    public void setIsOnWishList(final boolean isOnWishList) {
+        fIsOnWishList = isOnWishList;
+    }
+
+    public String getUserComments() {
+        return fUserComments;
+    }
+
+    public void setUserComments(final String userComments) {
+        fUserComments = userComments;
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
@@ -125,6 +149,7 @@ public final class Beer implements Serializable {
         final Beer beer = (Beer) o;
 
         if (Float.compare(beer.fAbv, fAbv) != 0) return false;
+        if (fIsOnWishList != beer.fIsOnWishList) return false;
         if (fRating != beer.fRating) return false;
         if (fBrewery != null ? !fBrewery.equals(beer.fBrewery) : beer.fBrewery != null) return false;
         if (fDescription != null ? !fDescription.equals(beer.fDescription) : beer.fDescription != null) return false;
@@ -132,6 +157,8 @@ public final class Beer implements Serializable {
         if (fName != null ? !fName.equals(beer.fName) : beer.fName != null) return false;
         if (fStatus != null ? !fStatus.equals(beer.fStatus) : beer.fStatus != null) return false;
         if (fStyle != null ? !fStyle.equals(beer.fStyle) : beer.fStyle != null) return false;
+        if (fUserComments != null ? !fUserComments.equals(beer.fUserComments) : beer.fUserComments != null)
+            return false;
 
         return true;
     }
@@ -146,6 +173,8 @@ public final class Beer implements Serializable {
         result = 31 * result + fRating;
         result = 31 * result + (fFestivalID != null ? fFestivalID.hashCode() : 0);
         result = 31 * result + (fStyle != null ? fStyle.hashCode() : 0);
+        result = 31 * result + (fIsOnWishList ? 1 : 0);
+        result = 31 * result + (fUserComments != null ? fUserComments.hashCode() : 0);
         return result;
     }
 
@@ -153,7 +182,8 @@ public final class Beer implements Serializable {
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("Beer");
-        sb.append("{fBrewery=").append(fBrewery);
+        sb.append("{fId=").append(fId);
+        sb.append(", fBrewery=").append(fBrewery);
         sb.append(", fName='").append(fName).append('\'');
         sb.append(", fAbv=").append(fAbv);
         sb.append(", fDescription='").append(fDescription).append('\'');
@@ -161,6 +191,8 @@ public final class Beer implements Serializable {
         sb.append(", fRating=").append(fRating);
         sb.append(", fFestivalID='").append(fFestivalID).append('\'');
         sb.append(", fStyle='").append(fStyle).append('\'');
+        sb.append(", fIsOnWishList=").append(fIsOnWishList);
+        sb.append(", fUserComments='").append(fUserComments).append('\'');
         sb.append('}');
         return sb.toString();
     }

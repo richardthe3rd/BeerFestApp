@@ -90,8 +90,10 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     @Override
     protected void onDestroy() {
         Log.d(TAG, "In onDestroy");
+        if (fFilterTextBox != null)
+            fFilterTextBox.removeTextChangedListener(fFilterTextWatcher);
+
         super.onDestroy();
-        fFilterTextBox.removeTextChangedListener(fFilterTextWatcher);
     }
 
     /**
