@@ -25,7 +25,7 @@
             />
 
     <item android:id="@+id/refresh_database"
-          android:visible="true"
+          android:visible="false"
           android:title="@string/refresh_menu_label"
             />
 
