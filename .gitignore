@@ -1,5 +1,6 @@
 .idea/workspace.xml
 local.properties
+tests\local.properties
 CamBeerFestApp.apk
 keystore
 out/
