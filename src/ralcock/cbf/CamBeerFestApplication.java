@@ -365,22 +365,17 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
 
     private Dialog createAvailabilityDialog() {
         boolean hideUnavailable = fAppPreferences.getHideUnavailableBeers();
-        int selectedChoice = hideUnavailable ? 1 : 0;
+        boolean[] selectedChoice = new boolean[]{hideUnavailable};
 
         String[] choices = new String[]{
-                getResources().getString(R.string.filter_available_all),
                 getResources().getString(R.string.filter_available_hide)
         };
 
-        ListAdapter listAdapter = new ArrayAdapter<String>(this, R.layout.sort_by_dialog_list_item, choices);
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
         builder.setTitle(R.string.filter_available_dialog_title);
-
-        builder.setSingleChoiceItems(listAdapter, selectedChoice, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialogInterface, int i) {
-                hideUnavailableBeers(i == 1);
+        builder.setMultiChoiceItems(choices, selectedChoice, new DialogInterface.OnMultiChoiceClickListener() {
+            public void onClick(final DialogInterface dialogInterface, final int i, final boolean b) {
+                hideUnavailableBeers(b);
                 dialogInterface.dismiss();
             }
         });
