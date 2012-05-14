@@ -19,10 +19,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 import com.j256.ormlite.android.apptools.OrmLiteBaseListActivity;
@@ -44,7 +42,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -363,6 +361,19 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         return dialog;
     }
 
+    @Override
+    protected void onPrepareDialog(final int id, final Dialog dialog) {
+        switch (id) {
+            case SORT_DIALOG_ID:
+                break;
+            case FILTER_BY_STYLE_DIALOG_ID:
+                prepareStylesToHideDialog(dialog);
+                break;
+            case FILTER_BY_AVAILABLE_DIALOG_ID:
+                break;
+        }
+    }
+
     private Dialog createAvailabilityDialog() {
         boolean hideUnavailable = fAppPreferences.getHideUnavailableBeers();
         boolean[] selectedChoice = new boolean[]{hideUnavailable};
@@ -373,6 +384,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.filter_available_dialog_title);
+
         builder.setMultiChoiceItems(choices, selectedChoice, new DialogInterface.OnMultiChoiceClickListener() {
             public void onClick(final DialogInterface dialogInterface, final int i, final boolean b) {
                 hideUnavailableBeers(b);
@@ -384,16 +396,21 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     }
 
     private Dialog createSortDialog() {
-        final List<SortOrder> items = Arrays.asList(SortOrder.values());
-
-        ListAdapter listAdapter = new ArrayAdapter<SortOrder>(this, R.layout.sort_by_dialog_list_item, items);
+        final SortOrder[] sortOrders = SortOrder.values();
+        final CharSequence[] items = new CharSequence[sortOrders.length];
+        int checkedItem = -1;
+        for (int i = 0; i < items.length; i++) {
+            items[i] = sortOrders[i].toString();
+            if (sortOrders[i] == fAppPreferences.getSortOrder()) {
+                checkedItem = i;
+            }
+        }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.sort_dialog_title);
-        int checkedItem = items.indexOf(fAppPreferences.getSortOrder());
-        builder.setSingleChoiceItems(listAdapter, checkedItem, new DialogInterface.OnClickListener() {
+        builder.setSingleChoiceItems(items, checkedItem, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialogInterface, int i) {
-                sortBy(items.get(i));
+                sortBy(sortOrders[i]);
                 dialogInterface.dismiss();
             }
         });
@@ -404,26 +421,21 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.filter_style_dialog_title);
 
-        try {
-            final Set<String> stylesToHide = fAppPreferences.getStylesToHide();
-            final Set<String> allStyles = getBeerDao().getAvailableStyles();
+        final Set<String> emptySet = Collections.emptySet();
+        final BeerStyleListAdapter listAdapter = new BeerStyleListAdapter(this, emptySet, emptySet);
+        builder.setAdapter(listAdapter, new DialogInterface.OnClickListener() {
+            public void onClick(final DialogInterface dialogInterface, final int i) {
+                // NOTHING TO DO HERE
+            }
+        });
 
-            final BeerStyleListAdapter listAdapter = new BeerStyleListAdapter(this, allStyles, stylesToHide);
-            builder.setAdapter(listAdapter, new DialogInterface.OnClickListener() {
-                public void onClick(final DialogInterface dialogInterface, final int i) {
-                }
-            });
-
-            builder.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
-                public void onClick(final DialogInterface dialogInterface, final int i) {
-                    filterByStyle(listAdapter.getStylesToHide());
-                }
-            });
-
-        } catch (SQLException e) {
-            fExceptionReporter.report(TAG, e.getMessage(), e);
-            return null;
-        }
+        builder.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
+            public void onClick(final DialogInterface dialogInterface, final int i) {
+                AlertDialog alertDialog = (AlertDialog) dialogInterface;
+                BeerStyleListAdapter listAdapter = (BeerStyleListAdapter) alertDialog.getListView().getAdapter();
+                filterByStyle(listAdapter.getStylesToHide());
+            }
+        });
 
         builder.setNegativeButton(R.string.CANCEL, new DialogInterface.OnClickListener() {
             public void onClick(final DialogInterface dialogInterface, final int i) {
@@ -431,6 +443,18 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         });
 
         return builder.create();
+    }
+
+    private void prepareStylesToHideDialog(final Dialog dialog) {
+        try {
+            final Set<String> stylesToHide = fAppPreferences.getStylesToHide();
+            final Set<String> allStyles = getBeerDao().getAvailableStyles();
+            final BeerStyleListAdapter listAdapter = new BeerStyleListAdapter(this, allStyles, stylesToHide);
+            AlertDialog alertDialog = (AlertDialog) dialog;
+            alertDialog.getListView().setAdapter(listAdapter);
+        } catch (SQLException e) {
+            fExceptionReporter.report(TAG, e.getMessage(), e);
+        }
     }
 
     private void hideUnavailableBeers(boolean hide) {

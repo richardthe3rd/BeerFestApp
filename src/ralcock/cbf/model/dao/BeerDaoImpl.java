@@ -14,9 +14,9 @@ import ralcock.cbf.model.Brewery;
 import ralcock.cbf.model.SortOrder;
 
 import java.sql.SQLException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class BeerDaoImpl extends BaseDaoImpl<Beer, Long> implements BeerDao {
 
@@ -46,7 +46,7 @@ public class BeerDaoImpl extends BaseDaoImpl<Beer, Long> implements BeerDao {
 
         GenericRawResults<String[]> results = queryRaw(qb.prepareStatementString());
         try {
-            Set<String> styles = new HashSet<String>();
+            Set<String> styles = new TreeSet<String>();
             List<String[]> resultList = results.getResults();
             for (String[] array : resultList) {
                 styles.add(array[0]);

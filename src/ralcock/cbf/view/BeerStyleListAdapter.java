@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
+import android.widget.CheckedTextView;
 import android.widget.TextView;
 import ralcock.cbf.R;
 
@@ -47,7 +47,7 @@ public class BeerStyleListAdapter extends BaseAdapter {
         ItemView itemView;
         if (view == null) {
             LayoutInflater layoutInflater = LayoutInflater.from(fContext);
-            view = layoutInflater.inflate(R.layout.beer_style_view, viewGroup, false);
+            view = layoutInflater.inflate(android.R.layout.select_dialog_multichoice, viewGroup, false);
             itemView = new ItemView(view);
             view.setTag(itemView);
         } else {
@@ -102,11 +102,11 @@ public class BeerStyleListAdapter extends BaseAdapter {
 
     private static class ItemView {
         TextView StyleTextView;
-        CheckBox ShowStyleCheck;
+        CheckedTextView ShowStyleCheck;
 
         private ItemView(final View view) {
-            StyleTextView = (TextView) view.findViewById(R.id.style_text);
-            ShowStyleCheck = (CheckBox) view.findViewById(R.id.show_style);
+            StyleTextView = (TextView) view;
+            ShowStyleCheck = (CheckedTextView) view;
         }
     }
 
