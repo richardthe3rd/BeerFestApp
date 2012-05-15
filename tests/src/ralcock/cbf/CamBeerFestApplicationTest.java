@@ -74,11 +74,4 @@ public class CamBeerFestApplicationTest extends ActivityInstrumentationTestCase2
         int resetCount = fListView.getAdapter().getCount();
         assertEquals(originalCount, resetCount);
     }
-
-    public void testOrderBy() {
-        sendKeys(KeyEvent.KEYCODE_MENU);
-
-    }
-
-
 }
