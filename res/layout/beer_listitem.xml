@@ -15,20 +15,20 @@
             android:orientation="vertical"
             >
 
-        <TextView android:id="@+id/beer_name"
+        <TextView android:id="@+id/beerName"
                   android:layout_height="wrap_content"
                   android:layout_width="wrap_content"
                   android:textStyle="bold"
                   android:textSize="18sp"
                 />
 
-        <TextView android:id="@+id/brewery_name"
+        <TextView android:id="@+id/breweryName"
                   android:layout_height="wrap_content"
                   android:layout_width="wrap_content"
                   android:textSize="14sp"
                 />
 
-        <RatingBar android:id="@+id/beer_rating"
+        <RatingBar android:id="@+id/beerRatingBar"
                    android:layout_height="fill_parent"
                    android:layout_width="wrap_content"
                    android:gravity="left|center_vertical"
@@ -48,14 +48,14 @@
             android:paddingRight="2dip"
             >
 
-        <TextView android:id="@+id/beer_style"
+        <TextView android:id="@+id/beerStyle"
                   android:layout_height="wrap_content"
                   android:layout_width="wrap_content"
                   android:textSize="14sp"
                   android:layout_gravity="top|right"
                   android:text="Stout"
                 />
-        <TextView android:id="@+id/beer_status"
+        <TextView android:id="@+id/beerStatus"
                   android:layout_height="fill_parent"
                   android:layout_width="wrap_content"
                   android:textSize="12sp"

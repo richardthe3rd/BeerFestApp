@@ -7,13 +7,15 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.RatingBar;
+import android.widget.TextView;
 import ralcock.cbf.R;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerList;
 import ralcock.cbf.model.Brewery;
 import ralcock.cbf.util.ExceptionReporter;
 
-public class BeerListAdapter extends BaseAdapter implements Filterable {
+public final class BeerListAdapter extends BaseAdapter implements Filterable {
 
     private final Context fContext;
     private final BeerList fBeerList;
@@ -27,25 +29,25 @@ public class BeerListAdapter extends BaseAdapter implements Filterable {
 
     private View newView(ViewGroup viewGroup) {
         LayoutInflater layoutInflater = LayoutInflater.from(fContext);
-        View view = layoutInflater.inflate(R.layout.beer_item, viewGroup, false);
-        BeerItemView beerItemView = new BeerItemView(view);
-        view.setTag(beerItemView);
+        View view = layoutInflater.inflate(R.layout.beer_listitem, viewGroup, false);
+        BeerListItemView beerListItemView = new BeerListItemView(view);
+        view.setTag(beerListItemView);
         return view;
     }
 
     private void bindView(View view, final Beer beer) {
-        BeerItemView beerItemView = (BeerItemView) view.getTag();
+        BeerListItemView beerListItemView = (BeerListItemView) view.getTag();
 
         Brewery brewery = beer.getBrewery();
-        beerItemView.brewery.setText(brewery == null ? "<NULL_BREWERY>" : brewery.getName());
+        beerListItemView.BreweryName.setText(brewery == null ? "<NULL_BREWERY>" : brewery.getName());
 
-        beerItemView.rating.setRating(beer.getRating());
+        beerListItemView.BeerRatingBar.setRating(beer.getRating());
 
         String beerText = beer.getName() + " (" + beer.getAbv() + "%)";
-        beerItemView.beer.setText(beerText);
+        beerListItemView.BeerName.setText(beerText);
 
-        beerItemView.status.setText(beer.getStatus());
-        beerItemView.style.setText(beer.getStyle());
+        beerListItemView.BeerStatus.setText(beer.getStatus());
+        beerListItemView.BeerStyle.setText(beer.getStyle());
     }
 
     public int getCount() {
@@ -70,5 +72,25 @@ public class BeerListAdapter extends BaseAdapter implements Filterable {
 
     public Filter getFilter() {
         return fFilter;
+    }
+
+    private static final class BeerListItemView {
+        TextView BreweryName;
+        TextView BeerName;
+        TextView BeerStyle;
+        TextView BeerStatus;
+        RatingBar BeerRatingBar;
+
+        BeerListItemView(final View view) {
+            BreweryName = findTextViewById(view, R.id.breweryName);
+            BeerName = findTextViewById(view, R.id.beerName);
+            BeerStatus = findTextViewById(view, R.id.beerStatus);
+            BeerStyle = findTextViewById(view, R.id.beerStyle);
+            BeerRatingBar = (RatingBar) view.findViewById(R.id.beerRatingBar);
+        }
+
+        private TextView findTextViewById(final View view, final int id) {
+            return (TextView) view.findViewById(id);
+        }
     }
 }

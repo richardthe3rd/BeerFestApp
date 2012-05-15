@@ -24,6 +24,9 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 import com.j256.ormlite.android.apptools.OrmLiteBaseListActivity;
+import ralcock.cbf.actions.BeerExporter;
+import ralcock.cbf.actions.BeerSearcher;
+import ralcock.cbf.actions.BeerSharer;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerDatabaseHelper;
 import ralcock.cbf.model.BeerList;
@@ -34,8 +37,6 @@ import ralcock.cbf.model.dao.BreweryDao;
 import ralcock.cbf.util.ExceptionReporter;
 import ralcock.cbf.view.BeerDetailsActivity;
 import ralcock.cbf.view.BeerListAdapter;
-import ralcock.cbf.view.BeerSearcher;
-import ralcock.cbf.view.BeerSharer;
 import ralcock.cbf.view.BeerStyleListAdapter;
 
 import java.io.IOException;
@@ -105,7 +106,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
 
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.beer_list_view);
+        setContentView(R.layout.beer_listview_activity);
         setTitle(getResources().getText(R.string.list_title));
 
         try {
@@ -129,11 +130,11 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     }
 
     private void configureFilterTextBox() {
-        fFilterTextBox = (EditText) findViewById(R.id.search);
+        fFilterTextBox = (EditText) findViewById(R.id.searchBox);
         fFilterTextBox.setText(fAppPreferences.getFilterText());
         fFilterTextBox.addTextChangedListener(fFilterTextWatcher);
 
-        Button clearFilterButton = (Button) findViewById(R.id.clear_filter_text);
+        Button clearFilterButton = (Button) findViewById(R.id.clearSearchBoxBtn);
         clearFilterButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 fFilterTextBox.setText("");
@@ -242,10 +243,10 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     public boolean onMenuItemSelected(final int featureId, final MenuItem item) {
         try {
             switch (item.getItemId()) {
-                case R.id.search_beer:
+                case R.id.searchBeer:
                     fBeerSearcher.searchBeer(getBeerFromMenuItem(item));
                     return true;
-                case R.id.share_beer:
+                case R.id.shareBeer:
                     fBeerSharer.shareBeer(getBeerFromMenuItem(item));
                     return true;
             }
@@ -284,7 +285,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         android.view.MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.list_menu, menu);
+        inflater.inflate(R.menu.list_options_menu, menu);
         return true;
     }
 
@@ -294,10 +295,10 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
             case R.id.sort:
                 showDialog(SORT_DIALOG_ID);
                 return true;
-            case R.id.show_only_style:
+            case R.id.showOnlyStyle:
                 showDialog(FILTER_BY_STYLE_DIALOG_ID);
                 return true;
-            case R.id.show_only_available:
+            case R.id.showOnlyAvailable:
                 showDialog(FILTER_BY_AVAILABLE_DIALOG_ID);
                 return true;
             case R.id.export:
@@ -309,7 +310,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
             case R.id.reload_database:
                 doReloadDatabase();
                 return true;
-            case R.id.visit_festival_website:
+            case R.id.visitFestivalWebsite:
                 goToFestivalWebsite();
                 return true;
             default:

@@ -19,7 +19,7 @@
                 >
             <TableRow>
                 <TextView
-                        android:id="@+id/details_view_beer_name_and_abv"
+                        android:id="@+id/detailsViewBeerNameAndAbv"
                         android:layout_height="wrap_content"
                         android:layout_width="fill_parent"
                         android:textStyle="bold"
@@ -27,14 +27,14 @@
                         android:text="Comrade Bill Bartrums's Egalitarian Anti-Imperialist Soviet Stout (6.9%)"
                         />
                 <TextView
-                        android:id="@+id/details_view_beer_style"
+                        android:id="@+id/detailsViewBeerStyle"
                         android:layout_height="wrap_content"
                         android:layout_width="fill_parent"
                         android:text="Stout"
                         android:layout_gravity="center_horizontal"
                         />
                 <TextView
-                        android:id="@+id/details_view_beer_status"
+                        android:id="@+id/detailsViewBeerStatus"
                         android:text="Ordered"
                         android:textStyle="italic"
                         android:layout_gravity="right"
@@ -49,7 +49,7 @@
                     />
             <TableRow>
                 <TextView
-                        android:id="@+id/details_view_beer_description"
+                        android:id="@+id/detailsViewBeerDescription"
                         android:padding="3dip"
                         android:layout_width="fill_parent"
                         android:layout_span="33"
@@ -60,14 +60,14 @@
             </TableRow>
             <TableRow>
                 <TextView
-                        android:id="@+id/details_view_brewery_name"
+                        android:id="@+id/detailsViewBreweryName"
                         android:textStyle="bold"
                         android:text="Milton"
                         />
             </TableRow>
             <TableRow>
                 <TextView
-                        android:id="@+id/details_view_brewery_description"
+                        android:id="@+id/detailsViewBreweryDescription"
                         android:layout_width="fill_parent"
                         android:layout_span="3"
                         android:layout_height="wrap_content"
@@ -86,7 +86,7 @@
                 />
 
         <RatingBar
-                android:id="@+id/details_view_beer_rating"
+                android:id="@+id/detailsViewBeerRatingBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:numStars="5"

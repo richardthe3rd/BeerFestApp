@@ -7,15 +7,15 @@
           android:title="@string/sort_menu_label"
             />
 
-    <item android:id="@+id/show_only_style"
+    <item android:id="@+id/showOnlyStyle"
           android:title="@string/show_only_style_label"
             />
 
-    <item android:id="@+id/show_only_available"
+    <item android:id="@+id/showOnlyAvailable"
           android:title="@string/show_only_available_label"
             />
 
-    <item android:id="@+id/visit_festival_website"
+    <item android:id="@+id/visitFestivalWebsite"
           android:title="@string/visit_festival_website_label"
             />
 

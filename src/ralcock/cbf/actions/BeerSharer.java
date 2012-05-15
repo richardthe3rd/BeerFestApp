@@ -1,4 +1,4 @@
-package ralcock.cbf.view;
+package ralcock.cbf.actions;
 
 import android.content.Context;
 import android.content.Intent;

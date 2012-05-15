@@ -131,10 +131,6 @@ public final class AppPreferences {
         setPreference(NEXT_UPDATE_TIME_KEY, nextUpdateTime);
     }
 
-    public void setNextUpdateTime(final long nextUpdateTime) {
-        setNextUpdateTime(new Date(nextUpdateTime));
-    }
-
     public void setHideUnavailableBeers(final boolean hide) {
         setPreference(HIDE_UNAVAILABLE_KEY, hide);
     }
