@@ -1,7 +1,11 @@
 .idea/workspace.xml
+.idea/scopes
+.idea/dictionaries
 local.properties
 CamBeerFestApp.apk
 keystore
 out/
 gen/
 bin/
+coverage
+proguard-project.txt
