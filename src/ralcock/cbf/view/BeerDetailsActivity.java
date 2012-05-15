@@ -1,5 +1,6 @@
 package ralcock.cbf.view;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,6 +40,7 @@ public final class BeerDetailsActivity extends OrmLiteBaseActivity<BeerDatabaseH
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         try {
+            setContentView(R.layout.beer_details_activity);
             long id = getIntent().getExtras().getLong(EXTRA_BEER_ID);
             fBeer = getHelper().getBeerDao().queryForId(id);
             displayBeer();
@@ -49,7 +51,7 @@ public final class BeerDetailsActivity extends OrmLiteBaseActivity<BeerDatabaseH
 
     private void displayBeer() {
         if (fBeerDetailsView == null)
-            fBeerDetailsView = new BeerDetailsView();
+            fBeerDetailsView = new BeerDetailsView(this);
 
         setTitle(fBeer.getName() + " - " + fBeer.getBrewery().getName());
 
@@ -115,7 +117,7 @@ public final class BeerDetailsActivity extends OrmLiteBaseActivity<BeerDatabaseH
         super.onDestroy();
     }
 
-    final class BeerDetailsView {
+    static final class BeerDetailsView {
         final TextView BeerNameAndAbv;
         final TextView BeerStyle;
         final TextView BeerDescription;
@@ -124,14 +126,14 @@ public final class BeerDetailsActivity extends OrmLiteBaseActivity<BeerDatabaseH
         final TextView BreweryDescription;
         final TextView BeerStatus;
 
-        public BeerDetailsView() {
-            BeerNameAndAbv = (TextView) findViewById(R.id.detailsViewBeerNameAndAbv);
-            BeerStyle = (TextView) findViewById(R.id.detailsViewBeerStyle);
-            BeerDescription = (TextView) findViewById(R.id.detailsViewBeerDescription);
-            BreweryName = (TextView) findViewById(R.id.detailsViewBreweryName);
-            BreweryDescription = (TextView) findViewById(R.id.detailsViewBreweryDescription);
-            BeerRatingBar = (RatingBar) findViewById(R.id.detailsViewBeerRatingBar);
-            BeerStatus = (TextView) findViewById(R.id.detailsViewBeerStatus);
+        public BeerDetailsView(final Activity activity) {
+            BeerNameAndAbv = (TextView) activity.findViewById(R.id.detailsViewBeerNameAndAbv);
+            BeerStyle = (TextView) activity.findViewById(R.id.detailsViewBeerStyle);
+            BeerDescription = (TextView) activity.findViewById(R.id.detailsViewBeerDescription);
+            BreweryName = (TextView) activity.findViewById(R.id.detailsViewBreweryName);
+            BreweryDescription = (TextView) activity.findViewById(R.id.detailsViewBreweryDescription);
+            BeerRatingBar = (RatingBar) activity.findViewById(R.id.detailsViewBeerRatingBar);
+            BeerStatus = (TextView) activity.findViewById(R.id.detailsViewBeerStatus);
         }
     }
 }
