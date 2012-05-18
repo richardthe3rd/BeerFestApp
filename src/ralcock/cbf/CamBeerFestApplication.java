@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -70,6 +71,8 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     private final ExceptionReporter fExceptionReporter;
 
     private final AppPreferences fAppPreferences;
+    private UpdateBeersTask fUpdateBeersTask;
+    private LoadBeersTask fLoadBeersTask;
 
     private final TextWatcher fFilterTextWatcher = new TextWatcher() {
         public void afterTextChanged(Editable s) {
@@ -100,19 +103,30 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         if (fFilterTextBox != null)
             fFilterTextBox.removeTextChangedListener(fFilterTextWatcher);
 
+        if (fLoadBeersTask != null) {
+            fLoadBeersTask.setListener(null);
+        }
+
+        if (fLoadProgressDialog != null && fLoadProgressDialog.isShowing()) {
+            dismissDialog(LOAD_TASK_PROGRESS_DIALOG_ID);
+        }
+
+        if (fUpdateBeersTask != null)
+            fUpdateBeersTask.setListener(null);
+
+
+        if (fUpdateProgressDialog != null && fUpdateProgressDialog.isShowing()) {
+            dismissDialog(UPDATE_TASK_PROGRESS_DIALOG_ID);
+        }
+
         super.onDestroy();
     }
 
     @Override
     public Object onRetainNonConfigurationInstance() {
         Log.d(TAG, "onRetainNonConfigurationInstance");
-        return super.onRetainNonConfigurationInstance();
-    }
 
-    @Override
-    public Object getLastNonConfigurationInstance() {
-        Log.d(TAG, "getLastNonConfigurationInstance");
-        return super.getLastNonConfigurationInstance();
+        return new Tasks(fUpdateBeersTask, fLoadBeersTask);
     }
 
     /**
@@ -137,9 +151,33 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
             fAdapter = new BeerListAdapter(CamBeerFestApplication.this, fBeerList);
             setListAdapter(fAdapter);
             configureListView();
-            if (beerUpdateNeeded()) {
-                loadBeersInBackground();
+
+            Object cfgInstance = getLastNonConfigurationInstance();
+            if (cfgInstance instanceof Tasks) {
+                Tasks tasks = (Tasks) cfgInstance;
+                fLoadBeersTask = tasks.getLoadBeersTask();
+                if (fLoadBeersTask != null &&
+                        fLoadBeersTask.getStatus() == AsyncTask.Status.RUNNING) {
+                    // We have a running load task
+                    fLoadBeersTask.setListener(this);
+                    //showDialog(LOAD_TASK_PROGRESS_DIALOG_ID);
+                }
+
+                fUpdateBeersTask = tasks.getUpdateBeersTask();
+                if (fUpdateBeersTask != null &&
+                        fUpdateBeersTask.getStatus() == AsyncTask.Status.RUNNING) {
+                    // We have a running update task
+                    fUpdateBeersTask.setListener(this);
+                    //showDialog(UPDATE_TASK_PROGRESS_DIALOG_ID);
+                }
+            } else {
+                fLoadBeersTask = null;
+                fUpdateBeersTask = null;
+                if (beerUpdateNeeded()) {
+                    loadBeersInBackground();
+                }
             }
+
             configureFilterTextBox();
         } catch (SQLException e) {
             fExceptionReporter.report(TAG, e.getMessage(), e);
@@ -219,13 +257,16 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
 
     private void loadBeersInBackground() {
 
+        if (fLoadBeersTask != null && fLoadBeersTask.getStatus() == AsyncTask.Status.RUNNING) {
+            Log.d(TAG, "LoadBeerTask is already running.");
+            return;
+        }
+
         if (!haveNetworkConnection()) {
             Toast.makeText(this,
                     "Not updating beers as there is no internet connection.", Toast.LENGTH_LONG).show();
             return;
         }
-
-        final LoadBeersTask loadBeersTask = new LoadBeersTask(this, fAppPreferences);
 
         String md5 = fAppPreferences.getLastUpdateMD5();
         if (getBeerCount() == 0) {
@@ -234,7 +275,9 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         final LoadBeersTask.Source source = new LoadBeersTask.Source(beerListUrl(), md5);
 
         //noinspection unchecked
-        loadBeersTask.execute(source);
+        fLoadBeersTask = new LoadBeersTask(fAppPreferences);
+        fLoadBeersTask.setListener(this);
+        fLoadBeersTask.execute(source);
     }
 
     private void configureListView() {
@@ -374,24 +417,36 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
                 dialog = createAvailabilityDialog();
                 break;
             case LOAD_TASK_PROGRESS_DIALOG_ID:
-                fLoadProgressDialog = new ProgressDialog(this);
-                fLoadProgressDialog.setMessage(CamBeerFestApplication.this.getText(R.string.loading_message));
-                fLoadProgressDialog.setIndeterminate(true);
-                fLoadProgressDialog.setCancelable(false);
+                Log.d(TAG, "Creating LOAD_TASK_PROGRESS_DIALOG");
+                fLoadProgressDialog = createLoadProgressDialog();
                 dialog = fLoadProgressDialog;
                 break;
             case UPDATE_TASK_PROGRESS_DIALOG_ID:
-                fUpdateProgressDialog = new ProgressDialog(this);
-                fUpdateProgressDialog.setMessage("Updating database");
-                fUpdateProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                fUpdateProgressDialog.setIndeterminate(false);
-                fUpdateProgressDialog.setCancelable(false);
+                Log.d(TAG, "Creating UPDATE_TASK_PROGRESS_DIALOG");
+                fUpdateProgressDialog = createUpdateProgressDialog();
                 dialog = fUpdateProgressDialog;
                 break;
             default:
                 dialog = null;
         }
         return dialog;
+    }
+
+    private ProgressDialog createUpdateProgressDialog() {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Updating database");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDialog.setIndeterminate(false);
+        progressDialog.setCancelable(false);
+        return progressDialog;
+    }
+
+    private ProgressDialog createLoadProgressDialog() {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage(getText(R.string.loading_message));
+        progressDialog.setIndeterminate(true);
+        progressDialog.setCancelable(false);
+        return progressDialog;
     }
 
     @Override
@@ -552,8 +607,14 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         } else {
             dismissDialog(LOAD_TASK_PROGRESS_DIALOG_ID);
 
-            final UpdateBeersTask updateBeersTask = new UpdateBeersTask((Context) this, (UpdateTaskListener) this, beerList.size());
-            updateBeersTask.execute(beerList);
+            if (fUpdateBeersTask != null && fUpdateBeersTask.getStatus() == AsyncTask.Status.RUNNING) {
+                Log.d(TAG, "UpdateBeerTask is already running.");
+                return;
+            }
+            fUpdateBeersTask = new UpdateBeersTask(getApplicationContext(), fExceptionReporter);
+            fUpdateBeersTask.setListener(this);
+            fUpdateBeersTask.setNumberOfBeers(beerList.size());
+            fUpdateBeersTask.execute(beerList);
         }
     }
 
@@ -577,5 +638,24 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         }
         fUpdateProgressDialog.setMessage("Updated " + name);
         fUpdateProgressDialog.incrementProgressBy(1);
+    }
+
+    private static class Tasks {
+        private final UpdateBeersTask fUpdateBeersTask;
+        private final LoadBeersTask fLoadBeersTask;
+
+        Tasks(final UpdateBeersTask updateBeersTask,
+              final LoadBeersTask loadBeersTask) {
+            fUpdateBeersTask = updateBeersTask;
+            fLoadBeersTask = loadBeersTask;
+        }
+
+        UpdateBeersTask getUpdateBeersTask() {
+            return fUpdateBeersTask;
+        }
+
+        LoadBeersTask getLoadBeersTask() {
+            return fLoadBeersTask;
+        }
     }
 }

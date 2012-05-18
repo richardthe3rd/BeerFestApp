@@ -24,9 +24,7 @@ class LoadBeersTask extends AsyncTask<LoadBeersTask.Source, String, LoadBeersTas
 
     private LoadTaskListener fListener;
 
-    LoadBeersTask(final LoadTaskListener listener,
-                  final AppPreferences appPreferences) {
-        fListener = listener;
+    LoadBeersTask(final AppPreferences appPreferences) {
         fAppPreferences = appPreferences;
     }
 
@@ -36,29 +34,36 @@ class LoadBeersTask extends AsyncTask<LoadBeersTask.Source, String, LoadBeersTas
 
     @Override
     protected void onPreExecute() {
-        fListener.notifyLoadTaskStarted();
+        if (fListener != null)
+            fListener.notifyLoadTaskStarted();
     }
 
     @Override
     protected void onPostExecute(final Result result) {
-        fListener.notifyLoadTaskComplete(result);
+        if (fListener != null)
+            fListener.notifyLoadTaskComplete(result);
     }
 
     @Override
     protected void onProgressUpdate(final String... values) {
-        fListener.notifyLoadTaskUpdate(values);
+        if (fListener != null)
+            fListener.notifyLoadTaskUpdate(values);
     }
 
     @Override
     protected final Result doInBackground(Source... sources) {
         final Source source = sources[0];
         try {
-            Log.i(TAG, "Starting background initialization of database");
+            Log.i(TAG, "Starting downloading JSON from " + source.URL);
 
+            long t0 = System.currentTimeMillis();
             MessageDigest digest = MessageDigest.getInstance("MD5");
             final InputStream inputStream = source.URL.openStream();
             DigestInputStream digestStream = new DigestInputStream(inputStream, digest);
             final String jsonString = readStream(digestStream);
+            long elapsed = System.currentTimeMillis() - t0;
+            Log.i(TAG, "Loaded " + jsonString.getBytes().length + " bytes in " + elapsed / 1000 + " seconds.");
+
             String md5 = toHashText(digest);
             if (md5.equals(source.MD5)) {
                 Log.i(TAG, "MD5 streams match - nothing has changed, not parsing JSON or updating database.");
@@ -68,7 +73,11 @@ class LoadBeersTask extends AsyncTask<LoadBeersTask.Source, String, LoadBeersTas
                 Log.i(TAG, "Previous MD5 was " + source.MD5 + ", new MD5 is " + md5);
                 fAppPreferences.setLastUpdateMD5(md5);
                 setNextUpdateTime();
-                return new Result(new JsonBeerList(jsonString));
+
+                Log.i(TAG, "Starting parse of JSON");
+                final Result result = new Result(new JsonBeerList(jsonString));
+                Log.i(TAG, "Done parse of JSON");
+                return result;
             }
 
         } catch (JSONException e) {
