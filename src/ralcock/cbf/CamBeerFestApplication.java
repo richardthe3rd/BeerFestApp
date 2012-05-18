@@ -57,6 +57,8 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     private static final int SORT_DIALOG_ID = 0;
     private static final int FILTER_BY_STYLE_DIALOG_ID = 1;
     private static final int FILTER_BY_AVAILABLE_DIALOG_ID = 2;
+    private static final int LOAD_TASK_PROGRESS_DIALOG_ID = 3;
+    private static final int UPDATE_TASK_PROGRESS_DIALOG_ID = 4;
 
     private BeerListAdapter fAdapter;
     private EditText fFilterTextBox = null;
@@ -101,6 +103,18 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         super.onDestroy();
     }
 
+    @Override
+    public Object onRetainNonConfigurationInstance() {
+        Log.d(TAG, "onRetainNonConfigurationInstance");
+        return super.onRetainNonConfigurationInstance();
+    }
+
+    @Override
+    public Object getLastNonConfigurationInstance() {
+        Log.d(TAG, "getLastNonConfigurationInstance");
+        return super.getLastNonConfigurationInstance();
+    }
+
     /**
      * Called when the activity is first created.
      */
@@ -109,10 +123,6 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         Log.d(TAG, "In onCreate");
 
         super.onCreate(savedInstanceState);
-
-        // TODO: Move to onCreateDialog
-        fLoadProgressDialog = new ProgressDialog(this);
-        fUpdateProgressDialog = new ProgressDialog(this);
 
         setContentView(R.layout.beer_listview_activity);
         setTitle(getResources().getText(R.string.list_title));
@@ -225,7 +235,6 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
 
         //noinspection unchecked
         loadBeersTask.execute(source);
-
     }
 
     private void configureListView() {
@@ -363,6 +372,21 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
                 break;
             case FILTER_BY_AVAILABLE_DIALOG_ID:
                 dialog = createAvailabilityDialog();
+                break;
+            case LOAD_TASK_PROGRESS_DIALOG_ID:
+                fLoadProgressDialog = new ProgressDialog(this);
+                fLoadProgressDialog.setMessage(CamBeerFestApplication.this.getText(R.string.loading_message));
+                fLoadProgressDialog.setIndeterminate(true);
+                fLoadProgressDialog.setCancelable(false);
+                dialog = fLoadProgressDialog;
+                break;
+            case UPDATE_TASK_PROGRESS_DIALOG_ID:
+                fUpdateProgressDialog = new ProgressDialog(this);
+                fUpdateProgressDialog.setMessage("Updating database");
+                fUpdateProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                fUpdateProgressDialog.setIndeterminate(false);
+                fUpdateProgressDialog.setCancelable(false);
+                dialog = fUpdateProgressDialog;
                 break;
             default:
                 dialog = null;
@@ -507,10 +531,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     }
 
     public void notifyLoadTaskStarted() {
-        fLoadProgressDialog.setMessage(CamBeerFestApplication.this.getText(R.string.loading_message));
-        fLoadProgressDialog.setIndeterminate(true);
-        fLoadProgressDialog.setCancelable(false);
-        fLoadProgressDialog.show();
+        showDialog(LOAD_TASK_PROGRESS_DIALOG_ID);
     }
 
     public void notifyLoadTaskUpdate(final String[] values) {
@@ -527,28 +548,24 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
                         "Failed to download beers. " + t.getMessage(),
                         Toast.LENGTH_LONG).show();
             }
-            fLoadProgressDialog.dismiss();
+            dismissDialog(LOAD_TASK_PROGRESS_DIALOG_ID);
         } else {
-            fLoadProgressDialog.dismiss();
+            dismissDialog(LOAD_TASK_PROGRESS_DIALOG_ID);
 
-            fUpdateProgressDialog.setMax(beerList.size());
-            final UpdateBeersTask updateBeersTask = new UpdateBeersTask((Context) this, (UpdateTaskListener) this);
+            final UpdateBeersTask updateBeersTask = new UpdateBeersTask((Context) this, (UpdateTaskListener) this, beerList.size());
             updateBeersTask.execute(beerList);
         }
     }
 
-    public void notifyUpdateStarted() {
-        fUpdateProgressDialog.setMessage("Updating database");
+    public void notifyUpdateStarted(final int max) {
+        showDialog(UPDATE_TASK_PROGRESS_DIALOG_ID);
         fUpdateProgressDialog.setProgress(0);
-        fUpdateProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        fUpdateProgressDialog.setIndeterminate(false);
-        fUpdateProgressDialog.setCancelable(false);
-        fUpdateProgressDialog.show();
+        fUpdateProgressDialog.setMax(max);
     }
 
     public void notifyUpdateComplete(final Long aLong) {
         notifyBeersChanged();
-        fUpdateProgressDialog.dismiss();
+        dismissDialog(UPDATE_TASK_PROGRESS_DIALOG_ID);
     }
 
     public void notifyUpdateProgress(final Beer[] values) {

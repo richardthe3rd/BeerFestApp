@@ -19,16 +19,18 @@ class UpdateBeersTask extends AsyncTask<Iterable<Beer>, Beer, Long> {
     private final Context fContext;
     private final BeerDatabaseHelper fHelper;
     private UpdateTaskListener fListener;
+    private final int fMax;
 
-    UpdateBeersTask(final Context context, final UpdateTaskListener listener) {
+    UpdateBeersTask(final Context context, final UpdateTaskListener listener, final int max) {
         fContext = context;
         fListener = listener;
+        fMax = max;
         fHelper = new BeerDatabaseHelper(context);
     }
 
     @Override
     protected void onPreExecute() {
-        fListener.notifyUpdateStarted();
+        fListener.notifyUpdateStarted(fMax);
     }
 
     @Override
