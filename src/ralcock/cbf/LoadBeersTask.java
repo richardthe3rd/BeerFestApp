@@ -22,8 +22,31 @@ class LoadBeersTask extends AsyncTask<LoadBeersTask.Source, String, LoadBeersTas
 
     private final AppPreferences fAppPreferences;
 
-    LoadBeersTask(final AppPreferences appPreferences) {
+    private LoadTaskListener fListener;
+
+    LoadBeersTask(final LoadTaskListener listener,
+                  final AppPreferences appPreferences) {
+        fListener = listener;
         fAppPreferences = appPreferences;
+    }
+
+    public void setListener(final LoadTaskListener listener) {
+        fListener = listener;
+    }
+
+    @Override
+    protected void onPreExecute() {
+        fListener.notifyLoadTaskStarted();
+    }
+
+    @Override
+    protected void onPostExecute(final Result result) {
+        fListener.notifyLoadTaskComplete(result);
+    }
+
+    @Override
+    protected void onProgressUpdate(final String... values) {
+        fListener.notifyLoadTaskUpdate(values);
     }
 
     @Override
