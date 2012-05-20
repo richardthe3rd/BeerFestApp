@@ -24,13 +24,18 @@
           android:title="@string/export_label"
             />
 
-    <item android:id="@+id/refresh_database"
+    <item android:id="@+id/refreshDatabase"
           android:visible="false"
           android:title="@string/refresh_menu_label"
             />
 
-    <item android:id="@+id/reload_database"
+    <item android:id="@+id/reloadDatabase"
           android:visible="false"
           android:title="@string/reload_menu_label"
+            />
+
+    <item android:id="@+id/aboutApplication"
+          android:visible="true"
+          android:title="@string/about_this_application"
             />
 </menu>

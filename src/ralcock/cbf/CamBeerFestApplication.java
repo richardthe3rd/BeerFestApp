@@ -6,6 +6,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -60,6 +62,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     private static final int FILTER_BY_AVAILABLE_DIALOG_ID = 2;
     private static final int LOAD_TASK_PROGRESS_DIALOG_ID = 3;
     private static final int UPDATE_TASK_PROGRESS_DIALOG_ID = 4;
+    private static final int ABOUT_DIALOG_ID = 5;
 
     private BeerListAdapter fAdapter;
     private EditText fFilterTextBox = null;
@@ -139,7 +142,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.beer_listview_activity);
-        setTitle(getResources().getText(R.string.list_title));
+        setTitle(getText(R.string.list_title));
 
         try {
             fBeerList = new BeerList(getBeerDao(),
@@ -223,10 +226,11 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     }
 
     private URL beerListUrl() {
-        String beerJsonURL = getResources().getText(R.string.beer_list_url).toString();
+        String beerJsonURL = getString(R.string.beer_list_url);
         try {
             return new URL(beerJsonURL);
         } catch (MalformedURLException e) {
+            fExceptionReporter.report(TAG, e.getMessage(), e);
             // My fault
             throw new RuntimeException(e);
         }
@@ -263,8 +267,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         }
 
         if (!haveNetworkConnection()) {
-            Toast.makeText(this,
-                    "Not updating beers as there is no internet connection.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.NoInternetConnection), Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -336,7 +339,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     public void notifyBeersChanged() {
         try {
             fBeerList.updateBeerList();
-            fAdapter.notifyDataSetChanged();
+            notifyAdapterBeersChanged();
         } catch (SQLException e) {
             fExceptionReporter.report(TAG, e.getMessage(), e);
         }
@@ -364,14 +367,17 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
             case R.id.export:
                 doExport();
                 return true;
-            case R.id.refresh_database:
+            case R.id.refreshDatabase:
                 loadBeersInBackground();
                 return true;
-            case R.id.reload_database:
+            case R.id.reloadDatabase:
                 doReloadDatabase();
                 return true;
             case R.id.visitFestivalWebsite:
                 goToFestivalWebsite();
+                return true;
+            case R.id.aboutApplication:
+                showDialog(ABOUT_DIALOG_ID);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -391,7 +397,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     }
 
     private void goToFestivalWebsite() {
-        Uri festivalUri = Uri.parse(getResources().getString(R.string.festival_website_url));
+        Uri festivalUri = Uri.parse(getString(R.string.festival_website_url));
         Intent launchBrowser = new Intent(Intent.ACTION_VIEW, festivalUri);
         startActivity(launchBrowser);
     }
@@ -426,6 +432,20 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
                 fUpdateProgressDialog = createUpdateProgressDialog();
                 dialog = fUpdateProgressDialog;
                 break;
+            case ABOUT_DIALOG_ID:
+                String versionName = "UNKNOWN";
+                String appName = getString(R.string.app_name);
+                try {
+                    final PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                    versionName = packageInfo.versionName;
+                } catch (PackageManager.NameNotFoundException e) {
+                    fExceptionReporter.report(TAG, e.getMessage(), e);
+                }
+                dialog = new AlertDialog.Builder(this)
+                        .setMessage(appName + "\n" +
+                                "Version: " + versionName)
+                        .show();
+                break;
             default:
                 dialog = null;
         }
@@ -434,7 +454,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
 
     private ProgressDialog createUpdateProgressDialog() {
         ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Updating database");
+        progressDialog.setMessage(getString(R.string.updating_database));
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         progressDialog.setIndeterminate(false);
         progressDialog.setCancelable(false);
@@ -467,7 +487,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         boolean[] selectedChoice = new boolean[]{hideUnavailable};
 
         String[] choices = new String[]{
-                getResources().getString(R.string.filter_available_hide)
+                getString(R.string.filter_available_hide)
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -549,7 +569,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         try {
             fBeerList.hideUnavailableBeers(hide);
             fAppPreferences.setHideUnavailableBeers(hide);
-            fAdapter.notifyDataSetChanged();
+            notifyAdapterBeersChanged();
         } catch (SQLException e) {
             fExceptionReporter.report(TAG, e.getMessage(), e);
         }
@@ -559,17 +579,28 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         try {
             fBeerList.stylesToHide(stylesToHide);
             fAppPreferences.setStylesToHide(stylesToHide);
-            fAdapter.notifyDataSetChanged();
+            notifyAdapterBeersChanged();
         } catch (SQLException e) {
             fExceptionReporter.report(TAG, e.getMessage(), e);
         }
+    }
+
+    private void notifyAdapterBeersChanged() {
+        fAdapter.notifyDataSetChanged();
+        /*
+        long numShowing = fBeerList.getCount();
+        long numHidden = getBeerCount() - numShowing;
+        Toast.makeText(this,
+                "Showing " + numShowing + " beers (" + numHidden + " hidden)",
+                Toast.LENGTH_LONG).show();
+                */
     }
 
     private void filterBy(String filterText) {
         try {
             fBeerList.filterBy(filterText);
             fAppPreferences.setFilterText(filterText);
-            fAdapter.notifyDataSetChanged();
+            notifyAdapterBeersChanged();
         } catch (SQLException e) {
             fExceptionReporter.report(TAG, e.getMessage(), e);
         }
@@ -579,7 +610,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         try {
             fBeerList.sortBy(sortOrder);
             fAppPreferences.setSortOrder(sortOrder);
-            fAdapter.notifyDataSetChanged();
+            notifyAdapterBeersChanged();
         } catch (SQLException e) {
             fExceptionReporter.report(TAG, e.getMessage(), e);
         }
@@ -598,10 +629,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         if (beerList == null) {
             Throwable t = result.Throwable;
             if (t != null) {
-                Log.e(TAG, "Exception while downloading beer list. " + t.getMessage(), t);
-                Toast.makeText(getApplicationContext(),
-                        "Failed to download beers. " + t.getMessage(),
-                        Toast.LENGTH_LONG).show();
+                fExceptionReporter.report(TAG, "Failed to download beers. " + t.getMessage(), t);
             }
             dismissDialog(LOAD_TASK_PROGRESS_DIALOG_ID);
         } else {

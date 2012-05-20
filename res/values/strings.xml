@@ -37,5 +37,9 @@
 
     <string name="OK">OK</string>
     <string name="CANCEL">Cancel</string>
+    <string name="NoInternetConnection">Not updating beers as there is no internet connection.</string>
+
+    <string name="updating_database">Updating database</string>
+    <string name="about_this_application">About</string>
 
 </resources>
