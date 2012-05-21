@@ -111,7 +111,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         }
 
         if (fLoadProgressDialog != null && fLoadProgressDialog.isShowing()) {
-            dismissDialog(LOAD_TASK_PROGRESS_DIALOG_ID);
+            dismissDialogNoThrow(LOAD_TASK_PROGRESS_DIALOG_ID);
         }
 
         if (fUpdateBeersTask != null)
@@ -119,7 +119,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
 
 
         if (fUpdateProgressDialog != null && fUpdateProgressDialog.isShowing()) {
-            dismissDialog(UPDATE_TASK_PROGRESS_DIALOG_ID);
+            dismissDialogNoThrow(UPDATE_TASK_PROGRESS_DIALOG_ID);
         }
 
         super.onDestroy();
@@ -444,7 +444,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
                 dialog = new AlertDialog.Builder(this)
                         .setMessage(appName + "\n" +
                                 "Version: " + versionName)
-                        .show();
+                        .create();
                 break;
             default:
                 dialog = null;
@@ -496,7 +496,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         builder.setMultiChoiceItems(choices, selectedChoice, new DialogInterface.OnMultiChoiceClickListener() {
             public void onClick(final DialogInterface dialogInterface, final int i, final boolean b) {
                 hideUnavailableBeers(b);
-                dialogInterface.dismiss();
+                dismissDialogNoThrow(FILTER_BY_AVAILABLE_DIALOG_ID);
             }
         });
 
@@ -519,7 +519,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         builder.setSingleChoiceItems(items, checkedItem, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialogInterface, int i) {
                 sortBy(sortOrders[i]);
-                dialogInterface.dismiss();
+                dismissDialogNoThrow(SORT_DIALOG_ID);
             }
         });
         return builder.create();
@@ -631,9 +631,9 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
             if (t != null) {
                 fExceptionReporter.report(TAG, "Failed to download beers. " + t.getMessage(), t);
             }
-            dismissDialog(LOAD_TASK_PROGRESS_DIALOG_ID);
+            dismissDialogNoThrow(LOAD_TASK_PROGRESS_DIALOG_ID);
         } else {
-            dismissDialog(LOAD_TASK_PROGRESS_DIALOG_ID);
+            dismissDialogNoThrow(LOAD_TASK_PROGRESS_DIALOG_ID);
 
             if (fUpdateBeersTask != null && fUpdateBeersTask.getStatus() == AsyncTask.Status.RUNNING) {
                 Log.d(TAG, "UpdateBeerTask is already running.");
@@ -654,7 +654,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
 
     public void notifyUpdateComplete(final Long aLong) {
         notifyBeersChanged();
-        dismissDialog(UPDATE_TASK_PROGRESS_DIALOG_ID);
+        dismissDialogNoThrow(UPDATE_TASK_PROGRESS_DIALOG_ID);
     }
 
     public void notifyUpdateProgress(final Beer[] values) {
@@ -666,6 +666,16 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         }
         fUpdateProgressDialog.setMessage("Updated " + name);
         fUpdateProgressDialog.incrementProgressBy(1);
+    }
+
+    // HACK!!!
+    private void dismissDialogNoThrow(int dialogId) {
+        try {
+            dismissDialog(dialogId);
+        } catch (IllegalArgumentException e) {
+            Log.e(TAG, "Failed to dismiss dialog " + dialogId, e);
+            // ignore
+        }
     }
 
     private static class Tasks {
