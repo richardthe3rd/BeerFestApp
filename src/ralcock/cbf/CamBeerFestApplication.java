@@ -111,7 +111,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         }
 
         if (fLoadProgressDialog != null && fLoadProgressDialog.isShowing()) {
-            dismissDialogNoThrow(LOAD_TASK_PROGRESS_DIALOG_ID);
+            dismissDialog(LOAD_TASK_PROGRESS_DIALOG_ID);
         }
 
         if (fUpdateBeersTask != null)
@@ -119,7 +119,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
 
 
         if (fUpdateProgressDialog != null && fUpdateProgressDialog.isShowing()) {
-            dismissDialogNoThrow(UPDATE_TASK_PROGRESS_DIALOG_ID);
+            dismissDialog(UPDATE_TASK_PROGRESS_DIALOG_ID);
         }
 
         super.onDestroy();
