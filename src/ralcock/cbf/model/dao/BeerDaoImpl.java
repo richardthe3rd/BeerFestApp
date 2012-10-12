@@ -49,7 +49,10 @@ public class BeerDaoImpl extends BaseDaoImpl<Beer, Long> implements BeerDao {
             Set<String> styles = new TreeSet<String>();
             List<String[]> resultList = results.getResults();
             for (String[] array : resultList) {
-                styles.add(array[0]);
+                final String style = array[0];
+                if (style.length() == 0) {
+                    styles.add(style);
+                }
             }
             return styles;
         } finally {
