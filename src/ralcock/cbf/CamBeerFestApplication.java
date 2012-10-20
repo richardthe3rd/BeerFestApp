@@ -16,17 +16,18 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
-import com.j256.ormlite.android.apptools.OrmLiteBaseListActivity;
+import com.actionbarsherlock.app.SherlockListActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.Window;
+import com.j256.ormlite.android.apptools.OpenHelperManager;
 import ralcock.cbf.actions.BeerExporter;
 import ralcock.cbf.actions.BeerSearcher;
 import ralcock.cbf.actions.BeerSharer;
@@ -51,7 +52,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabaseHelper>
+public class CamBeerFestApplication extends SherlockListActivity
         implements LoadTaskListener, UpdateTaskListener {
     private static final String TAG = CamBeerFestApplication.class.getName();
 
@@ -92,6 +93,8 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     private ProgressDialog fLoadProgressDialog;
     private ProgressDialog fUpdateProgressDialog;
 
+    private BeerDatabaseHelper fDBHelper;
+
     public CamBeerFestApplication() {
         super();
         fAppPreferences = new AppPreferences(this);
@@ -123,6 +126,9 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         }
 
         super.onDestroy();
+        if (fDBHelper != null) {
+            OpenHelperManager.releaseHelper();
+        }
     }
 
     @Override
@@ -139,10 +145,15 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     public void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "In onCreate");
 
+        requestWindowFeature(Window.FEATURE_ACTION_BAR);
+
         super.onCreate(savedInstanceState);
 
+        setTitle("");
         setContentView(R.layout.beer_listview_activity);
-        setTitle(getText(R.string.list_title));
+
+        // Hide the search box
+        hideSearchBox();
 
         try {
             fBeerList = new BeerList(getBeerDao(),
@@ -188,6 +199,15 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         }
     }
 
+    private void hideSearchBox() {
+        findViewById(R.id.searchLayout).setVisibility(View.GONE);
+    }
+
+    private void showSearchBox() {
+        findViewById(R.id.searchLayout).setVisibility(View.VISIBLE);
+        findViewById(R.id.searchBox).requestFocus();
+    }
+
     private void configureFilterTextBox() {
         fFilterTextBox = (EditText) findViewById(R.id.searchBox);
         fFilterTextBox.setText(fAppPreferences.getFilterText());
@@ -198,6 +218,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
             public void onClick(View view) {
                 fFilterTextBox.setText("");
                 filterBy("");
+                hideSearchBox();
             }
         });
     }
@@ -219,6 +240,13 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
 
     private BreweryDao getBreweryDao() {
         return getHelper().getBreweryDao();
+    }
+
+    private BeerDatabaseHelper getHelper() {
+        if (fDBHelper == null) {
+            fDBHelper = OpenHelperManager.getHelper(this, BeerDatabaseHelper.class);
+        }
+        return fDBHelper;
     }
 
     private BeerDao getBeerDao() {
@@ -293,13 +321,14 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
                 startActivityForResult(intent, SHOW_BEER_DETAILS_REQUEST_CODE);
             }
         });
-
+        /*
         lv.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
             public void onCreateContextMenu(ContextMenu contextMenu, final View view, final ContextMenu.ContextMenuInfo contextMenuInfo) {
-                MenuInflater inflater = new MenuInflater(getApplicationContext());
+                MenuInflater inflater = getSupportMenuInflater();
                 inflater.inflate(R.menu.list_context_menu, contextMenu);
             }
         });
+        */
     }
 
     @Override
@@ -347,7 +376,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        android.view.MenuInflater inflater = getMenuInflater();
+        MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.list_options_menu, menu);
         return true;
     }
@@ -355,6 +384,9 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.search:
+                showSearchBox();
+                return true;
             case R.id.sort:
                 showDialog(SORT_DIALOG_ID);
                 return true;

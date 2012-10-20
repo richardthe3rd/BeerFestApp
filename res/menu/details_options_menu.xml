@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
     <item android:id="@+id/shareBeer"
           android:title="@string/share_this_beer_title"
           android:icon="@android:drawable/ic_menu_send"
+          android:showAsAction="ifRoom"
             />
+
     <item android:id="@+id/searchBeer"
           android:title="@string/search_this_beer_title"
-          android:icon="@android:drawable/ic_menu_search"
+          android:icon="@drawable/ic_google"
+          android:showAsAction="ifRoom"
             />
+
     <item android:id="@+id/clearRating"
           android:title="@string/oops_this_beer"
-          android:icon="@android:drawable/ic_menu_close_clear_cancel"/>
+          android:icon="@android:drawable/ic_menu_close_clear_cancel"
+          android:showAsAction="never"
+            />
 </menu>

@@ -50,7 +50,7 @@ public class BeerDaoImpl extends BaseDaoImpl<Beer, Long> implements BeerDao {
             List<String[]> resultList = results.getResults();
             for (String[] array : resultList) {
                 final String style = array[0];
-                if (style.length() == 0) {
+                if (style.length() > 0) {
                     styles.add(style);
                 }
             }

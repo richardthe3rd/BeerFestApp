@@ -2,17 +2,27 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <item android:id="@+id/search"
+          android:icon="@android:drawable/ic_menu_search"
+          android:title="@string/search_menu_label"
+          android:showAsAction="always"
+            />
+
     <item android:id="@+id/sort"
           android:icon="@android:drawable/ic_menu_sort_by_size"
           android:title="@string/sort_menu_label"
+          android:showAsAction="ifRoom"
             />
 
     <item android:id="@+id/showOnlyStyle"
           android:title="@string/show_only_style_label"
+          android:icon="@drawable/ic_action_filter"
+          android:showAsAction="ifRoom"
             />
 
     <item android:id="@+id/showOnlyAvailable"
           android:title="@string/show_only_available_label"
+          android:showAsAction="ifRoom"
             />
 
     <item android:id="@+id/visitFestivalWebsite"
@@ -22,15 +32,16 @@
     <item android:id="@+id/export"
           android:visible="false"
           android:title="@string/export_label"
+          android:showAsAction="ifRoom"
             />
 
     <item android:id="@+id/refreshDatabase"
-          android:visible="false"
+          android:visible="true"
           android:title="@string/refresh_menu_label"
             />
 
     <item android:id="@+id/reloadDatabase"
-          android:visible="false"
+          android:visible="true"
           android:title="@string/reload_menu_label"
             />
 

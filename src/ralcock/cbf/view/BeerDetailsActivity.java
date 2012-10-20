@@ -2,13 +2,13 @@ package ralcock.cbf.view;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.j256.ormlite.android.apptools.OpenHelperManager;
 import ralcock.cbf.R;
 import ralcock.cbf.actions.BeerSearcher;
 import ralcock.cbf.actions.BeerSharer;
@@ -19,7 +19,8 @@ import ralcock.cbf.util.ExceptionReporter;
 
 import java.sql.SQLException;
 
-public final class BeerDetailsActivity extends OrmLiteBaseActivity<BeerDatabaseHelper> {
+//OrmLiteBaseActivity<BeerDatabaseHelper>
+public final class BeerDetailsActivity extends SherlockActivity {
     @SuppressWarnings("UnusedDeclaration")
     private static final String TAG = BeerDetailsActivity.class.getName();
 
@@ -31,10 +32,19 @@ public final class BeerDetailsActivity extends OrmLiteBaseActivity<BeerDatabaseH
     private final ExceptionReporter fExceptionReporter;
     private BeerDetailsView fBeerDetailsView = null;
 
+    private BeerDatabaseHelper fDBHelper;
+
     public BeerDetailsActivity() {
         fBeerSharer = new BeerSharer(this);
         fBeerSearcher = new BeerSearcher(this);
         fExceptionReporter = new ExceptionReporter(this);
+    }
+
+    private BeerDatabaseHelper getHelper() {
+        if (fDBHelper == null) {
+            fDBHelper = OpenHelperManager.getHelper(this, BeerDatabaseHelper.class);
+        }
+        return fDBHelper;
     }
 
     public void onCreate(Bundle savedInstanceState) {
@@ -75,7 +85,7 @@ public final class BeerDetailsActivity extends OrmLiteBaseActivity<BeerDatabaseH
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = new MenuInflater(getApplicationContext());
+        com.actionbarsherlock.view.MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.details_options_menu, menu);
         return true;
     }

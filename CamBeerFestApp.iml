@@ -25,6 +25,7 @@
         <option name="PROGUARD_CFG_PATH" value="/proguard.cfg" />
         <resOverlayFolders />
         <includeSystemProguardFile>false</includeSystemProguardFile>
+        <additionalNativeLibs />
       </configuration>
     </facet>
   </component>
@@ -38,6 +39,8 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="PROVIDED" name="Android 2.2 Platform" level="application" />
     <orderEntry type="library" name="ormlite-4.40" level="project" />
+    <orderEntry type="library" name="android-support-v4" level="project" />
+    <orderEntry type="module" module-name="Actionbarsherlock" />
   </component>
 </module>
 
