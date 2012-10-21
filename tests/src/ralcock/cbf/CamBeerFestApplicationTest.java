@@ -1,9 +1,7 @@
 package ralcock.cbf;
 
 import android.test.ActivityInstrumentationTestCase2;
-import android.view.KeyEvent;
-import android.widget.Button;
-import android.widget.EditText;
+import android.test.UiThreadTest;
 import android.widget.ListView;
 
 /**
@@ -19,9 +17,7 @@ import android.widget.ListView;
 public class CamBeerFestApplicationTest extends ActivityInstrumentationTestCase2<CamBeerFestApplication> {
 
     private CamBeerFestApplication fActivity;
-    private EditText fSearchBox;
     private ListView fListView;
-    private Button fClearSearchBox;
 
     public CamBeerFestApplicationTest() {
         super("ralcock.cbf", CamBeerFestApplication.class);
@@ -32,45 +28,23 @@ public class CamBeerFestApplicationTest extends ActivityInstrumentationTestCase2
         super.setUp();
         setActivityInitialTouchMode(false);
         fActivity = getActivity();
-        fClearSearchBox = (Button) fActivity.findViewById(R.id.clearSearchBoxBtn);
-        fSearchBox = (EditText) fActivity.findViewById(R.id.searchBox);
         fListView = (ListView) fActivity.findViewById(android.R.id.list);
     }
 
     public void testPreconditions() throws Exception {
         assertNotNull(fActivity);
-        assertNotNull(fClearSearchBox);
-        assertNotNull(fSearchBox);
     }
 
+    @UiThreadTest
     public void testTextFilter() throws Exception {
-        fActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                fClearSearchBox.requestFocus();
-            }
-        });
-        sendKeys(KeyEvent.KEYCODE_DPAD_CENTER);
-        assertEquals("", fSearchBox.getText().toString());
-
+        fActivity.filterBy("");
         int originalCount = fListView.getAdapter().getCount();
-        fActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                fSearchBox.requestFocus();
-            }
-        });
 
-        sendKeys("M I L D");
-        assertEquals("mild", fSearchBox.getText().toString());
+        fActivity.filterBy("MILD");
         int filteredCount = fListView.getAdapter().getCount();
         assertTrue(filteredCount < originalCount);
 
-        fActivity.runOnUiThread(new Runnable() {
-            public void run() {
-                fClearSearchBox.requestFocus();
-            }
-        });
-        sendKeys(KeyEvent.KEYCODE_DPAD_CENTER);
-        assertEquals("", fSearchBox.getText().toString());
+        fActivity.filterBy("");
         int resetCount = fListView.getAdapter().getCount();
         assertEquals(originalCount, resetCount);
     }

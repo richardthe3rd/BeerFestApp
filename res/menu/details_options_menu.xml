@@ -4,7 +4,7 @@
 
     <item android:id="@+id/shareBeer"
           android:title="@string/share_this_beer_title"
-          android:icon="@android:drawable/ic_menu_send"
+          android:icon="@drawable/ic_social_share"
           android:showAsAction="ifRoom"
             />
 
@@ -16,7 +16,7 @@
 
     <item android:id="@+id/clearRating"
           android:title="@string/oops_this_beer"
-          android:icon="@android:drawable/ic_menu_close_clear_cancel"
+          android:icon="@drawable/ic_navigation_cancel"
           android:showAsAction="never"
             />
 </menu>

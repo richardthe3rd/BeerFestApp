@@ -3,13 +3,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:id="@+id/search"
-          android:icon="@android:drawable/ic_menu_search"
+          android:icon="@drawable/ic_action_search"
           android:title="@string/search_menu_label"
-          android:showAsAction="always"
+          android:showAsAction="ifRoom|collapseActionView"
+          android:actionViewClass="com.actionbarsherlock.widget.SearchView"
             />
 
     <item android:id="@+id/sort"
-          android:icon="@android:drawable/ic_menu_sort_by_size"
+          android:icon="@drawable/ic_collections_sort_by_size"
           android:title="@string/sort_menu_label"
           android:showAsAction="ifRoom"
             />

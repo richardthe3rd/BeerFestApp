@@ -48,6 +48,9 @@ public final class BeerDetailsActivity extends SherlockActivity {
     }
 
     public void onCreate(Bundle savedInstanceState) {
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         super.onCreate(savedInstanceState);
         try {
             setContentView(R.layout.beer_details_activity);
@@ -93,6 +96,10 @@ public final class BeerDetailsActivity extends SherlockActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                setResult(RESULT_OK);
+                finish();
+                return true;
             case R.id.shareBeer:
                 fBeerSharer.shareBeer(fBeer);
                 return true;

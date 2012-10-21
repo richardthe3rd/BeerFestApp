@@ -13,13 +13,9 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockListActivity;
@@ -27,6 +23,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
+import com.actionbarsherlock.widget.SearchView;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import ralcock.cbf.actions.BeerExporter;
 import ralcock.cbf.actions.BeerSearcher;
@@ -66,7 +63,6 @@ public class CamBeerFestApplication extends SherlockListActivity
     private static final int ABOUT_DIALOG_ID = 5;
 
     private BeerListAdapter fAdapter;
-    private EditText fFilterTextBox = null;
 
     private BeerList fBeerList;
 
@@ -77,18 +73,6 @@ public class CamBeerFestApplication extends SherlockListActivity
     private final AppPreferences fAppPreferences;
     private UpdateBeersTask fUpdateBeersTask;
     private LoadBeersTask fLoadBeersTask;
-
-    private final TextWatcher fFilterTextWatcher = new TextWatcher() {
-        public void afterTextChanged(Editable s) {
-        }
-
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        }
-
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            filterBy(s.toString());
-        }
-    };
 
     private ProgressDialog fLoadProgressDialog;
     private ProgressDialog fUpdateProgressDialog;
@@ -106,9 +90,6 @@ public class CamBeerFestApplication extends SherlockListActivity
     @Override
     protected void onDestroy() {
         Log.d(TAG, "In onDestroy");
-        if (fFilterTextBox != null)
-            fFilterTextBox.removeTextChangedListener(fFilterTextWatcher);
-
         if (fLoadBeersTask != null) {
             fLoadBeersTask.setListener(null);
         }
@@ -146,14 +127,11 @@ public class CamBeerFestApplication extends SherlockListActivity
         Log.d(TAG, "In onCreate");
 
         requestWindowFeature(Window.FEATURE_ACTION_BAR);
-
+        getSupportActionBar().setTitle("");
         super.onCreate(savedInstanceState);
 
         setTitle("");
         setContentView(R.layout.beer_listview_activity);
-
-        // Hide the search box
-        hideSearchBox();
 
         try {
             fBeerList = new BeerList(getBeerDao(),
@@ -182,7 +160,6 @@ public class CamBeerFestApplication extends SherlockListActivity
                         fUpdateBeersTask.getStatus() == AsyncTask.Status.RUNNING) {
                     // We have a running update task
                     fUpdateBeersTask.setListener(this);
-                    //showDialog(UPDATE_TASK_PROGRESS_DIALOG_ID);
                 }
             } else {
                 fLoadBeersTask = null;
@@ -192,35 +169,11 @@ public class CamBeerFestApplication extends SherlockListActivity
                 }
             }
 
-            configureFilterTextBox();
+            //configureFilterTextBox();
         } catch (SQLException e) {
             fExceptionReporter.report(TAG, e.getMessage(), e);
             return;
         }
-    }
-
-    private void hideSearchBox() {
-        findViewById(R.id.searchLayout).setVisibility(View.GONE);
-    }
-
-    private void showSearchBox() {
-        findViewById(R.id.searchLayout).setVisibility(View.VISIBLE);
-        findViewById(R.id.searchBox).requestFocus();
-    }
-
-    private void configureFilterTextBox() {
-        fFilterTextBox = (EditText) findViewById(R.id.searchBox);
-        fFilterTextBox.setText(fAppPreferences.getFilterText());
-        fFilterTextBox.addTextChangedListener(fFilterTextWatcher);
-
-        Button clearFilterButton = (Button) findViewById(R.id.clearSearchBoxBtn);
-        clearFilterButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                fFilterTextBox.setText("");
-                filterBy("");
-                hideSearchBox();
-            }
-        });
     }
 
     private long getBeerCount() {
@@ -378,15 +331,25 @@ public class CamBeerFestApplication extends SherlockListActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.list_options_menu, menu);
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            public boolean onQueryTextSubmit(final String query) {
+                filterBy(query.toString());
+                return true;
+            }
+
+            public boolean onQueryTextChange(final String newText) {
+                filterBy(newText.toString());
+                return true;
+            }
+        });
+        searchView.setQueryHint(getResources().getString(R.string.filter_hint));
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.search:
-                showSearchBox();
-                return true;
             case R.id.sort:
                 showDialog(SORT_DIALOG_ID);
                 return true;
@@ -619,16 +582,9 @@ public class CamBeerFestApplication extends SherlockListActivity
 
     private void notifyAdapterBeersChanged() {
         fAdapter.notifyDataSetChanged();
-        /*
-        long numShowing = fBeerList.getCount();
-        long numHidden = getBeerCount() - numShowing;
-        Toast.makeText(this,
-                "Showing " + numShowing + " beers (" + numHidden + " hidden)",
-                Toast.LENGTH_LONG).show();
-                */
     }
 
-    private void filterBy(String filterText) {
+    void filterBy(String filterText) {
         try {
             fBeerList.filterBy(filterText);
             fAppPreferences.setFilterText(filterText);
