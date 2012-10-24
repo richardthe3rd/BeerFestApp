@@ -127,12 +127,10 @@ public class CamBeerFestApplication extends SherlockListActivity
         Log.d(TAG, "In onCreate");
 
         requestWindowFeature(Window.FEATURE_ACTION_BAR);
-        getSupportActionBar().setTitle("");
         super.onCreate(savedInstanceState);
 
-        setTitle("");
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         setContentView(R.layout.beer_listview_activity);
-
         try {
             fBeerList = new BeerList(getBeerDao(),
                     getBreweryDao(),
@@ -332,6 +330,7 @@ public class CamBeerFestApplication extends SherlockListActivity
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.list_options_menu, menu);
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setQuery(fAppPreferences.getFilterText(), false);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             public boolean onQueryTextSubmit(final String query) {
                 filterBy(query.toString());

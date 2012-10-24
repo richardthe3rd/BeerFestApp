@@ -8,12 +8,6 @@
           android:showAsAction="ifRoom"
             />
 
-    <item android:id="@+id/searchBeer"
-          android:title="@string/search_this_beer_title"
-          android:icon="@drawable/ic_google"
-          android:showAsAction="ifRoom"
-            />
-
     <item android:id="@+id/clearRating"
           android:title="@string/oops_this_beer"
           android:icon="@drawable/ic_navigation_cancel"

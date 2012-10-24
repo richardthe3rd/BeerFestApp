@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_height="fill_parent"
+            android:layout_width="fill_parent"
+        >
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:orientation="vertical"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:paddingTop="5dip"
+                  android:paddingRight="10dip"
+                  android:paddingLeft="10dip"
+            >
+        <TableLayout
+                android:layout_height="fill_parent"
+                android:layout_width="fill_parent"
+                android:stretchColumns="1"
+                >
+            <TableRow>
+                <TextView
+                        android:id="@+id/detailsViewBeerNameAndAbv"
+                        android:layout_height="wrap_content"
+                        android:layout_width="fill_parent"
+                        android:textStyle="bold"
+                        android:maxWidth="150dip"
+                        android:text="Comrade Bill Bartrums's Egalitarian Anti-Imperialist Soviet Stout (6.9%)"
+                        />
+                <TextView
+                        android:id="@+id/detailsViewBeerStyle"
+                        android:layout_height="wrap_content"
+                        android:layout_width="fill_parent"
+                        android:text="Stout"
+                        android:layout_gravity="center_horizontal"
+                        />
+                <TextView
+                        android:id="@+id/detailsViewBeerStatus"
+                        android:text="Ordered"
+                        android:textStyle="italic"
+                        android:layout_gravity="right"
+                        />
+            </TableRow>
+            <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="2dip"
+                    android:layout_marginTop="10dip"
+                    android:layout_marginBottom="10dip"
+                    android:background="@android:color/darker_gray"
+                    />
+            <TableRow>
+                <TextView
+                        android:id="@+id/detailsViewBeerDescription"
+                        android:padding="3dip"
+                        android:layout_width="fill_parent"
+                        android:layout_span="33"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dp"
+                        android:text="dry stout crystal malt lauter tun abbey enzymes secondary fermentation. scotch ale wort scotch ale lagering becher lauter. real ale dry stout, secondary fermentation krug krausen dunkle lauter tun. original gravity bunghole saccharification degrees plato malt dry hopping."
+                        />
+            </TableRow>
+            <TableRow>
+                <TextView
+                        android:id="@+id/detailsViewBreweryName"
+                        android:textStyle="bold"
+                        android:text="Milton"
+                        />
+            </TableRow>
+            <TableRow>
+                <TextView
+                        android:id="@+id/detailsViewBreweryDescription"
+                        android:layout_width="fill_parent"
+                        android:layout_span="3"
+                        android:layout_height="wrap_content"
+                        android:padding="3dip"
+                        android:text="dry stout crystal malt lauter."
+                        />
+            </TableRow>
+            <TableRow>
+                <TextView
+                        android:id="@+id/clickToSearchOnline"
+                        android:layout_width="fill_parent"
+                        android:layout_span="3"
+                        android:layout_height="wrap_content"
+                        android:padding="3dip"
+                        android:text="@string/search_online"
+                        />
+            </TableRow>
+        </TableLayout>
+
+        <View
+                android:layout_width="fill_parent"
+                android:layout_height="2dip"
+                android:layout_marginTop="10dip"
+                android:layout_marginBottom="10dip"
+                android:background="@android:color/darker_gray"
+                />
+
+        <RatingBar
+                android:id="@+id/detailsViewBeerRatingBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:numStars="5"
+                android:stepSize="1"
+                />
+    </LinearLayout>
+
+</ScrollView>
+

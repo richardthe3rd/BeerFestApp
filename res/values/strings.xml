@@ -41,5 +41,6 @@
 
     <string name="updating_database">Updating database</string>
     <string name="about_this_application">About</string>
+    <string name="search_online">Search for more information online</string>
 
 </resources>
