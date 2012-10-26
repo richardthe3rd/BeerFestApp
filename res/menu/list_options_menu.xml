@@ -21,11 +21,6 @@
           android:showAsAction="ifRoom"
             />
 
-    <item android:id="@+id/showOnlyAvailable"
-          android:title="@string/show_only_available_label"
-          android:showAsAction="ifRoom"
-            />
-
     <item android:id="@+id/visitFestivalWebsite"
           android:title="@string/visit_festival_website_label"
             />
