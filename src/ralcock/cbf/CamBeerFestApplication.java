@@ -3,6 +3,8 @@ package ralcock.cbf;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -31,8 +33,10 @@ import ralcock.cbf.model.JsonBeerList;
 import ralcock.cbf.model.SortOrder;
 import ralcock.cbf.model.dao.BeerDao;
 import ralcock.cbf.util.ExceptionReporter;
+import ralcock.cbf.view.AboutDialogFragment;
 import ralcock.cbf.view.AllBeersListFragment;
 import ralcock.cbf.view.AvailableBeersListFragment;
+import ralcock.cbf.view.FilterByStyleDialogFragment;
 import ralcock.cbf.view.ListChangedListener;
 import ralcock.cbf.view.SortByDialogFragment;
 import ralcock.cbf.view.TabListener;
@@ -43,6 +47,7 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CamBeerFestApplication extends SherlockFragmentActivity
@@ -51,11 +56,8 @@ public class CamBeerFestApplication extends SherlockFragmentActivity
 
     private static final int SHOW_BEER_DETAILS_REQUEST_CODE = 1;
 
-    private static final int SORT_DIALOG_ID = 0;
-    private static final int FILTER_BY_STYLE_DIALOG_ID = 1;
     private static final int LOAD_TASK_PROGRESS_DIALOG_ID = 3;
     private static final int UPDATE_TASK_PROGRESS_DIALOG_ID = 4;
-    private static final int ABOUT_DIALOG_ID = 5;
 
     private final BeerSharer fBeerSharer;
     private final BeerSearcher fBeerSearcher;
@@ -304,7 +306,10 @@ public class CamBeerFestApplication extends SherlockFragmentActivity
                 showSortByDialog();
                 return true;
             case R.id.showOnlyStyle:
-                //showDialog(FILTER_BY_STYLE_DIALOG_ID);
+                showFilterByStyleDialog();
+                return true;
+            case R.id.aboutApplication:
+                showAboutDialog();
                 return true;
             case R.id.export:
                 //doExport();
@@ -318,18 +323,39 @@ public class CamBeerFestApplication extends SherlockFragmentActivity
             case R.id.visitFestivalWebsite:
                 //goToFestivalWebsite();
                 return true;
-            case R.id.aboutApplication:
-                //showDialog(ABOUT_DIALOG_ID);
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void showAboutDialog() {
+        String versionName = "UNKNOWN";
+        String appName = getString(R.string.app_name);
+        try {
+            final PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            versionName = packageInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            fExceptionReporter.report(TAG, e.getMessage(), e);
+        }
+        DialogFragment newFragment = AboutDialogFragment.newInstance(appName, versionName);
+        newFragment.show(getSupportFragmentManager(), "about");
     }
 
     // Copied from http://developer.android.com/reference/android/app/DialogFragment.html
     private void showSortByDialog() {
         DialogFragment newFragment = SortByDialogFragment.newInstance(fAppPreferences.getSortOrder());
         newFragment.show(getSupportFragmentManager(), "sortBy");
+    }
+
+    private void showFilterByStyleDialog() {
+        try {
+            final Set<String> allStyles = getBeerDao().getAvailableStyles();
+            final Set<String> stylesToHide = fAppPreferences.getStylesToHide();
+            final DialogFragment newFragment = FilterByStyleDialogFragment.newInstance(stylesToHide, allStyles);
+            newFragment.show(getSupportFragmentManager(), "filterByStyle");
+        } catch (SQLException e) {
+            fExceptionReporter.report(TAG, e.getMessage(), e);
+        }
     }
 
     @Override
@@ -407,15 +433,6 @@ public class CamBeerFestApplication extends SherlockFragmentActivity
     protected Dialog onCreateDialog(final int id) {
         Dialog dialog;
         switch (id) {
-            case SORT_DIALOG_ID:
-                dialog = createSortDialog();
-                break;
-            case FILTER_BY_STYLE_DIALOG_ID:
-                dialog = createStylesToHideDialog();
-                break;
-            case FILTER_BY_AVAILABLE_DIALOG_ID:
-                dialog = createAvailabilityDialog();
-                break;
             case LOAD_TASK_PROGRESS_DIALOG_ID:
                 Log.d(TAG, "Creating LOAD_TASK_PROGRESS_DIALOG");
                 fLoadProgressDialog = createLoadProgressDialog();
@@ -426,22 +443,6 @@ public class CamBeerFestApplication extends SherlockFragmentActivity
                 fUpdateProgressDialog = createUpdateProgressDialog();
                 dialog = fUpdateProgressDialog;
                 break;
-            case ABOUT_DIALOG_ID:
-                String versionName = "UNKNOWN";
-                String appName = getString(R.string.app_name);
-                try {
-                    final PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-                    versionName = packageInfo.versionName;
-                } catch (PackageManager.NameNotFoundException e) {
-                    fExceptionReporter.report(TAG, e.getMessage(), e);
-                }
-                dialog = new AlertDialog.Builder(this)
-                        .setMessage(appName + "\n" +
-                                "Version: " + versionName)
-                        .create();
-                break;
-            default:
-                dialog = null;
         }
         return dialog;
     }
@@ -462,75 +463,8 @@ public class CamBeerFestApplication extends SherlockFragmentActivity
         progressDialog.setCancelable(false);
         return progressDialog;
     }
-
-    @Override
-    protected void onPrepareDialog(final int id, final Dialog dialog) {
-        switch (id) {
-            case SORT_DIALOG_ID:
-                break;
-            case FILTER_BY_STYLE_DIALOG_ID:
-                prepareStylesToHideDialog(dialog);
-                break;
-            case FILTER_BY_AVAILABLE_DIALOG_ID:
-                break;
-        }
-    }
-
-    private Dialog createStylesToHideDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.filter_style_dialog_title);
-
-        final Set<String> emptySet = Collections.emptySet();
-        final BeerStyleListAdapter listAdapter = new BeerStyleListAdapter(this, emptySet, emptySet);
-        builder.setAdapter(listAdapter, new DialogInterface.OnClickListener() {
-            public void onClick(final DialogInterface dialogInterface, final int i) {
-                // NOTHING TO DO HERE
-            }
-        });
-
-        builder.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
-            public void onClick(final DialogInterface dialogInterface, final int i) {
-                AlertDialog alertDialog = (AlertDialog) dialogInterface;
-                BeerStyleListAdapter listAdapter = (BeerStyleListAdapter) alertDialog.getListView().getAdapter();
-                filterByStyle(listAdapter.getStylesToHide());
-            }
-        });
-
-        builder.setNegativeButton(R.string.CANCEL, new DialogInterface.OnClickListener() {
-            public void onClick(final DialogInterface dialogInterface, final int i) {
-            }
-        });
-
-        return builder.create();
-    }
-
-    private void prepareStylesToHideDialog(final Dialog dialog) {
-        try {
-            final Set<String> stylesToHide = fAppPreferences.getStylesToHide();
-            final Set<String> allStyles = getBeerDao().getAvailableStyles();
-            final BeerStyleListAdapter listAdapter = new BeerStyleListAdapter(this, allStyles, stylesToHide);
-            AlertDialog alertDialog = (AlertDialog) dialog;
-            alertDialog.getListView().setAdapter(listAdapter);
-        } catch (SQLException e) {
-            fExceptionReporter.report(TAG, e.getMessage(), e);
-        }
-    }
-
-    private void filterByStyle(Set<String> stylesToHide) {
-        try {
-            fBeerList.stylesToHide(stylesToHide);
-            fAppPreferences.setStylesToHide(stylesToHide);
-            notifyAdapterBeersChanged();
-        } catch (SQLException e) {
-            fExceptionReporter.report(TAG, e.getMessage(), e);
-        }
-    }
-
-    private void notifyAdapterBeersChanged() {
-        fAdapter.notifyDataSetChanged();
-    }
-
     */
+
     public void notifyLoadTaskStarted() {
         showDialog(LOAD_TASK_PROGRESS_DIALOG_ID);
     }
@@ -598,9 +532,18 @@ public class CamBeerFestApplication extends SherlockFragmentActivity
         sortBy(sortOrder);
     }
 
+    public void doDismissFilterByStyleDialog(final Set<String> stylesToHide) {
+        filterByBeerStyle(stylesToHide);
+    }
+
     private void sortBy(SortOrder sortOrder) {
         fireSortByChanged(sortOrder);
         fAppPreferences.setSortOrder(sortOrder);
+    }
+
+    private void filterByBeerStyle(Set<String> stylesToHide) {
+        fireStylesToHideChanged(stylesToHide);
+        fAppPreferences.setStylesToHide(stylesToHide);
     }
 
     public void addListChangedListener(final ListChangedListener listChangedListener) {
@@ -620,6 +563,12 @@ public class CamBeerFestApplication extends SherlockFragmentActivity
     private void fireSortByChanged(final SortOrder sortOrder) {
         for (ListChangedListener l : fListChangedListeners) {
             l.sortOrderChanged(sortOrder);
+        }
+    }
+
+    private void fireStylesToHideChanged(final Set<String> stylesToHide) {
+        for (ListChangedListener l : fListChangedListeners) {
+            l.stylesToHideChanged(stylesToHide);
         }
     }
 
