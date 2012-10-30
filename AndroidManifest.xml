@@ -18,6 +18,7 @@
                  android:icon="@drawable/ic_caskman">
 
         <activity android:name=".CamBeerFestApplication"
+                  android:theme="@style/Theme.Sherlock"
                   android:windowSoftInputMode="stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

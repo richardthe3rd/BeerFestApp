@@ -10,4 +10,6 @@ public interface ListChangedListener {
     void sortOrderChanged(SortOrder sortOrder);
 
     void stylesToHideChanged(Set<String> stylesToHide);
+
+    void beersChanged();
 }

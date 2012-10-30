@@ -1,6 +1,5 @@
 package ralcock.cbf;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -38,8 +37,10 @@ import ralcock.cbf.view.AllBeersListFragment;
 import ralcock.cbf.view.AvailableBeersListFragment;
 import ralcock.cbf.view.FilterByStyleDialogFragment;
 import ralcock.cbf.view.ListChangedListener;
+import ralcock.cbf.view.LoadBeersProgressDialogFragment;
 import ralcock.cbf.view.SortByDialogFragment;
 import ralcock.cbf.view.TabListener;
+import ralcock.cbf.view.UpdateBeersProgressDialogFragment;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -56,9 +57,6 @@ public class CamBeerFestApplication extends SherlockFragmentActivity
 
     private static final int SHOW_BEER_DETAILS_REQUEST_CODE = 1;
 
-    private static final int LOAD_TASK_PROGRESS_DIALOG_ID = 3;
-    private static final int UPDATE_TASK_PROGRESS_DIALOG_ID = 4;
-
     private final BeerSharer fBeerSharer;
     private final BeerSearcher fBeerSearcher;
     private final ExceptionReporter fExceptionReporter;
@@ -66,9 +64,6 @@ public class CamBeerFestApplication extends SherlockFragmentActivity
     private final AppPreferences fAppPreferences;
     private UpdateBeersTask fUpdateBeersTask;
     private LoadBeersTask fLoadBeersTask;
-
-    private ProgressDialog fLoadProgressDialog;
-    private ProgressDialog fUpdateProgressDialog;
 
     private BeerDatabaseHelper fDBHelper;
 
@@ -89,17 +84,8 @@ public class CamBeerFestApplication extends SherlockFragmentActivity
             fLoadBeersTask.setListener(null);
         }
 
-        if (fLoadProgressDialog != null && fLoadProgressDialog.isShowing()) {
-            dismissDialog(LOAD_TASK_PROGRESS_DIALOG_ID);
-        }
-
         if (fUpdateBeersTask != null)
             fUpdateBeersTask.setListener(null);
-
-
-        if (fUpdateProgressDialog != null && fUpdateProgressDialog.isShowing()) {
-            dismissDialog(UPDATE_TASK_PROGRESS_DIALOG_ID);
-        }
 
         super.onDestroy();
         if (fDBHelper != null) {
@@ -110,7 +96,6 @@ public class CamBeerFestApplication extends SherlockFragmentActivity
     //@Override
     //public Object onRetainNonConfigurationInstance() {
     //    Log.d(TAG, "onRetainNonConfigurationInstance");
-    //
     //    return new Tasks(fUpdateBeersTask, fLoadBeersTask);
     //}
 
@@ -122,9 +107,15 @@ public class CamBeerFestApplication extends SherlockFragmentActivity
         Log.d(TAG, "In onCreate");
 
         requestWindowFeature(Window.FEATURE_ACTION_BAR);
+
         super.onCreate(savedInstanceState);
 
+        setContentView(R.layout.beer_listview_activity);
+
         final ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
+        actionBar.setTitle(fAppPreferences.getFilterText());
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         ActionBar.Tab allBeersTab = actionBar.newTab()
                 .setText("All Beers")
@@ -132,9 +123,6 @@ public class CamBeerFestApplication extends SherlockFragmentActivity
         ActionBar.Tab availableBeersTab = actionBar.newTab()
                 .setText("Available Only")
                 .setTabListener(new TabListener<AvailableBeersListFragment>(this, "available", AvailableBeersListFragment.class));
-
-        actionBar.setTitle(fAppPreferences.getFilterText());
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         actionBar.addTab(allBeersTab);
         actionBar.addTab(availableBeersTab);
@@ -165,7 +153,7 @@ public class CamBeerFestApplication extends SherlockFragmentActivity
             fLoadBeersTask = null;
             fUpdateBeersTask = null;
             if (beerUpdateNeeded()) {
-                loadBeersInBackground();
+                refreshBeers();
             }
         }
     }
@@ -238,7 +226,7 @@ public class CamBeerFestApplication extends SherlockFragmentActivity
         return haveConnectedWifi || haveConnectedMobile;
     }
 
-    private void loadBeersInBackground() {
+    private void refreshBeers() {
 
         if (fLoadBeersTask != null && fLoadBeersTask.getStatus() == AsyncTask.Status.RUNNING) {
             Log.d(TAG, "LoadBeerTask is already running.");
@@ -308,6 +296,9 @@ public class CamBeerFestApplication extends SherlockFragmentActivity
             case R.id.showOnlyStyle:
                 showFilterByStyleDialog();
                 return true;
+            case R.id.visitFestivalWebsite:
+                visitFestivalWebsite();
+                return true;
             case R.id.aboutApplication:
                 showAboutDialog();
                 return true;
@@ -315,17 +306,41 @@ public class CamBeerFestApplication extends SherlockFragmentActivity
                 //doExport();
                 return true;
             case R.id.refreshDatabase:
-                //loadBeersInBackground();
+                refreshBeers();
                 return true;
             case R.id.reloadDatabase:
-                //doReloadDatabase();
-                return true;
-            case R.id.visitFestivalWebsite:
-                //goToFestivalWebsite();
+                reloadBeers();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void showLoadBeersTaskDialog() {
+        DialogFragment newFragment = LoadBeersProgressDialogFragment.newInstance();
+        newFragment.show(getSupportFragmentManager(), "loadBeerProgress");
+    }
+
+    private void dismissLoadBeersTaskDialog() {
+        LoadBeersProgressDialogFragment fragment = findLoadBeersProgressDialog();
+        fragment.dismiss();
+        getSupportFragmentManager().beginTransaction().remove(fragment);
+    }
+
+    private void dismissUpdateBeersProgressDialog() {
+        UpdateBeersProgressDialogFragment fragment = findUpdateBeersProgressDialog();
+        fragment.dismiss();
+        getSupportFragmentManager().beginTransaction().remove(fragment);
+    }
+
+    private UpdateBeersProgressDialogFragment findUpdateBeersProgressDialog() {
+        return (UpdateBeersProgressDialogFragment) getSupportFragmentManager().
+                findFragmentByTag("updateBeerProgress");
+    }
+
+    private LoadBeersProgressDialogFragment findLoadBeersProgressDialog() {
+        return (LoadBeersProgressDialogFragment) getSupportFragmentManager().
+                findFragmentByTag("loadBeerProgress");
     }
 
     private void showAboutDialog() {
@@ -393,14 +408,7 @@ public class CamBeerFestApplication extends SherlockFragmentActivity
     }
 
     public void notifyBeersChanged() {
-        /*
-        try {
-            fBeerList.updateBeerList();
-            notifyAdapterBeersChanged();
-        } catch (SQLException e) {
-            fExceptionReporter.report(TAG, e.getMessage(), e);
-        }
-        */
+        fireBeerListChanged();
     }
 
     private void doExport() {
@@ -415,62 +423,25 @@ public class CamBeerFestApplication extends SherlockFragmentActivity
         }
     }
 
-    private void goToFestivalWebsite() {
+    private void visitFestivalWebsite() {
         Uri festivalUri = Uri.parse(getString(R.string.festival_website_url));
         Intent launchBrowser = new Intent(Intent.ACTION_VIEW, festivalUri);
         startActivity(launchBrowser);
     }
 
-    private void doReloadDatabase() {
+    private void reloadBeers() {
         // delete all beers
         getHelper().deleteAll();
         fAppPreferences.setLastUpdateMD5("");
-        loadBeersInBackground();
+        refreshBeers();
     }
-
-    /*
-    @Override
-    protected Dialog onCreateDialog(final int id) {
-        Dialog dialog;
-        switch (id) {
-            case LOAD_TASK_PROGRESS_DIALOG_ID:
-                Log.d(TAG, "Creating LOAD_TASK_PROGRESS_DIALOG");
-                fLoadProgressDialog = createLoadProgressDialog();
-                dialog = fLoadProgressDialog;
-                break;
-            case UPDATE_TASK_PROGRESS_DIALOG_ID:
-                Log.d(TAG, "Creating UPDATE_TASK_PROGRESS_DIALOG");
-                fUpdateProgressDialog = createUpdateProgressDialog();
-                dialog = fUpdateProgressDialog;
-                break;
-        }
-        return dialog;
-    }
-
-    private ProgressDialog createUpdateProgressDialog() {
-        ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage(getString(R.string.updating_database));
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        progressDialog.setIndeterminate(false);
-        progressDialog.setCancelable(false);
-        return progressDialog;
-    }
-
-    private ProgressDialog createLoadProgressDialog() {
-        ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage(getText(R.string.loading_message));
-        progressDialog.setIndeterminate(true);
-        progressDialog.setCancelable(false);
-        return progressDialog;
-    }
-    */
 
     public void notifyLoadTaskStarted() {
-        showDialog(LOAD_TASK_PROGRESS_DIALOG_ID);
+        showLoadBeersTaskDialog();
     }
 
     public void notifyLoadTaskUpdate(final String[] values) {
-        fLoadProgressDialog.setMessage(values[0]);
+        findLoadBeersProgressDialog().setMessage(values[0]);
     }
 
     public void notifyLoadTaskComplete(final LoadBeersTask.Result result) {
@@ -480,9 +451,9 @@ public class CamBeerFestApplication extends SherlockFragmentActivity
             if (t != null) {
                 fExceptionReporter.report(TAG, "Failed to download beers. " + t.getMessage(), t);
             }
-            dismissDialogNoThrow(LOAD_TASK_PROGRESS_DIALOG_ID);
+            dismissLoadBeersTaskDialog();
         } else {
-            dismissDialogNoThrow(LOAD_TASK_PROGRESS_DIALOG_ID);
+            dismissLoadBeersTaskDialog();
 
             if (fUpdateBeersTask != null && fUpdateBeersTask.getStatus() == AsyncTask.Status.RUNNING) {
                 Log.d(TAG, "UpdateBeerTask is already running.");
@@ -496,14 +467,17 @@ public class CamBeerFestApplication extends SherlockFragmentActivity
     }
 
     public void notifyUpdateStarted(final int max) {
-        showDialog(UPDATE_TASK_PROGRESS_DIALOG_ID);
-        fUpdateProgressDialog.setProgress(0);
-        fUpdateProgressDialog.setMax(max);
+        showUpdateBeerProgressDialog(0, max);
+    }
+
+    private void showUpdateBeerProgressDialog(final int progress, final int max) {
+        DialogFragment newFragment = UpdateBeersProgressDialogFragment.newInstance(progress, max);
+        newFragment.show(getSupportFragmentManager(), "updateBeerProgress");
     }
 
     public void notifyUpdateComplete(final Long aLong) {
         notifyBeersChanged();
-        dismissDialogNoThrow(UPDATE_TASK_PROGRESS_DIALOG_ID);
+        dismissUpdateBeersProgressDialog();
     }
 
     public void notifyUpdateProgress(final Beer[] values) {
@@ -513,18 +487,8 @@ public class CamBeerFestApplication extends SherlockFragmentActivity
             name = name.substring(0, maxLength - 3);
             name = name + "...";
         }
-        fUpdateProgressDialog.setMessage("Updated " + name);
-        fUpdateProgressDialog.incrementProgressBy(1);
-    }
-
-    // HACK!!!
-    private void dismissDialogNoThrow(int dialogId) {
-        try {
-            dismissDialog(dialogId);
-        } catch (IllegalArgumentException e) {
-            Log.e(TAG, "Failed to dismiss dialog " + dialogId, e);
-            // ignore
-        }
+        findUpdateBeersProgressDialog().setMessage("Updated " + name);
+        findUpdateBeersProgressDialog().incrementProgressBy(1);
     }
 
     // Called when sort dialog is closed.
@@ -569,6 +533,12 @@ public class CamBeerFestApplication extends SherlockFragmentActivity
     private void fireStylesToHideChanged(final Set<String> stylesToHide) {
         for (ListChangedListener l : fListChangedListeners) {
             l.stylesToHideChanged(stylesToHide);
+        }
+    }
+
+    private void fireBeerListChanged() {
+        for (ListChangedListener l : fListChangedListeners) {
+            l.beersChanged();
         }
     }
 

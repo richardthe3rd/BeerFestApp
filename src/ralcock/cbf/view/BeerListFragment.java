@@ -118,6 +118,10 @@ public abstract class BeerListFragment extends SherlockListFragment implements L
         }
     }
 
+    public void beersChanged() {
+        fAdapter.notifyDataSetChanged();
+    }
+
     private BeerDatabaseHelper getHelper() {
         if (fDBHelper == null) {
             fDBHelper = OpenHelperManager.getHelper(this.getActivity(), BeerDatabaseHelper.class);

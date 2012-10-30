@@ -25,6 +25,7 @@
         <option name="PROGUARD_CFG_PATH" value="/proguard.cfg" />
         <resOverlayFolders />
         <includeSystemProguardFile>false</includeSystemProguardFile>
+        <includeAssetsFromLibraries>true</includeAssetsFromLibraries>
         <additionalNativeLibs />
       </configuration>
     </facet>
@@ -35,12 +36,10 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gen" isTestSource="false" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Android 4.1.2 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" scope="PROVIDED" name="Android 2.2 Platform" level="application" />
     <orderEntry type="library" name="ormlite-4.40" level="project" />
-    <orderEntry type="library" name="android-support-v4" level="project" />
-    <orderEntry type="module" module-name="Actionbarsherlock" />
+    <orderEntry type="module" module-name="ActionBarSherlock" exported="" />
   </component>
 </module>
 
