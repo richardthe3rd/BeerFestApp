@@ -124,7 +124,7 @@ public class CamBeerFestApplication extends SherlockFragmentActivity {
     private void doReceivedUpdateServiceResult(final UpdateTask.Result result) {
         if (result.success()) {
             // Updated
-            fAppPreferences.setLastUpdateMD5(result.getHash());
+            fAppPreferences.setLastUpdateMD5(result.getDigest());
             fAppPreferences.setNextUpdateTime(calcNextUpdateTime());
             notifyBeersChanged();
         } else {
@@ -154,6 +154,9 @@ public class CamBeerFestApplication extends SherlockFragmentActivity {
         filter.addAction(UpdateService.UPDATE_SERVICE_PROGRESS);
         filter.addAction(UpdateService.UPDATE_SERVICE_RESULT);
         fLocalBroadcastManager.registerReceiver(fBroadcastReceiver, filter);
+
+        // Start the update service
+        startService(new Intent(this, UpdateService.class));
     }
 
     @Override

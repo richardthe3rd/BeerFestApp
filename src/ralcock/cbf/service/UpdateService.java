@@ -42,6 +42,8 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
     private NotificationManager fNotifyManager;
     private NotificationCompat.Builder fBuilder;
 
+    private int fNotificationID = 0;
+
     private long getBeerCount() {
         try {
             return getHelper().getBeerDao().getNumberOfBeers();
@@ -118,8 +120,14 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
                 broadcastIntent.putExtra(RESULT_EXTRA, result);
                 fLocalBroadcastManager.sendBroadcast(broadcastIntent);
 
-                fBuilder.setContentText(getString(R.string.update_complete_notification_text));
-                fNotifyManager.notify(0, fBuilder.build());
+                fNotificationID = 0;
+                if (result.getCount() == 0) {
+                    fNotifyManager.cancel(fNotificationID);
+                } else {
+                    fBuilder.setProgress(fNotificationID, 0, false);
+                    fBuilder.setContentText(getString(R.string.update_complete_notification_text, result.getCount()));
+                    fNotifyManager.notify(fNotificationID, fBuilder.build());
+                }
 
                 // We're done. Stop the service.
                 Log.d(TAG, "Stopping UpdateService");
@@ -152,8 +160,7 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
 
             @Override
             boolean needsUpdate(final byte[] digest) {
-                BigInteger bigInt = new BigInteger(1, digest);
-                String hashString = bigInt.toString(16);
+                String hashString = toMD5String(digest);
                 final String lastUpdateMD5 = fAppPreferences.getLastUpdateMD5();
                 Log.d(TAG, "Previous hash was " + lastUpdateMD5 + " new hash is " + hashString);
                 return !hashString.equals(lastUpdateMD5);
@@ -170,9 +177,14 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
         task.execute(p);
     }
 
+    private static String toMD5String(final byte[] digest) {
+        BigInteger bigInt = new BigInteger(1, digest);
+        return bigInt.toString(16);
+    }
+
     private void updateProgress(final int progress, final int max) {
         fBuilder.setProgress(max, progress, false);
-        fNotifyManager.notify(0, fBuilder.build());
+        fNotifyManager.notify(fNotificationID, fBuilder.build());
     }
 
     @Override

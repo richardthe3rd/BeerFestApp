@@ -4,8 +4,8 @@
 
     <item android:id="@+id/shareBeer"
           android:title="@string/share_this_beer_title"
-          android:icon="@drawable/ic_social_share"
           android:showAsAction="ifRoom"
+          android:actionProviderClass="android.widget.ShareActionProvider"
             />
 
     <item android:id="@+id/clearRating"

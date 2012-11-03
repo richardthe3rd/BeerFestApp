@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -23,6 +24,9 @@ import java.sql.SQLException;
 import java.util.concurrent.Callable;
 
 public class UpdateTask extends AsyncTask<UpdateTask.Params, UpdateTask.Progress, UpdateTask.Result> {
+
+    private static final String TAG = UpdateTask.class.getName();
+
     @Override
     protected Result doInBackground(final Params... params) {
         final Params param0 = params[0];
@@ -63,7 +67,7 @@ public class UpdateTask extends AsyncTask<UpdateTask.Params, UpdateTask.Progress
                             }
                         });
                 Log.d(TAG, "Updated " + count + " beers.");
-                return new UpdateResult(digest);
+                return new UpdateResult(count, toMD5String(digest));
             } catch (JSONException e) {
                 return new FailedUpdateResult(e);
             } catch (SQLException e) {
@@ -76,7 +80,10 @@ public class UpdateTask extends AsyncTask<UpdateTask.Params, UpdateTask.Progress
         }
     }
 
-    private static final String TAG = UpdateTask.class.getName();
+    private static String toMD5String(final byte[] digest) {
+        BigInteger bigInt = new BigInteger(1, digest);
+        return bigInt.toString(16);
+    }
 
     private static String readEntireStream(final InputStream inputStream) throws IOException {
         Log.i(TAG, "Loading beer list from input stream.");
@@ -163,7 +170,11 @@ public class UpdateTask extends AsyncTask<UpdateTask.Params, UpdateTask.Progress
             return null;
         }
 
-        public String getHash() {
+        public int getCount() {
+            return 0;
+        }
+
+        public String getDigest() {
             return "";
         }
     }
@@ -174,14 +185,22 @@ public class UpdateTask extends AsyncTask<UpdateTask.Params, UpdateTask.Progress
 
     public class UpdateResult extends Result {
 
-        private final byte[] fDigest;
+        private final int fCount;
+        private final String fDigest;
 
-        public UpdateResult(final byte[] digest) {
+        public UpdateResult(final int count, final String digest) {
+            fCount = count;
             fDigest = digest;
         }
 
-        public byte[] getDigest() {
+        @Override
+        public String getDigest() {
             return fDigest;
+        }
+
+        @Override
+        public int getCount() {
+            return fCount;
         }
     }
 
