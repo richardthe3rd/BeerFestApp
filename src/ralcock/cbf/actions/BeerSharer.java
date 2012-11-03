@@ -14,6 +14,14 @@ public final class BeerSharer {
     }
 
     public void shareBeer(final Beer beer) {
+        Intent intent = makeShareIntent(beer);
+
+        String title = fContext.getResources().getString(R.string.share_this_beer_title);
+        fContext.startActivity(Intent.createChooser(intent, title));
+
+    }
+
+    public Intent makeShareIntent(final Beer beer) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
 
@@ -31,9 +39,6 @@ public final class BeerSharer {
         }
 
         intent.putExtra(Intent.EXTRA_TEXT, extraText);
-
-        String title = fContext.getResources().getString(R.string.share_this_beer_title);
-        fContext.startActivity(Intent.createChooser(intent, title));
-
+        return intent;
     }
 }
