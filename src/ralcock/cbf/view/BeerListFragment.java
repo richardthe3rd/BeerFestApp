@@ -2,6 +2,7 @@ package ralcock.cbf.view;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import java.sql.SQLException;
 import java.util.Set;
 
 public abstract class BeerListFragment extends SherlockListFragment implements ListChangedListener {
+    private static final String TAG = BeerListFragment.class.getName();
 
     private static final int SHOW_BEER_DETAILS_REQUEST_CODE = 1;
 
@@ -64,6 +66,7 @@ public abstract class BeerListFragment extends SherlockListFragment implements L
         // Add list click listener.
         getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Log.i(TAG, "Starting BeerDetails Activity with ID " + id);
                 Intent intent = new Intent(getActivity(), BeerDetailsActivity.class);
                 intent.putExtra(BeerDetailsActivity.EXTRA_BEER_ID, id);
                 startActivityForResult(intent, SHOW_BEER_DETAILS_REQUEST_CODE);
@@ -119,7 +122,13 @@ public abstract class BeerListFragment extends SherlockListFragment implements L
     }
 
     public void beersChanged() {
-        fAdapter.notifyDataSetChanged();
+        try {
+            Log.i(TAG, "beersChanged: notifying ListAdapter of changed DataSet.");
+            fBeerList.updateBeerList();
+            fAdapter.notifyDataSetChanged();
+        } catch (SQLException e) {
+            // TODO:
+        }
     }
 
     private BeerDatabaseHelper getHelper() {

@@ -32,5 +32,7 @@
             </intent-filter>
         </activity>
 
+        <service android:name="ralcock.cbf.service.UpdateService"/>
+
     </application>
 </manifest> 

@@ -5,9 +5,10 @@
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
               android:orientation="vertical">
-    <!--    <fragment android:name="ralcock.cbf.view.BeerListFragment"
-    android:id="@+id/beerListFragment"
-    android:layout_weight="1"
-    android:layout_width="match_parent"
-    android:layout_height="0dip"/>-->
+    <LinearLayout android:id="@+id/tabContainer"
+                  android:layout_width="fill_parent"
+                  android:layout_height="0dip"
+                  android:gravity="start"
+                  android:layout_weight="1"
+            />
 </LinearLayout>

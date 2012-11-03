@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import com.actionbarsherlock.app.ActionBar;
+import ralcock.cbf.R;
 
 public class TabListener<T extends Fragment> implements ActionBar.TabListener {
     private final Activity fActivity;
@@ -21,7 +22,7 @@ public class TabListener<T extends Fragment> implements ActionBar.TabListener {
         if (fFragment == null) {
             fFragment = Fragment.instantiate(fActivity, fClazz.getName());
 
-            ft.replace(android.R.id.content, fFragment, fTag);
+            ft.replace(R.id.tabContainer, fFragment, fTag);
         } else {
             ft.attach(fFragment);
         }

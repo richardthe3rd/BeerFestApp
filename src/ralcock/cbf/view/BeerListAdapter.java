@@ -27,6 +27,11 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
         fFilter = new BeerFilter(this, fBeerList, new ExceptionReporter(context));
     }
 
+    @Override
+    public boolean hasStableIds() {
+        return false;
+    }
+
     private View newView(ViewGroup viewGroup) {
         LayoutInflater layoutInflater = LayoutInflater.from(fContext);
         View view = layoutInflater.inflate(R.layout.beer_listitem, viewGroup, false);

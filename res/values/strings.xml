@@ -43,4 +43,8 @@
     <string name="about_this_application">About</string>
     <string name="search_online">Search for more information online</string>
 
+    <string name="update_notification_title">Updating Beers</string>
+    <string name="update_in_progress_notification_text">Downloading and Updating Beers</string>
+    <string name="update_complete_notification_text">Beers Updated</string>
+
 </resources>

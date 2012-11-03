@@ -1,11 +1,14 @@
 package ralcock.cbf.view;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.Window;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import ralcock.cbf.R;
 import ralcock.cbf.actions.BeerSharer;
@@ -46,18 +49,24 @@ public final class BeerDetailsActivity extends SherlockFragmentActivity {
     }
 
     public void onCreate(Bundle savedInstanceState) {
+
+        requestWindowFeature(Window.FEATURE_ACTION_BAR);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.beer_details_activity);
 
         try {
             long id = getIntent().getExtras().getLong(EXTRA_BEER_ID);
+            Log.i(TAG, "In BeerDetailsActivity.onCreate with ID " + id);
             fBeer = getHelper().getBeerDao().queryForId(id);
+            Log.i(TAG, "In BeerDetailsActivity.onCreate with Beer " + fBeer);
         } catch (SQLException e) {
             fExceptionReporter.report(TAG, "", e);
         }
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(fBeer.getName());
+        final ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle(fBeer.getName());
     }
 
     @Override
