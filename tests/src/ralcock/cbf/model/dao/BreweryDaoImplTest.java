@@ -1,8 +1,10 @@
-package ralcock.cbf.model;
+package ralcock.cbf.model.dao;
 
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
-import ralcock.cbf.model.dao.BreweryDao;
+import ralcock.cbf.model.BeerDatabaseHelper;
+import ralcock.cbf.model.BeerListTest;
+import ralcock.cbf.model.Brewery;
 
 import java.sql.SQLException;
 

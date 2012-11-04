@@ -1,6 +1,5 @@
 package ralcock.cbf.model;
 
-import com.j256.ormlite.stmt.QueryBuilder;
 import ralcock.cbf.model.dao.BeerDao;
 import ralcock.cbf.model.dao.BreweryDao;
 
@@ -87,9 +86,8 @@ public class BeerList {
                                  final CharSequence filterText,
                                  final Set<String> stylesToHide,
                                  final Set<String> statusToHide) throws SQLException {
-        QueryBuilder<Beer, Long> qb = fBeerDao.buildSortedFilteredBeerQuery(fBreweryDao,
+        return fBeerDao.getSortedFilteredList(fBreweryDao,
                 sortOrder, filterText, stylesToHide, statusToHide);
-        return qb.query();
     }
 
 }

@@ -68,11 +68,20 @@ public class BeerDaoImpl extends BaseDaoImpl<Beer, Long> implements BeerDao {
         return qb.query();
     }
 
-    public QueryBuilder<Beer, Long> buildSortedFilteredBeerQuery(final BreweryDao breweryDao,
-                                                                 final SortOrder sortOrder,
-                                                                 final CharSequence filterText,
-                                                                 final Set<String> stylesToHide,
-                                                                 final Set<String> statusToHide) {
+    public List<Beer> getSortedFilteredList(final BreweryDao breweryDao,
+                                            final SortOrder sortOrder,
+                                            final CharSequence filterText,
+                                            final Set<String> stylesToHide,
+                                            final Set<String> statusToHide) throws SQLException {
+        QueryBuilder<Beer, Long> query = buildSortedFilteredBeerQuery(breweryDao, sortOrder, filterText, stylesToHide, statusToHide);
+        return query.query();
+    }
+
+    private QueryBuilder<Beer, Long> buildSortedFilteredBeerQuery(final BreweryDao breweryDao,
+                                                                  final SortOrder sortOrder,
+                                                                  final CharSequence filterText,
+                                                                  final Set<String> stylesToHide,
+                                                                  final Set<String> statusToHide) {
         QueryBuilder<Beer, Long> qb = queryBuilder();
         Where where = qb.where();
         try {

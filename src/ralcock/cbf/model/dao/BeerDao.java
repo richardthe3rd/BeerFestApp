@@ -1,7 +1,6 @@
 package ralcock.cbf.model.dao;
 
 import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.stmt.QueryBuilder;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.SortOrder;
 
@@ -15,11 +14,11 @@ public interface BeerDao extends Dao<Beer, Long> {
 
     long getNumberOfBeers() throws SQLException;
 
-    QueryBuilder<Beer, Long> buildSortedFilteredBeerQuery(BreweryDao breweryDao,
-                                                          SortOrder sortOrder,
-                                                          CharSequence filterText,
-                                                          Set<String> filterStyles,
-                                                          Set<String> statusToHide);
+    List<Beer> getSortedFilteredList(BreweryDao breweryDao,
+                                     SortOrder sortOrder,
+                                     CharSequence filterText,
+                                     Set<String> filterStyles,
+                                     Set<String> statusToHide) throws SQLException;
 
     void updateFromFestivalOrCreate(Beer beer) throws SQLException;
 
