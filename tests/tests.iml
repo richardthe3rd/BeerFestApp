@@ -25,6 +25,7 @@
         <option name="PROGUARD_CFG_PATH" value="/proguard.cfg" />
         <resOverlayFolders />
         <includeSystemProguardFile>false</includeSystemProguardFile>
+        <includeAssetsFromLibraries>true</includeAssetsFromLibraries>
         <additionalNativeLibs />
       </configuration>
     </facet>
@@ -35,12 +36,12 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gen" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="Android SDK" jdkType="Android SDK" />
+    <orderEntry type="library" name="junit-4.10" level="project" />
+    <orderEntry type="jdk" jdkName="Android 4.1.2 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="CamBeerFestApp" scope="PROVIDED" />
     <orderEntry type="library" scope="PROVIDED" name="ormlite-4.40" level="project" />
-    <orderEntry type="library" name="junit-4.10" level="project" />
-    <orderEntry type="module" module-name="Actionbarsherlock" scope="PROVIDED" />
+    <orderEntry type="library" name="easymock-3.1" level="project" />
   </component>
 </module>
 
