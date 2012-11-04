@@ -9,6 +9,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
+import com.actionbarsherlock.widget.ShareActionProvider;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import ralcock.cbf.R;
 import ralcock.cbf.actions.BeerSharer;
@@ -31,6 +32,7 @@ public final class BeerDetailsActivity extends SherlockFragmentActivity {
     private final ExceptionReporter fExceptionReporter;
 
     private BeerDatabaseHelper fDBHelper;
+    private ShareActionProvider fShareActionProvider;
 
     public BeerDetailsActivity() {
         fBeerSharer = new BeerSharer(this);
@@ -73,6 +75,9 @@ public final class BeerDetailsActivity extends SherlockFragmentActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.details_options_menu, menu);
+
+        fShareActionProvider = (ShareActionProvider) (menu.findItem(R.id.shareBeer).getActionProvider());
+        fShareActionProvider.setShareIntent(fBeerSharer.makeShareIntent(fBeer));
         return true;
     }
 
@@ -82,9 +87,6 @@ public final class BeerDetailsActivity extends SherlockFragmentActivity {
             case android.R.id.home:
                 setResult(RESULT_OK);
                 finish();
-                return true;
-            case R.id.shareBeer:
-                fBeerSharer.shareBeer(fBeer);
                 return true;
             case R.id.clearRating:
                 //rateBeer(StarRating.NO_STARS);
