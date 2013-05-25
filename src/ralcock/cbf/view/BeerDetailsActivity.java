@@ -88,14 +88,10 @@ public final class BeerDetailsActivity extends SherlockFragmentActivity {
                 setResult(RESULT_OK);
                 finish();
                 return true;
-            case R.id.clearRating:
-                //rateBeer(StarRating.NO_STARS);
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
-
 
     @SuppressWarnings({"UnusedDeclaration"}) // Called from beer_details_activity.xml.xml
     public void shareBeer(View button) {

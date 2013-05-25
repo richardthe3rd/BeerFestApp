@@ -6,7 +6,7 @@
       <directory url="file://$PROJECT_DIR$/gen" includeSubdirectories="true" />
       <directory url="file://$PROJECT_DIR$/tests/gen" includeSubdirectories="true" />
       <directory url="file://$PROJECT_DIR$/actionbarsherlock/gen" includeSubdirectories="true" />
-      <directory url="file://$PROJECT_DIR$/../ActionBarSherlock/gen" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/../ActionBarSherlock 4.2/gen" includeSubdirectories="true" />
       <directory url="file://$PROJECT_DIR$/../Tests/gen" includeSubdirectories="true" />
     </excludeFromCompile>
     <resourceExtensions />
@@ -23,7 +23,11 @@
       <entry name="?*.ftl" />
       <entry name="*.json" />
     </wildcardResourcePatterns>
-    <annotationProcessing enabled="false" useClasspath="true" />
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="false">
+        <processorPath useClasspath="true" />
+      </profile>
+    </annotationProcessing>
   </component>
 </project>
 

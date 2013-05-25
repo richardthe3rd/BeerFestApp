@@ -29,13 +29,14 @@ import ralcock.cbf.actions.BeerSharer;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerDatabaseHelper;
 import ralcock.cbf.model.SortOrder;
+import ralcock.cbf.model.StatusToShow;
 import ralcock.cbf.model.dao.BeerDao;
 import ralcock.cbf.service.UpdateService;
 import ralcock.cbf.service.UpdateTask;
 import ralcock.cbf.util.ExceptionReporter;
 import ralcock.cbf.view.AboutDialogFragment;
 import ralcock.cbf.view.AllBeersListFragment;
-import ralcock.cbf.view.AvailableBeersListFragment;
+import ralcock.cbf.view.BookmarkedBeerListFragment;
 import ralcock.cbf.view.FilterByStyleDialogFragment;
 import ralcock.cbf.view.ListChangedListener;
 import ralcock.cbf.view.SortByDialogFragment;
@@ -96,9 +97,10 @@ public class CamBeerFestApplication extends SherlockFragmentActivity {
         ActionBar.Tab allBeersTab = actionBar.newTab()
                 .setText("All Beers")
                 .setTabListener(new TabListener<AllBeersListFragment>(this, "all", AllBeersListFragment.class));
+
         ActionBar.Tab availableBeersTab = actionBar.newTab()
-                .setText("Available Only")
-                .setTabListener(new TabListener<AvailableBeersListFragment>(this, "available", AvailableBeersListFragment.class));
+                .setText("Bookmarked Beers")
+                .setTabListener(new TabListener<BookmarkedBeerListFragment>(this, "bookmarks", BookmarkedBeerListFragment.class));
 
         actionBar.addTab(allBeersTab);
         actionBar.addTab(availableBeersTab);
@@ -136,7 +138,8 @@ public class CamBeerFestApplication extends SherlockFragmentActivity {
 
     private Date calcNextUpdateTime() {
         Date now = new Date();
-        long one_day = TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS);
+        // Can't use TimeUnit.Day on older Androids.
+        long one_day = 24 * 60 * 60 * TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS);
         return new Date(now.getTime() + one_day);
     }
 
@@ -210,12 +213,15 @@ public class CamBeerFestApplication extends SherlockFragmentActivity {
     public boolean onCreateOptionsMenu(final Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.list_options_menu, menu);
+
         final SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+
         searchView.setOnSearchClickListener(new View.OnClickListener() {
             public void onClick(final View view) {
                 searchView.setQueryHint(getResources().getString(R.string.filter_hint));
             }
         });
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             public boolean onQueryTextSubmit(final String query) {
                 filterBy(query.toString());
@@ -244,6 +250,8 @@ public class CamBeerFestApplication extends SherlockFragmentActivity {
                 return true;
             case R.id.showOnlyStyle:
                 showFilterByStyleDialog();
+                return true;
+            case R.id.hideUnavailable:
                 return true;
             case R.id.visitFestivalWebsite:
                 visitFestivalWebsite();
@@ -374,6 +382,11 @@ public class CamBeerFestApplication extends SherlockFragmentActivity {
         fAppPreferences.setStylesToHide(stylesToHide);
     }
 
+    private void statusToShow(StatusToShow statusToShow) {
+        fireStatusToShowChanged(statusToShow);
+        fAppPreferences.setHideUnavailableBeers(StatusToShow.AVAILABLE_ONLY == statusToShow);
+    }
+
     public void addListChangedListener(final ListChangedListener listChangedListener) {
         fListChangedListeners.add(listChangedListener);
     }
@@ -397,6 +410,12 @@ public class CamBeerFestApplication extends SherlockFragmentActivity {
     private void fireStylesToHideChanged(final Set<String> stylesToHide) {
         for (ListChangedListener l : fListChangedListeners) {
             l.stylesToHideChanged(stylesToHide);
+        }
+    }
+
+    private void fireStatusToShowChanged(final StatusToShow statusToShow) {
+        for (ListChangedListener l : fListChangedListeners) {
+            l.statusToShowChanged(statusToShow);
         }
     }
 

@@ -5,7 +5,9 @@ import android.content.SharedPreferences;
 import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
+import ralcock.cbf.model.BeerList;
 import ralcock.cbf.model.SortOrder;
+import ralcock.cbf.model.StatusToShow;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -145,5 +147,22 @@ public final class AppPreferences {
 
     public String getLastUpdateMD5() {
         return getPreference(LAST_UPDATE_MD5_KEY, "");
+    }
+
+    public StatusToShow getStatusToShow() {
+        boolean hideUnavailableBeers = getHideUnavailableBeers();
+        if (hideUnavailableBeers) {
+            return StatusToShow.AVAILABLE_ONLY;
+        } else {
+            return StatusToShow.ALL;
+        }
+    }
+
+    public BeerList.Config getBeerListConfig() {
+        return new BeerList.Config(
+                getSortOrder(),
+                getFilterText(),
+                getStylesToHide(),
+                getStatusToShow());
     }
 }

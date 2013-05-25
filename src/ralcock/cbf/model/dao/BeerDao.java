@@ -14,11 +14,17 @@ public interface BeerDao extends Dao<Beer, Long> {
 
     long getNumberOfBeers() throws SQLException;
 
-    List<Beer> getSortedFilteredList(BreweryDao breweryDao,
-                                     SortOrder sortOrder,
-                                     CharSequence filterText,
-                                     Set<String> filterStyles,
-                                     Set<String> statusToHide) throws SQLException;
+    List<Beer> allBeersList(BreweryDao breweryDao,
+                            SortOrder sortOrder,
+                            CharSequence filterText,
+                            Set<String> filterStyles,
+                            Set<String> statusToHide) throws SQLException;
+
+    List<Beer> bookmarkedBeersList(BreweryDao breweryDao,
+                                   SortOrder sortOrder,
+                                   CharSequence filterText,
+                                   Set<String> filterStyles,
+                                   Set<String> statusToHide) throws SQLException;
 
     void updateFromFestivalOrCreate(Beer beer) throws SQLException;
 

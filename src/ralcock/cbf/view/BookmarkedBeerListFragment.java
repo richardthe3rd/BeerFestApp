@@ -7,15 +7,15 @@ import ralcock.cbf.model.dao.BreweryDao;
 
 import java.sql.SQLException;
 
-public class AllBeersListFragment extends BeerListFragment {
-    public AllBeersListFragment() {
+public class BookmarkedBeerListFragment extends BeerListFragment {
+    public BookmarkedBeerListFragment() {
         super();
     }
-
 
     @Override
     BeerList makeBeerList(final BeerDao beerDao, final BreweryDao breweryDao) throws SQLException {
         AppPreferences preferences = new AppPreferences(this.getActivity());
-        return BeerList.allBeers(beerDao, breweryDao, preferences.getBeerListConfig());
+        return BeerList.bookmarkedBeers(beerDao, breweryDao, preferences.getBeerListConfig());
     }
+
 }

@@ -1,12 +1,12 @@
 <resources>
     <string name="app_name">Cambridge Beer Festival</string>
-    <string name="list_title">6th Cambridge Octoberfest</string>
-    <string name="share_this_beer_subject">Drinking a beer at the 6th Cambridge Octoberfest</string>
-    <string formatted="false" name="share_this_beer_text">Drinking %s %s #camoctfest #beer</string>
-    <string formatted="false" name="share_this_rated_beer_text">Gave %d stars to %s %s #camoctfest #beer</string>
+    <string name="festival_name">40th Cambridge Beer Festival</string>
+    <string name="share_this_beer_subject">Drinking a beer at the 40th Cambridge Beer Festival</string>
+    <string formatted="false" name="share_this_beer_text">Drinking %s %s #cbf40</string>
+    <string formatted="false" name="share_this_rated_beer_text">Gave %d stars to %s %s #cbf40</string>
 
     <!--<string name="beer_list_url">http://dl.dropbox.com/u/4457379/cbf39.json</string>-->
-    <string name="beer_list_url">http://www.cambridgebeerfestival.com/viewnode.php?id=239&amp;format=json&amp;parts=listing</string>
+    <string name="beer_list_url">http://www.cambridgebeerfestival.com/viewnode.php?id=250&amp;format=json&amp;parts=listing</string>
 
-    <string name="festival_website_url">http://www.cambridgebeerfestival.com/viewnode.php?id=114</string>
+    <string name="festival_website_url">http://www.cambridgebeerfestival.com/viewnode.php?id=3</string>
 </resources>

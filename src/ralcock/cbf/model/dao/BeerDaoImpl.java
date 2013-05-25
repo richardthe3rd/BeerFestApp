@@ -68,13 +68,39 @@ public class BeerDaoImpl extends BaseDaoImpl<Beer, Long> implements BeerDao {
         return qb.query();
     }
 
-    public List<Beer> getSortedFilteredList(final BreweryDao breweryDao,
-                                            final SortOrder sortOrder,
-                                            final CharSequence filterText,
-                                            final Set<String> stylesToHide,
-                                            final Set<String> statusToHide) throws SQLException {
+    public List<Beer> allBeersList(final BreweryDao breweryDao,
+                                   final SortOrder sortOrder,
+                                   final CharSequence filterText,
+                                   final Set<String> stylesToHide,
+                                   final Set<String> statusToHide) throws SQLException {
         QueryBuilder<Beer, Long> query = buildSortedFilteredBeerQuery(breweryDao, sortOrder, filterText, stylesToHide, statusToHide);
         return query.query();
+    }
+
+    public List<Beer> bookmarkedBeersList(final BreweryDao breweryDao,
+                                          final SortOrder sortOrder,
+                                          final CharSequence filterText,
+                                          final Set<String> stylesToHide,
+                                          final Set<String> statusToHide) throws SQLException {
+        QueryBuilder<Beer, Long> query = buildBookmarkQuery(breweryDao, sortOrder, filterText, stylesToHide, statusToHide);
+        return query.query();
+    }
+
+    private QueryBuilder<Beer, Long> buildBookmarkQuery(final BreweryDao breweryDao,
+                                                        final SortOrder sortOrder,
+                                                        final CharSequence filterText,
+                                                        final Set<String> stylesToHide,
+                                                        final Set<String> statusToHide) throws SQLException {
+        QueryBuilder<Beer, Long> qb = queryBuilder();
+        Where where = qb.where();
+        try {
+            doWhere(where, breweryDao, filterText, stylesToHide, statusToHide);
+            where.and().eq(Beer.ON_WISH_LIST_FIELD, true);
+            qb.orderBy(sortOrder.columnName(), sortOrder.ascending());
+            return qb;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private QueryBuilder<Beer, Long> buildSortedFilteredBeerQuery(final BreweryDao breweryDao,
@@ -85,24 +111,31 @@ public class BeerDaoImpl extends BaseDaoImpl<Beer, Long> implements BeerDao {
         QueryBuilder<Beer, Long> qb = queryBuilder();
         Where where = qb.where();
         try {
-            //noinspection unchecked
-            where.and(
-                    where.not().in(Beer.STATUS_FIELD, statusToHide),
-                    where.not().in(Beer.STYLE_FIELD, stylesToHide),
-                    where.or(
-                            where.or(
-                                    where.like(Beer.NAME_FIELD, "%" + filterText + "%"),
-                                    where.like(Beer.STYLE_FIELD, "%" + filterText + "%")
-                            ),
-                            where.in(Beer.BREWERY_FIELD, breweryDao.buildFilteredBreweryQuery(filterText))
-                    )
-            );
+            doWhere(where, breweryDao, filterText, stylesToHide, statusToHide);
             qb.orderBy(sortOrder.columnName(), sortOrder.ascending());
             return qb;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
 
+    private void doWhere(final Where where,
+                         final BreweryDao breweryDao,
+                         final CharSequence filterText,
+                         final Set<String> stylesToHide,
+                         final Set<String> statusToHide) throws SQLException {
+        //noinspection unchecked
+        where.and(
+                where.not().in(Beer.STATUS_FIELD, statusToHide),
+                where.not().in(Beer.STYLE_FIELD, stylesToHide),
+                where.or(
+                        where.or(
+                                where.like(Beer.NAME_FIELD, "%" + filterText + "%"),
+                                where.like(Beer.STYLE_FIELD, "%" + filterText + "%")
+                        ),
+                        where.in(Beer.BREWERY_FIELD, breweryDao.buildFilteredBreweryQuery(filterText))
+                )
+        );
     }
 
     public void updateFromFestivalOrCreate(final Beer beer) throws SQLException {

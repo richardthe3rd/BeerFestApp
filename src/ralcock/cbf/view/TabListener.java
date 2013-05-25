@@ -10,7 +10,7 @@ public class TabListener<T extends Fragment> implements ActionBar.TabListener {
     private final Activity fActivity;
     private final String fTag;
     private final Class<T> fClazz;
-    private Fragment fFragment;
+    private BeerListFragment fFragment;
 
     public TabListener(Activity activity, String tag, Class<T> clazz) {
         fActivity = activity;
@@ -20,7 +20,7 @@ public class TabListener<T extends Fragment> implements ActionBar.TabListener {
 
     public void onTabSelected(final ActionBar.Tab tab, final FragmentTransaction ft) {
         if (fFragment == null) {
-            fFragment = Fragment.instantiate(fActivity, fClazz.getName());
+            fFragment = (BeerListFragment) Fragment.instantiate(fActivity, fClazz.getName());
 
             ft.replace(R.id.tabContainer, fFragment, fTag);
         } else {

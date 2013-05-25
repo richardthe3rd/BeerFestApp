@@ -5,10 +5,12 @@
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
               android:orientation="vertical">
-    <LinearLayout android:id="@+id/tabContainer"
-                  android:layout_width="fill_parent"
-                  android:layout_height="0dip"
-                  android:gravity="start"
-                  android:layout_weight="1"
+
+    <LinearLayout
+            android:id="@+id/tabContainer"
+            android:layout_width="fill_parent"
+            android:layout_height="0dip"
+            android:gravity="start"
+            android:layout_weight="1"
             />
 </LinearLayout>

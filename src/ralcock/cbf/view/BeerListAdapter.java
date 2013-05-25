@@ -53,6 +53,12 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
 
         beerListItemView.BeerStatus.setText(beer.getStatus());
         beerListItemView.BeerStyle.setText(beer.getStyle());
+
+        if (beer.isIsOnWishList()) {
+            beerListItemView.BookmarkStatus.setText("Bookmarked");
+        } else {
+            beerListItemView.BookmarkStatus.setText("");
+        }
     }
 
     public int getCount() {
@@ -85,6 +91,7 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
         TextView BeerStyle;
         TextView BeerStatus;
         RatingBar BeerRatingBar;
+        TextView BookmarkStatus;
 
         BeerListItemView(final View view) {
             BreweryName = findTextViewById(view, R.id.breweryName);
@@ -92,6 +99,7 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
             BeerStatus = findTextViewById(view, R.id.beerStatus);
             BeerStyle = findTextViewById(view, R.id.beerStyle);
             BeerRatingBar = (RatingBar) view.findViewById(R.id.beerRatingBar);
+            BookmarkStatus = findTextViewById(view, R.id.bookmarkStatus);
         }
 
         private TextView findTextViewById(final View view, final int id) {

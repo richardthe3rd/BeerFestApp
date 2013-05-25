@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/../ActionBarSherlock/ActionBarSherlock.iml" filepath="$PROJECT_DIR$/../ActionBarSherlock/ActionBarSherlock.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../ActionBarSherlock 4.2/ActionBarSherlock 4.2.iml" filepath="$PROJECT_DIR$/../ActionBarSherlock 4.2/ActionBarSherlock 4.2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../ActionBarSherlock 4.3.1/ActionBarSherlock 4.3.1.iml" filepath="$PROJECT_DIR$/../ActionBarSherlock 4.3.1/ActionBarSherlock 4.3.1.iml" />
       <module fileurl="file://$PROJECT_DIR$/CamBeerFestApp.iml" filepath="$PROJECT_DIR$/CamBeerFestApp.iml" />
-      <module fileurl="file://$PROJECT_DIR$/tests/Tests.iml" filepath="$PROJECT_DIR$/tests/Tests.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tests/tests.iml" filepath="$PROJECT_DIR$/tests/tests.iml" />
     </modules>
   </component>
 </project>

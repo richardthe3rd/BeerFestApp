@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/shareBeer"
-          android:title="@string/share_this_beer_title"
-          android:icon="@android:drawable/ic_menu_send"
+    <item
+            android:id="@+id/bookmarkBeer"
+            android:title="@string/bookmark_title"
             />
-    <item android:id="@+id/searchBeer"
-          android:title="@string/search_this_beer_title"
-          android:icon="@android:drawable/ic_menu_search"
+    <item
+            android:id="@+id/unBookmarkBeer"
+            android:title="@string/unbookmark_title"
+            android:visible="false"
+            />
+    <item
+            android:id="@+id/shareBeer"
+            android:title="@string/share_this_beer_title"
+            android:icon="@android:drawable/ic_menu_send"
+            />
+    <item
+            android:id="@+id/searchBeer"
+            android:title="@string/search_this_beer_title"
+            android:icon="@android:drawable/ic_menu_search"
             />
 
 </menu>

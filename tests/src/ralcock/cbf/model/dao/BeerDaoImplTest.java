@@ -63,7 +63,7 @@ public class BeerDaoImplTest extends AndroidTestCase {
     }
 
     private List<Beer> doQuery(SortOrder sortOrder, CharSequence filterText, Set<String> stylesToHide) throws SQLException {
-        return fBeerDao.getSortedFilteredList(fBreweryDao, sortOrder, filterText, stylesToHide, stylesToHide);
+        return fBeerDao.allBeersList(fBreweryDao, sortOrder, filterText, stylesToHide, stylesToHide);
     }
 
     public void testFiltering() throws Exception {
