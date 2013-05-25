@@ -1,14 +1,17 @@
-package ralcock.cbf.model;
+package ralcock.cbf.model.dao;
 
 
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
-import com.j256.ormlite.stmt.QueryBuilder;
-import ralcock.cbf.model.dao.BeerDao;
-import ralcock.cbf.model.dao.BreweryDao;
+import ralcock.cbf.model.Beer;
+import ralcock.cbf.model.BeerDatabaseHelper;
+import ralcock.cbf.model.BeerListTest;
+import ralcock.cbf.model.Brewery;
+import ralcock.cbf.model.SortOrder;
 
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -60,8 +63,7 @@ public class BeerDaoImplTest extends AndroidTestCase {
     }
 
     private List<Beer> doQuery(SortOrder sortOrder, CharSequence filterText, Set<String> stylesToHide) throws SQLException {
-        QueryBuilder<Beer, Long> qb = fBeerDao.buildSortedFilteredBeerQuery(fBreweryDao, sortOrder, filterText, stylesToHide, stylesToHide);
-        return qb.query();
+        return fBeerDao.allBeersList(fBreweryDao, sortOrder, filterText, stylesToHide, stylesToHide);
     }
 
     public void testFiltering() throws Exception {
@@ -78,4 +80,12 @@ public class BeerDaoImplTest extends AndroidTestCase {
             assertEquals(fBeer3, list.get(1));
         }
     }
+
+    public void testGetAvailableStyles() throws Exception {
+        Set<String> styles = new HashSet<String>();
+        styles.add("style1");
+        styles.add("style2");
+        assertEquals(styles, fBeerDao.getAvailableStyles());
+    }
+
 }

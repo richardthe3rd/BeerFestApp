@@ -1,22 +1,27 @@
 package ralcock.cbf.view;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.util.Log;
 import android.view.View;
-import android.widget.RatingBar;
-import android.widget.TextView;
-import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.Window;
+import com.actionbarsherlock.widget.ShareActionProvider;
+import com.j256.ormlite.android.apptools.OpenHelperManager;
 import ralcock.cbf.R;
+import ralcock.cbf.actions.BeerSharer;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerDatabaseHelper;
-import ralcock.cbf.model.StarRating;
+import ralcock.cbf.util.ExceptionReporter;
 
 import java.sql.SQLException;
 
-public final class BeerDetailsActivity extends OrmLiteBaseActivity<BeerDatabaseHelper> {
+//OrmLiteBaseActivity<BeerDatabaseHelper>
+public final class BeerDetailsActivity extends SherlockFragmentActivity {
+
     @SuppressWarnings("UnusedDeclaration")
     private static final String TAG = BeerDetailsActivity.class.getName();
 
@@ -24,80 +29,71 @@ public final class BeerDetailsActivity extends OrmLiteBaseActivity<BeerDatabaseH
 
     private Beer fBeer;
     private final BeerSharer fBeerSharer;
-    private final BeerSearcher fBeerSearcher;
-    private BeerDetailsView fBeerDetailsView = null;
+    private final ExceptionReporter fExceptionReporter;
+
+    private BeerDatabaseHelper fDBHelper;
+    private ShareActionProvider fShareActionProvider;
 
     public BeerDetailsActivity() {
         fBeerSharer = new BeerSharer(this);
-        fBeerSearcher = new BeerSearcher(this);
+        fExceptionReporter = new ExceptionReporter(this);
+    }
+
+    private BeerDatabaseHelper getHelper() {
+        if (fDBHelper == null) {
+            fDBHelper = OpenHelperManager.getHelper(this, BeerDatabaseHelper.class);
+        }
+        return fDBHelper;
+    }
+
+    Beer getBeer() {
+        return fBeer;
     }
 
     public void onCreate(Bundle savedInstanceState) {
+
+        requestWindowFeature(Window.FEATURE_ACTION_BAR);
+
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.beer_details_activity);
 
-        // open DB and make queries on a bg thread
-        new ShowBeerTask().execute(getIntent().getExtras().getLong(EXTRA_BEER_ID));
-    }
+        try {
+            long id = getIntent().getExtras().getLong(EXTRA_BEER_ID);
+            Log.i(TAG, "In BeerDetailsActivity.onCreate with ID " + id);
+            fBeer = getHelper().getBeerDao().queryForId(id);
+            Log.i(TAG, "In BeerDetailsActivity.onCreate with Beer " + fBeer);
+        } catch (SQLException e) {
+            fExceptionReporter.report(TAG, "", e);
+        }
 
-    private void displayBeer() {
-        if (fBeerDetailsView == null)
-            fBeerDetailsView = new BeerDetailsView();
-
-        setTitle(fBeer.getName() + " - " + fBeer.getBrewery().getName());
-
-        fBeerDetailsView.BeerNameAndAbv.setText(String.format("%s (%.1f%%)", fBeer.getName(), fBeer.getAbv()));
-        fBeerDetailsView.BeerDescription.setText(fBeer.getDescription());
-        fBeerDetailsView.BeerStyle.setText(fBeer.getStyle());
-
-        fBeerDetailsView.Status.setText(fBeer.getStatus());
-
-        fBeerDetailsView.BreweryName.setText(fBeer.getBrewery().getName());
-        fBeerDetailsView.BreweryDescription.setText(fBeer.getBrewery().getDescription());
-
-        fBeerDetailsView.BeerRating.setRating(fBeer.getRating());
-        fBeerDetailsView.BeerRating.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
-            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                if (fromUser)
-                    rateBeer(new StarRating(rating));
-            }
-        });
+        final ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle(fBeer.getName());
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = new MenuInflater(getApplicationContext());
-        inflater.inflate(R.menu.details_menu, menu);
+        MenuInflater inflater = getSupportMenuInflater();
+        inflater.inflate(R.menu.details_options_menu, menu);
+
+        fShareActionProvider = (ShareActionProvider) (menu.findItem(R.id.shareBeer).getActionProvider());
+        fShareActionProvider.setShareIntent(fBeerSharer.makeShareIntent(fBeer));
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.share_beer:
-                fBeerSharer.shareBeer(fBeer);
-                return true;
-            case R.id.search_beer:
-                fBeerSearcher.searchBeer(fBeer);
-                return true;
-            case R.id.clear_rating:
-                rateBeer(StarRating.NO_STARS);
+            case android.R.id.home:
+                setResult(RESULT_OK);
+                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void rateBeer(StarRating rating) {
-        try {
-            fBeer.setNumberOfStars(rating);
-            getHelper().getBeerDao().update(fBeer);
-            displayBeer();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @SuppressWarnings({"UnusedDeclaration"}) // Called from beer_details_view.xml
+    @SuppressWarnings({"UnusedDeclaration"}) // Called from beer_details_activity.xml.xml
     public void shareBeer(View button) {
         fBeerSharer.shareBeer(fBeer);
     }
@@ -105,44 +101,5 @@ public final class BeerDetailsActivity extends OrmLiteBaseActivity<BeerDatabaseH
     @Override
     protected void onDestroy() {
         super.onDestroy();
-    }
-
-    private class ShowBeerTask extends AsyncTask<Long, Void, Beer> {
-
-        @Override
-        protected void onPostExecute(Beer beer) {
-            setContentView(R.layout.beer_details_view);
-            fBeer = beer;
-            displayBeer();
-        }
-
-        @Override
-        protected Beer doInBackground(Long... ids) {
-            try {
-                return getHelper().getBeerDao().queryForId(ids[0]);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    final class BeerDetailsView {
-        final TextView BeerNameAndAbv;
-        final TextView BeerStyle;
-        final TextView BeerDescription;
-        final RatingBar BeerRating;
-        final TextView BreweryName;
-        final TextView BreweryDescription;
-        final TextView Status;
-
-        public BeerDetailsView() {
-            BeerNameAndAbv = (TextView) findViewById(R.id.details_view_beer_name_and_abv);
-            BeerStyle = (TextView) findViewById(R.id.details_view_beer_style);
-            BeerDescription = (TextView) findViewById(R.id.details_view_beer_description);
-            BreweryName = (TextView) findViewById(R.id.details_view_brewery_name);
-            BreweryDescription = (TextView) findViewById(R.id.details_view_brewery_description);
-            BeerRating = (RatingBar) findViewById(R.id.details_view_beer_rating);
-            Status = (TextView) findViewById(R.id.details_view_beer_status);
-        }
     }
 }

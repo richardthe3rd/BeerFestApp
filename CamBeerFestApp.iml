@@ -4,6 +4,9 @@
     <facet type="android" name="Android">
       <configuration>
         <option name="PROGUARD_CFG_PATH" value="/proguard.cfg" />
+        <option name="UPDATE_PROPERTY_FILES" value="true" />
+        <includeSystemProguardFile>false</includeSystemProguardFile>
+        <includeAssetsFromLibraries>true</includeAssetsFromLibraries>
         <resOverlayFolders />
       </configuration>
     </facet>
@@ -14,10 +17,11 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gen" isTestSource="false" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Android 4.1.2 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" scope="PROVIDED" name="Android 2.2 Platform" level="application" />
     <orderEntry type="library" name="ormlite-4.40" level="project" />
+    <orderEntry type="module" module-name="ActionBarSherlock 4.3.1" exported="" />
+    <orderEntry type="library" exported="" name="android-support-v13" level="project" />
   </component>
 </module>
 

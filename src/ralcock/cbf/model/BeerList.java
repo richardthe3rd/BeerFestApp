@@ -1,6 +1,5 @@
 package ralcock.cbf.model;
 
-import com.j256.ormlite.stmt.QueryBuilder;
 import ralcock.cbf.model.dao.BeerDao;
 import ralcock.cbf.model.dao.BreweryDao;
 
@@ -11,8 +10,39 @@ import java.util.List;
 import java.util.Set;
 
 public class BeerList {
+
+    private static enum Type {
+        ALL,
+        BOOKMARKS
+    }
+
+    public static class Config {
+        public Config() {
+
+        }
+
+        public Config(final SortOrder sortOrder,
+                      final CharSequence searchText,
+                      final Set<String> stylesToHide,
+                      final StatusToShow statusToShow) {
+            SortOrder = sortOrder;
+            SearchText = searchText;
+            StylesToHide = stylesToHide;
+            StatusToShow = statusToShow;
+        }
+
+        public SortOrder SortOrder;
+        public CharSequence SearchText;
+        public Set<String> StylesToHide;
+        public StatusToShow StatusToShow;
+    }
+
+    ;
+
     private final BeerDao fBeerDao;
     private final BreweryDao fBreweryDao;
+
+    private final Type fType;
 
     private CharSequence fFilterText;
     private SortOrder fSortOrder;
@@ -29,16 +59,15 @@ public class BeerList {
 
     public BeerList(final BeerDao beerDao,
                     final BreweryDao breweryDao,
-                    final SortOrder sortOrder,
-                    final CharSequence filterText,
-                    final Set<String> filterStyles,
-                    final boolean hideUnavailableBeers) throws SQLException {
+                    final Type type,
+                    final Config config) throws SQLException {
         fBeerDao = beerDao;
         fBreweryDao = breweryDao;
-        fSortOrder = sortOrder;
-        fFilterText = filterText;
-        fFilterStyles = filterStyles;
-        fStatusToHide = statusToHide(hideUnavailableBeers);
+        fType = type;
+        fSortOrder = config.SortOrder;
+        fFilterText = config.SearchText;
+        fFilterStyles = config.StylesToHide;
+        fStatusToHide = statusToHide(config.StatusToShow);
         updateBeerList();
     }
 
@@ -57,13 +86,13 @@ public class BeerList {
         updateBeerList();
     }
 
-    public void hideUnavailableBeers(final boolean hideUnavailable) throws SQLException {
-        fStatusToHide = statusToHide(hideUnavailable);
+    public void setStatusToShow(final StatusToShow statusToShow) throws SQLException {
+        fStatusToHide = statusToHide(statusToShow);
         updateBeerList();
     }
 
-    private Set<String> statusToHide(final boolean hideUnavailable) {
-        if (hideUnavailable) {
+    private Set<String> statusToHide(final StatusToShow statusToShow) {
+        if (statusToShow == StatusToShow.AVAILABLE_ONLY) {
             return UNAVAILABLE_STATUS_SET;
         } else {
             // Hide nothing
@@ -87,9 +116,27 @@ public class BeerList {
                                  final CharSequence filterText,
                                  final Set<String> stylesToHide,
                                  final Set<String> statusToHide) throws SQLException {
-        QueryBuilder<Beer, Long> qb = fBeerDao.buildSortedFilteredBeerQuery(fBreweryDao,
-                sortOrder, filterText, stylesToHide, statusToHide);
-        return qb.query();
+        if (fType == Type.ALL)
+            return fBeerDao.allBeersList(fBreweryDao,
+                    sortOrder, filterText, stylesToHide, statusToHide);
+        else {
+            return fBeerDao.bookmarkedBeersList(fBreweryDao,
+                    sortOrder, filterText, stylesToHide, statusToHide);
+        }
+    }
+
+    public static BeerList allBeers(final BeerDao beerDao,
+                                    final BreweryDao breweryDao,
+                                    final Config config) throws SQLException {
+        return new BeerList(beerDao, breweryDao,
+                Type.ALL, config);
+    }
+
+    public static BeerList bookmarkedBeers(final BeerDao beerDao,
+                                           final BreweryDao breweryDao,
+                                           final Config config) throws SQLException {
+        return new BeerList(beerDao, breweryDao,
+                Type.BOOKMARKS, config);
     }
 
 }

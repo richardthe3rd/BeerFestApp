@@ -6,7 +6,7 @@ import ralcock.cbf.util.ExceptionReporter;
 
 import java.sql.SQLException;
 
-class BeerFilter extends Filter {
+final class BeerFilter extends Filter {
     private static final String TAG = BeerFilter.class.getName();
 
     private final BeerListAdapter fBeerListAdapter;

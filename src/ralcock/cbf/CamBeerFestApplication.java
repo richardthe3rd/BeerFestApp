@@ -1,67 +1,59 @@
 package ralcock.cbf;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.Toast;
-import com.j256.ormlite.android.apptools.OrmLiteBaseListActivity;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.Window;
+import com.actionbarsherlock.widget.SearchView;
+import com.j256.ormlite.android.apptools.OpenHelperManager;
+import ralcock.cbf.actions.BeerExporter;
+import ralcock.cbf.actions.BeerSearcher;
+import ralcock.cbf.actions.BeerSharer;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerDatabaseHelper;
-import ralcock.cbf.model.BeerList;
-import ralcock.cbf.model.JsonBeerList;
 import ralcock.cbf.model.SortOrder;
+import ralcock.cbf.model.StatusToShow;
 import ralcock.cbf.model.dao.BeerDao;
-import ralcock.cbf.model.dao.BreweryDao;
+import ralcock.cbf.service.UpdateService;
+import ralcock.cbf.service.UpdateTask;
 import ralcock.cbf.util.ExceptionReporter;
-import ralcock.cbf.view.BeerDetailsActivity;
-import ralcock.cbf.view.BeerListAdapter;
-import ralcock.cbf.view.BeerSearcher;
-import ralcock.cbf.view.BeerSharer;
-import ralcock.cbf.view.BeerStyleListAdapter;
+import ralcock.cbf.view.AboutDialogFragment;
+import ralcock.cbf.view.AllBeersListFragment;
+import ralcock.cbf.view.BookmarkedBeerListFragment;
+import ralcock.cbf.view.FilterByStyleDialogFragment;
+import ralcock.cbf.view.ListChangedListener;
+import ralcock.cbf.view.SortByDialogFragment;
+import ralcock.cbf.view.TabListener;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 
-public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabaseHelper> {
+public class CamBeerFestApplication extends SherlockFragmentActivity {
     private static final String TAG = CamBeerFestApplication.class.getName();
 
     private static final int SHOW_BEER_DETAILS_REQUEST_CODE = 1;
-
-    private static final int SORT_DIALOG_ID = 0;
-    private static final int FILTER_BY_STYLE_DIALOG_ID = 1;
-    private static final int FILTER_BY_AVAILABLE_DIALOG_ID = 2;
-
-    private BeerListAdapter fAdapter;
-    private EditText fFilterTextBox = null;
-
-    private BeerList fBeerList;
 
     private final BeerSharer fBeerSharer;
     private final BeerSearcher fBeerSearcher;
@@ -69,17 +61,12 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
 
     private final AppPreferences fAppPreferences;
 
-    private final TextWatcher fFilterTextWatcher = new TextWatcher() {
-        public void afterTextChanged(Editable s) {
-        }
+    private BeerDatabaseHelper fDBHelper;
 
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        }
+    private final List<ListChangedListener> fListChangedListeners = new CopyOnWriteArrayList<ListChangedListener>();
 
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            filterBy(s.toString());
-        }
-    };
+    private LocalBroadcastManager fLocalBroadcastManager;
+    private BroadcastReceiver fBroadcastReceiver;
 
     public CamBeerFestApplication() {
         super();
@@ -89,15 +76,6 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         fExceptionReporter = new ExceptionReporter(this);
     }
 
-    @Override
-    protected void onDestroy() {
-        Log.d(TAG, "In onDestroy");
-        if (fFilterTextBox != null)
-            fFilterTextBox.removeTextChangedListener(fFilterTextWatcher);
-
-        super.onDestroy();
-    }
-
     /**
      * Called when the activity is first created.
      */
@@ -105,149 +83,238 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     public void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "In onCreate");
 
+        requestWindowFeature(Window.FEATURE_ACTION_BAR);
+
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.beer_list_view);
-        setTitle(getResources().getText(R.string.list_title));
+        setContentView(R.layout.beer_listview_activity);
 
-        try {
-            fBeerList = new BeerList(getBeerDao(),
-                    getBreweryDao(),
-                    fAppPreferences.getSortOrder(),
-                    fAppPreferences.getFilterText(),
-                    fAppPreferences.getStylesToHide(),
-                    fAppPreferences.getHideUnavailableBeers());
-            fAdapter = new BeerListAdapter(CamBeerFestApplication.this, fBeerList);
-            setListAdapter(fAdapter);
-            configureListView();
-            if (beerUpdateNeeded()) {
-                loadBeersInBackground();
+        final ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
+        actionBar.setTitle(fAppPreferences.getFilterText());
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+        ActionBar.Tab allBeersTab = actionBar.newTab()
+                .setText("All Beers")
+                .setTabListener(new TabListener<AllBeersListFragment>(this, "all", AllBeersListFragment.class));
+
+        ActionBar.Tab availableBeersTab = actionBar.newTab()
+                .setText("Bookmarked Beers")
+                .setTabListener(new TabListener<BookmarkedBeerListFragment>(this, "bookmarks", BookmarkedBeerListFragment.class));
+
+        actionBar.addTab(allBeersTab);
+        actionBar.addTab(availableBeersTab);
+
+        if (savedInstanceState != null) {
+            int selectedTab = savedInstanceState.getInt("selected.navigation.index");
+            actionBar.setSelectedNavigationItem(selectedTab);
+        }
+
+        fLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
+        fBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(final Context context, final Intent intent) {
+                if (intent.getAction().equals(UpdateService.UPDATE_SERVICE_RESULT)) {
+                    Log.i(TAG, "Received " + UpdateService.UPDATE_SERVICE_RESULT);
+                    UpdateTask.Result result = (UpdateTask.Result) intent.getSerializableExtra(UpdateService.RESULT_EXTRA);
+                    doReceivedUpdateServiceResult(result);
+                }
             }
-            configureFilterTextBox();
-        } catch (SQLException e) {
-            fExceptionReporter.report(TAG, e.getMessage(), e);
-            return;
+        };
+    }
+
+    private void doReceivedUpdateServiceResult(final UpdateTask.Result result) {
+        if (result.success()) {
+            // Updated
+            fAppPreferences.setLastUpdateMD5(result.getDigest());
+            fAppPreferences.setNextUpdateTime(calcNextUpdateTime());
+            notifyBeersChanged();
+        } else {
+            // Failed - notify of failure.
+            Toast.makeText(this,
+                    result.getThrowable().getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
-    private void configureFilterTextBox() {
-        fFilterTextBox = (EditText) findViewById(R.id.search);
-        fFilterTextBox.setText(fAppPreferences.getFilterText());
-        fFilterTextBox.addTextChangedListener(fFilterTextWatcher);
-
-        Button clearFilterButton = (Button) findViewById(R.id.clear_filter_text);
-        clearFilterButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                fFilterTextBox.setText("");
-                filterBy("");
-            }
-        });
+    private Date calcNextUpdateTime() {
+        Date now = new Date();
+        // Can't use TimeUnit.Day on older Androids.
+        long one_day = 24 * 60 * 60 * TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS);
+        return new Date(now.getTime() + one_day);
     }
 
-    private long getBeerCount() {
-        try {
-            return getBeerDao().getNumberOfBeers();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+    @Override
+    protected void onStart() {
+        Log.d(TAG, "In onStart");
+        super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        Log.d(TAG, "In onResume");
+        super.onResume();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(UpdateService.UPDATE_SERVICE_PROGRESS);
+        filter.addAction(UpdateService.UPDATE_SERVICE_RESULT);
+        fLocalBroadcastManager.registerReceiver(fBroadcastReceiver, filter);
+
+        // Start the update service
+        startService(new Intent(this, UpdateService.class));
+    }
+
+    @Override
+    protected void onPause() {
+        Log.d(TAG, "In onPause");
+        fLocalBroadcastManager.unregisterReceiver(fBroadcastReceiver);
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG, "In onDestroy");
+        super.onDestroy();
+        if (fDBHelper != null) {
+            OpenHelperManager.releaseHelper();
         }
     }
 
-    private boolean beerUpdateNeeded() {
-        Date nextUpdate = fAppPreferences.getNextUpdateTime();
-        Log.i(TAG, "Beer update due after " + nextUpdate);
-        Date currentTime = new Date();
-        return getBeerCount() == 0 || currentTime.after(nextUpdate);
+    @Override
+    public boolean onKeyUp(final int keyCode, final KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_SEARCH) {
+            // TODO: Expand SearchView
+        }
+        return super.onKeyUp(keyCode, event);
     }
 
-    private BreweryDao getBreweryDao() {
-        return getHelper().getBreweryDao();
+    private BeerDatabaseHelper getHelper() {
+        if (fDBHelper == null) {
+            fDBHelper = OpenHelperManager.getHelper(this, BeerDatabaseHelper.class);
+        }
+        return fDBHelper;
     }
 
     private BeerDao getBeerDao() {
         return getHelper().getBeerDao();
     }
 
-    private URL beerListUrl() {
-        String beerJsonURL = getResources().getText(R.string.beer_list_url).toString();
+    @Override
+    protected void onSaveInstanceState(final Bundle outState) {
+        int selectedTab = getSupportActionBar().getSelectedNavigationIndex();
+        outState.putInt("selected.navigation.index", selectedTab);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        MenuInflater inflater = getSupportMenuInflater();
+        inflater.inflate(R.menu.list_options_menu, menu);
+
+        final SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            public void onClick(final View view) {
+                searchView.setQueryHint(getResources().getString(R.string.filter_hint));
+            }
+        });
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            public boolean onQueryTextSubmit(final String query) {
+                filterBy(query.toString());
+                return true;
+            }
+
+            public boolean onQueryTextChange(final String newText) {
+                filterBy(newText.toString());
+                return true;
+            }
+        });
+        return true;
+    }
+
+    void filterBy(String filterText) {
+        fireFilterTextChanged(filterText);
+        fAppPreferences.setFilterText(filterText);
+        getSupportActionBar().setTitle(filterText);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.sort:
+                showSortByDialog();
+                return true;
+            case R.id.showOnlyStyle:
+                showFilterByStyleDialog();
+                return true;
+            case R.id.hideUnavailable:
+                return true;
+            case R.id.visitFestivalWebsite:
+                visitFestivalWebsite();
+                return true;
+            case R.id.aboutApplication:
+                showAboutDialog();
+                return true;
+            case R.id.export:
+                //doExport();
+                return true;
+            case R.id.refreshDatabase:
+                // Start the update service
+                startService(new Intent(this, UpdateService.class));
+                return true;
+            case R.id.reloadDatabase:
+                // Start the update service with the CLEAN_UPDATE flag
+                final Intent intent = new Intent(this, UpdateService.class);
+                intent.putExtra(UpdateService.CLEAN_UPDATE, true);
+                startService(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void showAboutDialog() {
+        String versionName = "UNKNOWN";
+        String appName = getString(R.string.app_name);
         try {
-            return new URL(beerJsonURL);
-        } catch (MalformedURLException e) {
-            // My fault
-            throw new RuntimeException(e);
+            final PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            versionName = packageInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            fExceptionReporter.report(TAG, e.getMessage(), e);
         }
+        DialogFragment newFragment = AboutDialogFragment.newInstance(appName, versionName);
+        newFragment.show(getSupportFragmentManager(), "about");
     }
 
-    private boolean haveNetworkConnection() {
-        boolean haveConnectedWifi = false;
-        boolean haveConnectedMobile = false;
-
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo[] netInfo = cm.getAllNetworkInfo();
-        for (NetworkInfo ni : netInfo) {
-            if (ni.getTypeName().equalsIgnoreCase("WIFI")) {
-                if (ni.isConnected()) {
-                    haveConnectedWifi = true;
-                    break;
-                }
-            }
-            if (ni.getTypeName().equalsIgnoreCase("MOBILE")) {
-                if (ni.isConnected()) {
-                    haveConnectedMobile = true;
-                    break;
-                }
-            }
-        }
-        return haveConnectedWifi || haveConnectedMobile;
+    // Copied from http://developer.android.com/reference/android/app/DialogFragment.html
+    private void showSortByDialog() {
+        DialogFragment newFragment = SortByDialogFragment.newInstance(fAppPreferences.getSortOrder());
+        newFragment.show(getSupportFragmentManager(), "sortBy");
     }
 
-    private void loadBeersInBackground() {
-
-        if (!haveNetworkConnection()) {
-            Toast.makeText(this,
-                    "Not updating beers as there is no internet connection.", Toast.LENGTH_LONG).show();
-            return;
+    private void showFilterByStyleDialog() {
+        try {
+            final Set<String> allStyles = getBeerDao().getAvailableStyles();
+            final Set<String> stylesToHide = fAppPreferences.getStylesToHide();
+            final DialogFragment newFragment = FilterByStyleDialogFragment.newInstance(stylesToHide, allStyles);
+            newFragment.show(getSupportFragmentManager(), "filterByStyle");
+        } catch (SQLException e) {
+            fExceptionReporter.report(TAG, e.getMessage(), e);
         }
-
-        final LoadBeersTask loadBeersTask = new MyLoadBeersTask(fAppPreferences);
-
-        String md5 = fAppPreferences.getLastUpdateMD5();
-        if (getBeerCount() == 0) {
-            md5 = "EMPTY_DATABASE";
-        }
-        final LoadBeersTask.Source source = new LoadBeersTask.Source(beerListUrl(), md5);
-
-        //noinspection unchecked
-        loadBeersTask.execute(source);
-
-    }
-
-    private void configureListView() {
-        ListView lv = getListView();
-
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Intent intent = new Intent(CamBeerFestApplication.this, BeerDetailsActivity.class);
-                intent.putExtra(BeerDetailsActivity.EXTRA_BEER_ID, id);
-                startActivityForResult(intent, SHOW_BEER_DETAILS_REQUEST_CODE);
-            }
-        });
-
-        lv.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
-            public void onCreateContextMenu(ContextMenu contextMenu, final View view, final ContextMenu.ContextMenuInfo contextMenuInfo) {
-                MenuInflater inflater = new MenuInflater(getApplicationContext());
-                inflater.inflate(R.menu.list_context_menu, contextMenu);
-            }
-        });
     }
 
     @Override
     public boolean onMenuItemSelected(final int featureId, final MenuItem item) {
         try {
             switch (item.getItemId()) {
-                case R.id.search_beer:
+                case R.id.searchBeer:
                     fBeerSearcher.searchBeer(getBeerFromMenuItem(item));
                     return true;
-                case R.id.share_beer:
+                case R.id.shareBeer:
                     fBeerSharer.shareBeer(getBeerFromMenuItem(item));
                     return true;
             }
@@ -275,48 +342,7 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
     }
 
     public void notifyBeersChanged() {
-        try {
-            fBeerList.updateBeerList();
-            fAdapter.notifyDataSetChanged();
-        } catch (SQLException e) {
-            fExceptionReporter.report(TAG, e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        android.view.MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.list_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.sort:
-                showDialog(SORT_DIALOG_ID);
-                return true;
-            case R.id.show_only_style:
-                showDialog(FILTER_BY_STYLE_DIALOG_ID);
-                return true;
-            case R.id.show_only_available:
-                showDialog(FILTER_BY_AVAILABLE_DIALOG_ID);
-                return true;
-            case R.id.export:
-                doExport();
-                return true;
-            case R.id.refresh_database:
-                loadBeersInBackground();
-                return true;
-            case R.id.reload_database:
-                doReloadDatabase();
-                return true;
-            case R.id.visit_festival_website:
-                goToFestivalWebsite();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+        fireBeerListChanged();
     }
 
     private void doExport() {
@@ -331,227 +357,71 @@ public class CamBeerFestApplication extends OrmLiteBaseListActivity<BeerDatabase
         }
     }
 
-    private void goToFestivalWebsite() {
-        Uri festivalUri = Uri.parse(getResources().getString(R.string.festival_website_url));
+    private void visitFestivalWebsite() {
+        Uri festivalUri = Uri.parse(getString(R.string.festival_website_url));
         Intent launchBrowser = new Intent(Intent.ACTION_VIEW, festivalUri);
         startActivity(launchBrowser);
     }
 
-    private void doReloadDatabase() {
-        // delete all beers
-        getHelper().deleteAll();
-        fAppPreferences.setLastUpdateMD5("");
-        loadBeersInBackground();
+    // Called when sort dialog is closed.
+    public void doDismissSortDialog(final SortOrder sortOrder) {
+        sortBy(sortOrder);
     }
 
-    @Override
-    protected Dialog onCreateDialog(final int id) {
-        Dialog dialog;
-        switch (id) {
-            case SORT_DIALOG_ID:
-                dialog = createSortDialog();
-                break;
-            case FILTER_BY_STYLE_DIALOG_ID:
-                dialog = createStylesToHideDialog();
-                break;
-            case FILTER_BY_AVAILABLE_DIALOG_ID:
-                dialog = createAvailabilityDialog();
-                break;
-            default:
-                dialog = null;
-        }
-        return dialog;
-    }
-
-    private Dialog createAvailabilityDialog() {
-        boolean hideUnavailable = fAppPreferences.getHideUnavailableBeers();
-        boolean[] selectedChoice = new boolean[]{hideUnavailable};
-
-        String[] choices = new String[]{
-                getResources().getString(R.string.filter_available_hide)
-        };
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.filter_available_dialog_title);
-        builder.setMultiChoiceItems(choices, selectedChoice, new DialogInterface.OnMultiChoiceClickListener() {
-            public void onClick(final DialogInterface dialogInterface, final int i, final boolean b) {
-                hideUnavailableBeers(b);
-                dialogInterface.dismiss();
-            }
-        });
-
-        return builder.create();
-    }
-
-    private Dialog createSortDialog() {
-        final List<SortOrder> items = Arrays.asList(SortOrder.values());
-
-        ListAdapter listAdapter = new ArrayAdapter<SortOrder>(this, R.layout.sort_by_dialog_list_item, items);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.sort_dialog_title);
-        int checkedItem = items.indexOf(fAppPreferences.getSortOrder());
-        builder.setSingleChoiceItems(listAdapter, checkedItem, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialogInterface, int i) {
-                sortBy(items.get(i));
-                dialogInterface.dismiss();
-            }
-        });
-        return builder.create();
-    }
-
-    private Dialog createStylesToHideDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.filter_style_dialog_title);
-
-        try {
-            final Set<String> stylesToHide = fAppPreferences.getStylesToHide();
-            final Set<String> allStyles = getBeerDao().getAvailableStyles();
-
-            final BeerStyleListAdapter listAdapter = new BeerStyleListAdapter(this, allStyles, stylesToHide);
-            builder.setAdapter(listAdapter, new DialogInterface.OnClickListener() {
-                public void onClick(final DialogInterface dialogInterface, final int i) {
-                }
-            });
-
-            builder.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
-                public void onClick(final DialogInterface dialogInterface, final int i) {
-                    filterByStyle(listAdapter.getStylesToHide());
-                }
-            });
-
-        } catch (SQLException e) {
-            fExceptionReporter.report(TAG, e.getMessage(), e);
-            return null;
-        }
-
-        builder.setNegativeButton(R.string.CANCEL, new DialogInterface.OnClickListener() {
-            public void onClick(final DialogInterface dialogInterface, final int i) {
-            }
-        });
-
-        return builder.create();
-    }
-
-    private void hideUnavailableBeers(boolean hide) {
-        try {
-            fBeerList.hideUnavailableBeers(hide);
-            fAppPreferences.setHideUnavailableBeers(hide);
-            fAdapter.notifyDataSetChanged();
-        } catch (SQLException e) {
-            fExceptionReporter.report(TAG, e.getMessage(), e);
-        }
-    }
-
-    private void filterByStyle(Set<String> stylesToHide) {
-        try {
-            fBeerList.stylesToHide(stylesToHide);
-            fAppPreferences.setStylesToHide(stylesToHide);
-            fAdapter.notifyDataSetChanged();
-        } catch (SQLException e) {
-            fExceptionReporter.report(TAG, e.getMessage(), e);
-        }
-    }
-
-    private void filterBy(String filterText) {
-        try {
-            fBeerList.filterBy(filterText);
-            fAppPreferences.setFilterText(filterText);
-            fAdapter.notifyDataSetChanged();
-        } catch (SQLException e) {
-            fExceptionReporter.report(TAG, e.getMessage(), e);
-        }
+    public void doDismissFilterByStyleDialog(final Set<String> stylesToHide) {
+        filterByBeerStyle(stylesToHide);
     }
 
     private void sortBy(SortOrder sortOrder) {
-        try {
-            fBeerList.sortBy(sortOrder);
-            fAppPreferences.setSortOrder(sortOrder);
-            fAdapter.notifyDataSetChanged();
-        } catch (SQLException e) {
-            fExceptionReporter.report(TAG, e.getMessage(), e);
+        fireSortByChanged(sortOrder);
+        fAppPreferences.setSortOrder(sortOrder);
+    }
+
+    private void filterByBeerStyle(Set<String> stylesToHide) {
+        fireStylesToHideChanged(stylesToHide);
+        fAppPreferences.setStylesToHide(stylesToHide);
+    }
+
+    private void statusToShow(StatusToShow statusToShow) {
+        fireStatusToShowChanged(statusToShow);
+        fAppPreferences.setHideUnavailableBeers(StatusToShow.AVAILABLE_ONLY == statusToShow);
+    }
+
+    public void addListChangedListener(final ListChangedListener listChangedListener) {
+        fListChangedListeners.add(listChangedListener);
+    }
+
+    public void removeListChangedListener(final ListChangedListener listChangedListener) {
+        fListChangedListeners.remove(listChangedListener);
+    }
+
+    private void fireFilterTextChanged(final String filterText) {
+        for (ListChangedListener l : fListChangedListeners) {
+            l.filterTextChanged(filterText);
         }
     }
 
-    private class MyLoadBeersTask extends LoadBeersTask {
-        private final ProgressDialog fLoadProgressDialog;
-
-        public MyLoadBeersTask(AppPreferences appPreferences) {
-            super(appPreferences);
-            fLoadProgressDialog = new ProgressDialog(CamBeerFestApplication.this);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            fLoadProgressDialog.setMessage(CamBeerFestApplication.this.getText(R.string.loading_message));
-            fLoadProgressDialog.setIndeterminate(true);
-            fLoadProgressDialog.setCancelable(false);
-            fLoadProgressDialog.show();
-        }
-
-        @Override
-        protected void onPostExecute(final Result result) {
-            JsonBeerList beerList = result.BeerList;
-            if (beerList == null) {
-                Throwable t = result.Throwable;
-                if (t != null) {
-                    Log.e(TAG, "Exception while downloading beer list. " + t.getMessage(), t);
-                    Toast.makeText(getApplicationContext(),
-                            "Failed to download beers. " + t.getMessage(),
-                            Toast.LENGTH_LONG).show();
-                }
-                fLoadProgressDialog.dismiss();
-            } else {
-                fLoadProgressDialog.dismiss();
-
-                final UpdateBeersTask updateBeersTask = new MyUpdateBeersTask(beerList.size());
-                updateBeersTask.execute(beerList);
-            }
-        }
-
-        @Override
-        protected void onProgressUpdate(final String... msg) {
-            fLoadProgressDialog.setMessage(msg[0]);
+    private void fireSortByChanged(final SortOrder sortOrder) {
+        for (ListChangedListener l : fListChangedListeners) {
+            l.sortOrderChanged(sortOrder);
         }
     }
 
-    private class MyUpdateBeersTask extends UpdateBeersTask {
-        private final ProgressDialog fUpdateProgressDialog;
-        private final int fNumberOfBeers;
-
-        private MyUpdateBeersTask(final int numberOfBeers) {
-            super(getApplicationContext(), getConnectionSource(), getBreweryDao(), getBeerDao());
-            fUpdateProgressDialog = new ProgressDialog(CamBeerFestApplication.this);
-            fNumberOfBeers = numberOfBeers;
+    private void fireStylesToHideChanged(final Set<String> stylesToHide) {
+        for (ListChangedListener l : fListChangedListeners) {
+            l.stylesToHideChanged(stylesToHide);
         }
+    }
 
-        @Override
-        protected void onPreExecute() {
-            fUpdateProgressDialog.setMessage("Updating database");
-            fUpdateProgressDialog.setProgress(0);
-            fUpdateProgressDialog.setMax(fNumberOfBeers);
-            fUpdateProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            fUpdateProgressDialog.setIndeterminate(false);
-            fUpdateProgressDialog.setCancelable(false);
-            fUpdateProgressDialog.show();
+    private void fireStatusToShowChanged(final StatusToShow statusToShow) {
+        for (ListChangedListener l : fListChangedListeners) {
+            l.statusToShowChanged(statusToShow);
         }
+    }
 
-        @Override
-        protected void onPostExecute(final Long aLong) {
-            CamBeerFestApplication.this.notifyBeersChanged();
-            fUpdateProgressDialog.dismiss();
-        }
-
-        @Override
-        protected void onProgressUpdate(final Beer... values) {
-            String name = values[0].getName();
-            int maxLength = 12;
-            if (name.length() > maxLength) {
-                name = name.substring(0, maxLength - 3);
-                name = name + "...";
-            }
-            fUpdateProgressDialog.setMessage("Updated " + name);
-            fUpdateProgressDialog.incrementProgressBy(1);
+    private void fireBeerListChanged() {
+        for (ListChangedListener l : fListChangedListeners) {
+            l.beersChanged();
         }
     }
 }
