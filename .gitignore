@@ -9,3 +9,4 @@ gen/
 bin/
 coverage
 proguard-project.txt
+libs/
