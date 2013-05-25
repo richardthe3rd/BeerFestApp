@@ -1,0 +1,18 @@
+<component name="ArtifactManager">
+  <artifact type="apk" name="CamBeerFestApp (signed)">
+    <output-path>$PROJECT_DIR$/..</output-path>
+    <properties id="android-properties">
+      <options>
+        <option name="keyAlias" value="key" />
+        <option name="keyPassword" value="bWF0bGFi" />
+        <option name="keyStorePassword" value="bWF0bGFi" />
+        <option name="keyStoreUrl" value="file://$PROJECT_DIR$/../keystore" />
+        <option name="proGuardCfgFileUrl" value="file://$PROJECT_DIR$/proguard.cfg" />
+        <option name="signingMode" value="RELEASE_SIGNED" />
+      </options>
+    </properties>
+    <root id="archive" name="CamBeerFestApp.apk">
+      <element id="android-final-package" facet="CamBeerFestApp/android/Android" />
+    </root>
+  </artifact>
+</component>

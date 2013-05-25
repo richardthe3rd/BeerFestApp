@@ -1,7 +1,10 @@
 .idea/workspace.xml
 local.properties
-tests\local.properties
+tests/local.properties
+tests/coverage/
 CamBeerFestApp.apk
 keystore
 out/
 gen/
+bin/
+libs/
