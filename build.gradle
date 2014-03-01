@@ -1,0 +1,50 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.8+'
+    }
+}
+
+apply plugin: 'android'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'com.j256.ormlite',      name: 'ormlite-core',      version: '4+'
+    compile group: 'com.j256.ormlite',      name: 'ormlite-android',   version: '4+'
+    compile group: 'com.android.support',   name: 'support-v13',       version: '18.0.+'
+    compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
+ }
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "19.0.2"
+    
+    defaultConfig {
+        minSdkVersion 7
+        targetSdkVersion 17
+    }
+    
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src']
+            resources.srcDirs = ['src']
+            aidl.srcDirs = ['src']
+            renderscript.srcDirs = ['src']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+        }
+
+        instrumentTest.setRoot('tests')
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.10'
+}

@@ -1,9 +1,7 @@
 package ralcock.cbf.model;
 
-import ralcock.cbf.model.dao.BeerDao;
-import ralcock.cbf.model.dao.BreweryDao;
+import ralcock.cbf.model.dao.Beers;
 
-import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -31,16 +29,25 @@ public class BeerList {
             StatusToShow = statusToShow;
         }
 
-        public SortOrder SortOrder;
-        public CharSequence SearchText;
-        public Set<String> StylesToHide;
-        public StatusToShow StatusToShow;
+        public SortOrder SortOrder = ralcock.cbf.model.SortOrder.BREWERY_NAME_DESC;
+        public CharSequence SearchText = "";
+        public Set<String> StylesToHide = Collections.emptySet();
+        public StatusToShow StatusToShow = ralcock.cbf.model.StatusToShow.ALL;
+
+        public Config withSortOrder(final SortOrder sortOrder) {
+            SortOrder = sortOrder;
+            return this;
+        }
+
+        public Config withSearchText(final String searchText) {
+            SearchText = searchText;
+            return this;
+        }
     }
 
     ;
 
-    private final BeerDao fBeerDao;
-    private final BreweryDao fBreweryDao;
+    private final Beers fBeers;
 
     private final Type fType;
 
@@ -57,12 +64,10 @@ public class BeerList {
         add("Sold Out");
     }};
 
-    public BeerList(final BeerDao beerDao,
-                    final BreweryDao breweryDao,
+    public BeerList(final Beers beers,
                     final Type type,
-                    final Config config) throws SQLException {
-        fBeerDao = beerDao;
-        fBreweryDao = breweryDao;
+                    final Config config) {
+        fBeers = beers;
         fType = type;
         fSortOrder = config.SortOrder;
         fFilterText = config.SearchText;
@@ -71,22 +76,22 @@ public class BeerList {
         updateBeerList();
     }
 
-    public void stylesToHide(final Set<String> stylesToShow) throws SQLException {
+    public void stylesToHide(final Set<String> stylesToShow) {
         fFilterStyles = stylesToShow;
         updateBeerList();
     }
 
-    public void filterBy(CharSequence filterText) throws SQLException {
+    public void filterBy(CharSequence filterText) {
         fFilterText = filterText;
         updateBeerList();
     }
 
-    public void sortBy(SortOrder sortOrder) throws SQLException {
+    public void sortBy(SortOrder sortOrder) {
         fSortOrder = sortOrder;
         updateBeerList();
     }
 
-    public void setStatusToShow(final StatusToShow statusToShow) throws SQLException {
+    public void setStatusToShow(final StatusToShow statusToShow) {
         fStatusToHide = statusToHide(statusToShow);
         updateBeerList();
     }
@@ -100,7 +105,7 @@ public class BeerList {
         }
     }
 
-    public void updateBeerList() throws SQLException {
+    public void updateBeerList() {
         fBeerList = buildList(fSortOrder, fFilterText, fFilterStyles, fStatusToHide);
     }
 
@@ -115,28 +120,22 @@ public class BeerList {
     private List<Beer> buildList(final SortOrder sortOrder,
                                  final CharSequence filterText,
                                  final Set<String> stylesToHide,
-                                 final Set<String> statusToHide) throws SQLException {
+                                 final Set<String> statusToHide) {
         if (fType == Type.ALL)
-            return fBeerDao.allBeersList(fBreweryDao,
-                    sortOrder, filterText, stylesToHide, statusToHide);
+            return fBeers.allBeersList(sortOrder, filterText, stylesToHide, statusToHide);
         else {
-            return fBeerDao.bookmarkedBeersList(fBreweryDao,
-                    sortOrder, filterText, stylesToHide, statusToHide);
+            return fBeers.bookmarkedBeersList(sortOrder, filterText, stylesToHide, statusToHide);
         }
     }
 
-    public static BeerList allBeers(final BeerDao beerDao,
-                                    final BreweryDao breweryDao,
-                                    final Config config) throws SQLException {
-        return new BeerList(beerDao, breweryDao,
-                Type.ALL, config);
+    public static BeerList allBeers(final Beers beers,
+                                    final Config config) {
+        return new BeerList(beers, Type.ALL, config);
     }
 
-    public static BeerList bookmarkedBeers(final BeerDao beerDao,
-                                           final BreweryDao breweryDao,
-                                           final Config config) throws SQLException {
-        return new BeerList(beerDao, breweryDao,
-                Type.BOOKMARKS, config);
+    public static BeerList bookmarkedBeers(final Beers beers,
+                                           final Config config) {
+        return new BeerList(beers, Type.BOOKMARKS, config);
     }
 
 }

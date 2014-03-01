@@ -20,6 +20,25 @@ public final class StarRating implements Serializable, Comparable<StarRating> {
         return fRating;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder stars = new StringBuilder();
+        for (int i = 0; i < fRating; i++) {
+            stars.append('*');
+        }
+        return stars.toString();
+    }
+
+    public String toFancyString() {
+        StringBuilder stars = new StringBuilder();
+        char star = 0x272F;
+        for (int i = 0; i < fRating; i++) {
+            stars.append(star);
+        }
+        return stars.toString();
+    }
+
+
     public int compareTo(final StarRating starRating) {
         if (fRating > starRating.fRating) return -1;
         if (fRating == starRating.fRating) return 0;

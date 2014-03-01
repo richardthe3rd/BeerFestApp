@@ -1,88 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_height="fill_parent"
-              android:layout_width="fill_parent"
-              android:layout_weight="1"
-              android:baselineAligned="true"
-              android:padding="5dip"
-              android:orientation="horizontal">
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:baselineAligned="true"
+        android:padding="5dip"
+        android:orientation="horizontal"
+        >
 
-    <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            >
+    <TextView
+            android:id="@+id/beerName"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:text="Comrade Bill Bartrams Egalitarian Anti Imperialist Soviet Stout"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:singleLine="false"
+            android:layout_marginRight="75dp"/>
 
-        <TextView
-                android:id="@+id/beerName"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:textStyle="bold"
-                android:textSize="18sp"
-                android:text="Comrade Bill Bartrams Egalitarian Anti Imperialist Soviet Stout"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
-                android:singleLine="false"
-                android:layout_marginRight="75dp"/>
+    <TextView
+            android:id="@+id/breweryName"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textSize="14sp"
+            android:text="Bartrams Brewery"
+            android:layout_alignParentLeft="false"
+            android:layout_below="@id/beerName"/>
 
-        <TextView
-                android:id="@+id/breweryName"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:textSize="14sp"
-                android:text="Bartrams Brewery"
-                android:layout_alignParentLeft="false"
-                android:layout_below="@id/beerName"/>
+    <RatingBar
+            android:id="@+id/beerRatingBar"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:gravity="left|center_vertical"
+            android:textSize="14sp"
+            android:layout_marginRight="10dp"
+            android:isIndicator="true"
+            android:numStars="5"
+            style="?android:attr/ratingBarStyleSmall"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/breweryName"/>
 
-        <RatingBar
-                android:id="@+id/beerRatingBar"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:gravity="left|center_vertical"
-                android:textSize="14sp"
-                android:layout_marginRight="10dp"
-                android:isIndicator="true"
-                android:numStars="5"
-                style="?android:attr/ratingBarStyleSmall"
-                android:layout_rowSpan="1"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@+id/breweryName"/>
+    <TextView
+            android:id="@+id/beerStyle"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textSize="14sp"
+            android:layout_gravity="top|right"
+            android:text="Stout"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"/>
 
-        <TextView
-                android:id="@+id/beerStyle"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:textSize="14sp"
-                android:layout_gravity="top|right"
-                android:text="Stout"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"/>
+    <TextView
+            android:id="@+id/beerStatus"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textSize="12sp"
+            android:textStyle="italic"
+            android:layout_gravity="center|right"
+            android:text="Ordered"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_below="@+id/beerStyle"/>
 
-        <TextView
-                android:id="@+id/beerStatus"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:textSize="12sp"
-                android:textStyle="italic"
-                android:layout_gravity="center|right"
-                android:text="Ordered"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_below="@+id/beerStyle"/>
-
-        <TextView
-                android:id="@+id/bookmarkStatus"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:textSize="8sp"
-                android:textStyle="italic"
-                android:layout_gravity="bottom|right"
-                android:text="abcdef"
-                android:textAllCaps="true"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                />
-    </RelativeLayout>
-</LinearLayout>
+    <TextView
+            android:id="@+id/bookmarkStatus"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textSize="8sp"
+            android:textStyle="italic"
+            android:layout_gravity="bottom|right"
+            android:text="abcdef"
+            android:textAllCaps="true"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            />
+</RelativeLayout>
 

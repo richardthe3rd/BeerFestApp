@@ -52,7 +52,7 @@
 
     <item
             android:id="@+id/reloadDatabase"
-            android:visible="false"
+            android:visible="true"
             android:title="@string/reload_menu_label"
             />
 

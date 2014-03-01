@@ -2,11 +2,11 @@ package ralcock.cbf.model;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import ralcock.cbf.model.dao.BeerDaoImpl;
+import ralcock.cbf.model.dao.BeersImpl;
 
 import java.io.Serializable;
 
-@DatabaseTable(tableName = Beer.TABLE_NAME, daoClass = BeerDaoImpl.class)
+@DatabaseTable(tableName = Beer.TABLE_NAME, daoClass = BeersImpl.class)
 public final class Beer implements Serializable {
 
     public static final String TABLE_NAME = "beers";
@@ -131,6 +131,10 @@ public final class Beer implements Serializable {
 
     public void setIsOnWishList(final boolean isOnWishList) {
         fIsOnWishList = isOnWishList;
+    }
+
+    public void setName(final String name) {
+        fName = name;
     }
 
     public String getUserComments() {

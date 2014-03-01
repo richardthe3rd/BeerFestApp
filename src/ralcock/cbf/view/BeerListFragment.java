@@ -20,11 +20,8 @@ import ralcock.cbf.model.BeerDatabaseHelper;
 import ralcock.cbf.model.BeerList;
 import ralcock.cbf.model.SortOrder;
 import ralcock.cbf.model.StatusToShow;
-import ralcock.cbf.model.dao.BeerDao;
-import ralcock.cbf.model.dao.BreweryDao;
-import ralcock.cbf.util.ExceptionReporter;
+import ralcock.cbf.model.dao.Beers;
 
-import java.sql.SQLException;
 import java.util.Set;
 
 public abstract class BeerListFragment extends SherlockListFragment implements ListChangedListener {
@@ -36,7 +33,6 @@ public abstract class BeerListFragment extends SherlockListFragment implements L
     private BeerList fBeerList;
     private BeerListAdapter fAdapter;
 
-    private ExceptionReporter fExceptionReporter;
     private BeerSharer fBeerSharer;
     private BeerSearcher fBeerSearcher;
 
@@ -48,7 +44,7 @@ public abstract class BeerListFragment extends SherlockListFragment implements L
         return inflater.inflate(R.layout.beer_listview_fragment, container, false);
     }
 
-    abstract BeerList makeBeerList(final BeerDao beerDao, final BreweryDao breweryDao) throws SQLException;
+    abstract BeerList makeBeerList(final Beers beers);
 
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
@@ -56,17 +52,12 @@ public abstract class BeerListFragment extends SherlockListFragment implements L
 
         CamBeerFestApplication application = getCamBeerFestApplication();
 
-        fExceptionReporter = new ExceptionReporter(application);
         fBeerSharer = new BeerSharer(application);
         fBeerSearcher = new BeerSearcher(application);
 
         application.addListChangedListener(this);
 
-        try {
-            fBeerList = makeBeerList(getBeerDao(), getBreweryDao());
-        } catch (SQLException e) {
-            fExceptionReporter.report(TAG, "Failed to make BeerList", e);
-        }
+        fBeerList = makeBeerList(getBeers());
         fAdapter = new BeerListAdapter(getActivity(), fBeerList);
         setListAdapter(fAdapter);
 
@@ -116,21 +107,12 @@ public abstract class BeerListFragment extends SherlockListFragment implements L
 
     private void toggleBookmark(final Beer beer) {
         beer.setIsOnWishList(!beer.isIsOnWishList());
-        try {
-            getBeerDao().update(beer);
-            beersChanged();
-        } catch (SQLException e) {
-            fExceptionReporter.report(TAG, "Update beer list failed.", e);
-        }
+        getBeers().updateBeer(beer);
+        beersChanged();
     }
 
     private Beer getBeer(final long id) {
-        try {
-            return getBeerDao().getBeerWithId(id);
-        } catch (SQLException e) {
-            fExceptionReporter.report(TAG, "Failed to get beer with ID " + id, e);
-            return null;
-        }
+        return getBeers().getBeerWithId(id);
     }
 
     private CamBeerFestApplication getCamBeerFestApplication() {
@@ -144,49 +126,29 @@ public abstract class BeerListFragment extends SherlockListFragment implements L
     }
 
     public void filterTextChanged(String filterText) {
-        try {
-            fBeerList.filterBy(filterText);
-            fAdapter.notifyDataSetChanged();
-        } catch (SQLException e) {
-            fExceptionReporter.report(TAG, "Failed to update Filter text", e);
-        }
+        fBeerList.filterBy(filterText);
+        fAdapter.notifyDataSetChanged();
     }
 
     public void sortOrderChanged(final SortOrder sortOrder) {
-        try {
-            fBeerList.sortBy(sortOrder);
-            fAdapter.notifyDataSetChanged();
-        } catch (SQLException e) {
-            fExceptionReporter.report(TAG, "Failed to update sort order", e);
-        }
+        fBeerList.sortBy(sortOrder);
+        fAdapter.notifyDataSetChanged();
     }
 
     public void stylesToHideChanged(final Set<String> stylesToHide) {
-        try {
-            fBeerList.stylesToHide(stylesToHide);
-            fAdapter.notifyDataSetChanged();
-        } catch (SQLException e) {
-            fExceptionReporter.report(TAG, "Failed to update hidden styles", e);
-        }
+        fBeerList.stylesToHide(stylesToHide);
+        fAdapter.notifyDataSetChanged();
     }
 
     public void statusToShowChanged(final StatusToShow statusToShow) {
-        try {
-            fBeerList.setStatusToShow(statusToShow);
-            fAdapter.notifyDataSetChanged();
-        } catch (SQLException sqlx) {
-            fExceptionReporter.report(TAG, "Failed to toggle status to show.", sqlx);
-        }
+        fBeerList.setStatusToShow(statusToShow);
+        fAdapter.notifyDataSetChanged();
     }
 
     public void beersChanged() {
-        try {
-            Log.i(TAG, "beersChanged: notifying ListAdapter of changed DataSet.");
-            fBeerList.updateBeerList();
-            fAdapter.notifyDataSetChanged();
-        } catch (SQLException e) {
-            fExceptionReporter.report(TAG, "Failed to update beer list", e);
-        }
+        Log.i(TAG, "beersChanged: notifying ListAdapter of changed DataSet.");
+        fBeerList.updateBeerList();
+        fAdapter.notifyDataSetChanged();
     }
 
     private BeerDatabaseHelper getHelper() {
@@ -196,11 +158,7 @@ public abstract class BeerListFragment extends SherlockListFragment implements L
         return fDBHelper;
     }
 
-    private BreweryDao getBreweryDao() {
-        return getHelper().getBreweryDao();
-    }
-
-    private BeerDao getBeerDao() {
-        return getHelper().getBeerDao();
+    private Beers getBeers() {
+        return getHelper().getBeers();
     }
 }

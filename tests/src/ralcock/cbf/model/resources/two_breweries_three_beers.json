@@ -31,7 +31,7 @@
                 {
                     "id": "3",
                     "name": "BEER_THREE",
-                    "style": "STYLE2",
+                    "style": "STYLE3",
                     "notes": "BEER_THREE_NOTES",
                     "abv": 3.3,
                     "status_text": "BEER_THREE_STATUS"

@@ -24,7 +24,6 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.SQLException;
 import java.util.Date;
 
 
@@ -48,12 +47,7 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
     private int fNotificationID = 0;
 
     private long getBeerCount() {
-        try {
-            return getHelper().getBeerDao().getNumberOfBeers();
-        } catch (SQLException e) {
-            Log.e(TAG, "Failed to get number of beers", e);
-            return 0;
-        }
+        return getHelper().getBeers().getNumberOfBeers();
     }
 
     private boolean haveNetworkConnection() {

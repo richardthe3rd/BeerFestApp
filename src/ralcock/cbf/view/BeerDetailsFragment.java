@@ -17,8 +17,6 @@ import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerDatabaseHelper;
 import ralcock.cbf.model.StarRating;
 
-import java.sql.SQLException;
-
 public class BeerDetailsFragment extends Fragment {
     private BeerDetailsView fBeerDetailsView;
     private BeerDatabaseHelper fDBHelper;
@@ -79,13 +77,9 @@ public class BeerDetailsFragment extends Fragment {
     }
 
     private void rateBeer(Beer beer, StarRating rating) {
-        try {
-            beer.setNumberOfStars(rating);
-            getHelper().getBeerDao().update(beer);
-            displayBeer(beer);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        beer.setNumberOfStars(rating);
+        getHelper().getBeers().updateBeer(beer);
+        displayBeer(beer);
     }
 
     private static final class BeerDetailsView {

@@ -6,10 +6,8 @@ import com.j256.ormlite.misc.TransactionManager;
 import org.json.JSONException;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerDatabaseHelper;
-import ralcock.cbf.model.Brewery;
 import ralcock.cbf.model.JsonBeerList;
-import ralcock.cbf.model.dao.BeerDao;
-import ralcock.cbf.model.dao.BreweryDao;
+import ralcock.cbf.model.dao.Beers;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,8 +60,7 @@ public class UpdateTask extends AsyncTask<UpdateTask.Params, UpdateTask.Progress
                                 if (param0.cleanUpdate()) {
                                     helper.deleteAll();
                                 }
-                                return initializeDatabase(beerList,
-                                        helper.getBreweryDao(), helper.getBeerDao());
+                                return initializeDatabase(beerList, helper.getBeers());
                             }
                         });
                 Log.d(TAG, "Updated " + count + " beers.");
@@ -101,24 +98,14 @@ public class UpdateTask extends AsyncTask<UpdateTask.Params, UpdateTask.Progress
         return builder.toString();
     }
 
-    private int initializeDatabase(JsonBeerList beers,
-                                   BreweryDao breweryDao,
-                                   BeerDao beerDao) throws SQLException {
-        final int size = beers.size();
+    private int initializeDatabase(JsonBeerList newBeers, Beers beers) {
+        final int size = newBeers.size();
         int count = 0;
-        for (Beer beer : beers) {
-            final Brewery brewery = beer.getBrewery();
-            if (brewery.getId() == 0) {
-                breweryDao.updateFromFestivalOrCreate(brewery);
-            }
-
-            if (beer.getId() == 0) {
-                beerDao.updateFromFestivalOrCreate(beer);
-            }
-
+        for (Beer beer : newBeers) {
+            beers.updateFromFestivalOrCreate(beer);
             count++;
-            publishProgress(new Progress(count, size, beer));
-
+            Progress p = new Progress(count, size, beer);
+            publishProgress(p);
         }
         return count;
     }

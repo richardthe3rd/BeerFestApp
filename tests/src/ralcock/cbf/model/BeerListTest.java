@@ -2,8 +2,8 @@ package ralcock.cbf.model;
 
 import junit.framework.TestCase;
 import org.easymock.EasyMock;
-import ralcock.cbf.model.dao.BeerDao;
-import ralcock.cbf.model.dao.BreweryDao;
+import ralcock.cbf.model.dao.Beers;
+import ralcock.cbf.model.dao.Breweries;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,13 +19,13 @@ public class BeerListTest extends TestCase {
 
     private static final Set<String> EMPTY_SET = Collections.emptySet();
 
-    private BeerDao fBeerDao;
-    private BreweryDao fBreweryDao;
+    private Beers fBeers;
+    private Breweries fBreweries;
 
     @Override
     public void setUp() throws Exception {
-        fBeerDao = EasyMock.createMock(BeerDao.class);
-        fBreweryDao = EasyMock.createMock(BreweryDao.class);
+        fBeers = EasyMock.createMock(Beers.class);
+        fBreweries = EasyMock.createMock(Breweries.class);
     }
 
     public void testFiltering() throws Exception {
@@ -34,29 +34,28 @@ public class BeerListTest extends TestCase {
         final String mild = "mild";
         final String best = "best";
 
-        final Beer aMild = new Beer();
-        final Beer aBest = new Beer();
-        final Beer anotherBest = new Beer();
+        final Beer aMild = new BeerBuilder().called("A Mild").withStyle(mild).build();
+        final Beer aBest = new BeerBuilder().called("A Best").withStyle(best).build();
+        final Beer anotherBest = new BeerBuilder().called("Another Best").withStyle(best).build();
 
-        expect(fBeerDao.allBeersList(
-                eq(fBreweryDao),
+        expect(fBeers.allBeersList(
                 eq(sortOrder),
                 eq(mild),
                 eq(EMPTY_SET),
                 eq(EMPTY_SET)
         )).andReturn(Arrays.asList(aMild));
 
-        expect(fBeerDao.allBeersList(
-                eq(fBreweryDao),
+        expect(fBeers.allBeersList(
                 eq(sortOrder),
                 eq(best),
                 eq(EMPTY_SET),
                 eq(EMPTY_SET)
         )).andReturn(Arrays.asList(aBest, anotherBest));
 
-        replay(fBeerDao, fBreweryDao);
+        replay(fBeers, fBreweries);
 
-        BeerList list = BeerList.allBeers(fBeerDao, fBreweryDao, new BeerList.Config());
+        final BeerList.Config config = new BeerList.Config().withSortOrder(sortOrder).withSearchText(mild);
+        BeerList list = BeerList.allBeers(fBeers, config);
 
         assertEquals(1, list.getCount());
         assertEquals(aMild, list.getBeerAt(0));
@@ -66,7 +65,7 @@ public class BeerListTest extends TestCase {
         assertEquals(aBest, list.getBeerAt(0));
         assertEquals(anotherBest, list.getBeerAt(1));
 
-        verify(fBeerDao, fBreweryDao);
+        verify(fBeers, fBreweries);
     }
 
     public void testSorting() throws Exception {
@@ -77,8 +76,7 @@ public class BeerListTest extends TestCase {
         final Beer beer2 = new Beer();
         final Beer beer3 = new Beer();
 
-        expect(fBeerDao.allBeersList(
-                eq(fBreweryDao),
+        expect(fBeers.allBeersList(
                 eq(sortOrder1),
                 eq(filterText),
                 eq(EMPTY_SET),
@@ -86,17 +84,15 @@ public class BeerListTest extends TestCase {
         )).andReturn(Arrays.asList(beer1, beer2, beer3));
 
         final SortOrder sortOrder2 = SortOrder.BREWERY_NAME_DESC;
-        expect(fBeerDao.allBeersList(
-                eq(fBreweryDao),
+        expect(fBeers.allBeersList(
                 eq(sortOrder2),
                 eq(filterText),
                 eq(EMPTY_SET),
                 eq(EMPTY_SET)
         )).andReturn(Arrays.asList(beer2, beer1, beer3));
-        replay(fBeerDao, fBreweryDao);
+        replay(fBeers, fBreweries);
 
-        BeerList list = BeerList.allBeers(fBeerDao, fBreweryDao,
-                new BeerList.Config(sortOrder1, filterText, EMPTY_SET, StatusToShow.ALL));
+        BeerList list = BeerList.allBeers(fBeers, new BeerList.Config(sortOrder1, filterText, EMPTY_SET, StatusToShow.ALL));
 
         assertEquals(3, list.getCount());
 
@@ -120,19 +116,18 @@ public class BeerListTest extends TestCase {
         final SortOrder sortOrder = SortOrder.BEER_NAME_ASC;
         final String filterText = "";
 
-        expect(fBeerDao.allBeersList(
-                eq(fBreweryDao),
+        expect(fBeers.allBeersList(
                 eq(sortOrder),
                 eq(filterText),
                 eq(stylesToHide),
                 eq(EMPTY_SET)
         )).andReturn(Arrays.asList(new Beer()));
-        replay(fBeerDao, fBreweryDao);
+        replay(fBeers, fBreweries);
 
-        BeerList list = BeerList.allBeers(fBeerDao, fBreweryDao,
+        BeerList list = BeerList.allBeers(fBeers,
                 new BeerList.Config(sortOrder, filterText, stylesToHide, StatusToShow.ALL));
 
         assertEquals(1, list.getCount());
-        verify(fBeerDao, fBreweryDao);
+        verify(fBeers, fBreweries);
     }
 }

@@ -15,9 +15,6 @@ import ralcock.cbf.R;
 import ralcock.cbf.actions.BeerSharer;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerDatabaseHelper;
-import ralcock.cbf.util.ExceptionReporter;
-
-import java.sql.SQLException;
 
 //OrmLiteBaseActivity<BeerDatabaseHelper>
 public final class BeerDetailsActivity extends SherlockFragmentActivity {
@@ -27,16 +24,14 @@ public final class BeerDetailsActivity extends SherlockFragmentActivity {
 
     public static final String EXTRA_BEER_ID = "BEER";
 
-    private Beer fBeer;
     private final BeerSharer fBeerSharer;
-    private final ExceptionReporter fExceptionReporter;
 
     private BeerDatabaseHelper fDBHelper;
     private ShareActionProvider fShareActionProvider;
+    private long fBeerId;
 
     public BeerDetailsActivity() {
         fBeerSharer = new BeerSharer(this);
-        fExceptionReporter = new ExceptionReporter(this);
     }
 
     private BeerDatabaseHelper getHelper() {
@@ -47,7 +42,7 @@ public final class BeerDetailsActivity extends SherlockFragmentActivity {
     }
 
     Beer getBeer() {
-        return fBeer;
+        return getHelper().getBeers().getBeerWithId(fBeerId);
     }
 
     public void onCreate(Bundle savedInstanceState) {
@@ -57,18 +52,12 @@ public final class BeerDetailsActivity extends SherlockFragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.beer_details_activity);
 
-        try {
-            long id = getIntent().getExtras().getLong(EXTRA_BEER_ID);
-            Log.i(TAG, "In BeerDetailsActivity.onCreate with ID " + id);
-            fBeer = getHelper().getBeerDao().queryForId(id);
-            Log.i(TAG, "In BeerDetailsActivity.onCreate with Beer " + fBeer);
-        } catch (SQLException e) {
-            fExceptionReporter.report(TAG, "", e);
-        }
+        fBeerId = getIntent().getExtras().getLong(EXTRA_BEER_ID);
+        Log.i(TAG, "In BeerDetailsActivity.onCreate with ID " + fBeerId);
 
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle(fBeer.getName());
+        actionBar.setTitle(getBeer().getName());
     }
 
     @Override
@@ -77,7 +66,7 @@ public final class BeerDetailsActivity extends SherlockFragmentActivity {
         inflater.inflate(R.menu.details_options_menu, menu);
 
         fShareActionProvider = (ShareActionProvider) (menu.findItem(R.id.shareBeer).getActionProvider());
-        fShareActionProvider.setShareIntent(fBeerSharer.makeShareIntent(fBeer));
+        fShareActionProvider.setShareIntent(fBeerSharer.makeShareIntent(getBeer()));
         return true;
     }
 
@@ -95,7 +84,7 @@ public final class BeerDetailsActivity extends SherlockFragmentActivity {
 
     @SuppressWarnings({"UnusedDeclaration"}) // Called from beer_details_activity.xml.xml
     public void shareBeer(View button) {
-        fBeerSharer.shareBeer(fBeer);
+        fBeerSharer.shareBeer(getBeer());
     }
 
     @Override

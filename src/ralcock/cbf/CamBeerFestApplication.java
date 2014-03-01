@@ -30,7 +30,7 @@ import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerDatabaseHelper;
 import ralcock.cbf.model.SortOrder;
 import ralcock.cbf.model.StatusToShow;
-import ralcock.cbf.model.dao.BeerDao;
+import ralcock.cbf.model.dao.Beers;
 import ralcock.cbf.service.UpdateService;
 import ralcock.cbf.service.UpdateTask;
 import ralcock.cbf.util.ExceptionReporter;
@@ -43,7 +43,6 @@ import ralcock.cbf.view.SortByDialogFragment;
 import ralcock.cbf.view.TabListener;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -198,8 +197,8 @@ public class CamBeerFestApplication extends SherlockFragmentActivity {
         return fDBHelper;
     }
 
-    private BeerDao getBeerDao() {
-        return getHelper().getBeerDao();
+    private Beers getBeerDao() {
+        return getHelper().getBeers();
     }
 
     @Override
@@ -297,37 +296,27 @@ public class CamBeerFestApplication extends SherlockFragmentActivity {
     }
 
     private void showFilterByStyleDialog() {
-        try {
-            final Set<String> allStyles = getBeerDao().getAvailableStyles();
-            final Set<String> stylesToHide = fAppPreferences.getStylesToHide();
-            final DialogFragment newFragment = FilterByStyleDialogFragment.newInstance(stylesToHide, allStyles);
-            newFragment.show(getSupportFragmentManager(), "filterByStyle");
-        } catch (SQLException e) {
-            fExceptionReporter.report(TAG, e.getMessage(), e);
-        }
+        final Set<String> allStyles = getBeerDao().getAvailableStyles();
+        final Set<String> stylesToHide = fAppPreferences.getStylesToHide();
+        final DialogFragment newFragment = FilterByStyleDialogFragment.newInstance(stylesToHide, allStyles);
+        newFragment.show(getSupportFragmentManager(), "filterByStyle");
     }
 
     @Override
     public boolean onMenuItemSelected(final int featureId, final MenuItem item) {
-        try {
-            switch (item.getItemId()) {
-                case R.id.searchBeer:
-                    fBeerSearcher.searchBeer(getBeerFromMenuItem(item));
-                    return true;
-                case R.id.shareBeer:
-                    fBeerSharer.shareBeer(getBeerFromMenuItem(item));
-                    return true;
-            }
-            return super.onMenuItemSelected(featureId, item);
-        } catch (SQLException e) {
-            // getBeerFromMenuItem failed
-            fExceptionReporter.report(TAG, e.getMessage(), e);
-            return true;
+        switch (item.getItemId()) {
+            case R.id.searchBeer:
+                fBeerSearcher.searchBeer(getBeerFromMenuItem(item));
+                return true;
+            case R.id.shareBeer:
+                fBeerSharer.shareBeer(getBeerFromMenuItem(item));
+                return true;
         }
+        return super.onMenuItemSelected(featureId, item);
     }
 
     // Helper for onMenuItemSelected
-    private Beer getBeerFromMenuItem(final MenuItem item) throws SQLException {
+    private Beer getBeerFromMenuItem(final MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         return getBeerDao().getBeerWithId(info.id);
     }
@@ -350,8 +339,6 @@ public class CamBeerFestApplication extends SherlockFragmentActivity {
             List<Beer> ratedBeers = getBeerDao().getRatedBeers();
             BeerExporter exporter = new BeerExporter(this);
             exporter.export(ratedBeers);
-        } catch (SQLException e) {
-            fExceptionReporter.report(TAG, e.getMessage(), e);
         } catch (IOException e) {
             fExceptionReporter.report(TAG, e.getMessage(), e);
         }

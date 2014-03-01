@@ -15,9 +15,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class BeerDaoImplTest extends AndroidTestCase {
+public class BeersImplTest extends AndroidTestCase {
     private BeerDatabaseHelper fBeerDatabaseHelper;
-    private BeerDao fBeerDao;
+    private Beers fBeers;
     private RenamingDelegatingContext fContext;
 
     private Beer fBeer1;
@@ -26,7 +26,7 @@ public class BeerDaoImplTest extends AndroidTestCase {
 
     private String fStyle1 = "style1";
     private String fStyle2 = "style2";
-    private BreweryDao fBreweryDao;
+    private Breweries fBreweries;
 
     @Override
     public void setUp() throws Exception {
@@ -34,25 +34,25 @@ public class BeerDaoImplTest extends AndroidTestCase {
         fContext = new RenamingDelegatingContext(getContext(),
                 BeerListTest.class.getSimpleName() + ".");
         fBeerDatabaseHelper = new BeerDatabaseHelper(fContext);
-        fBeerDao = fBeerDatabaseHelper.getBeerDao();
-        fBreweryDao = fBeerDatabaseHelper.getBreweryDao();
+        fBeers = fBeerDatabaseHelper.getBeers();
+        fBreweries = fBeerDatabaseHelper.getBreweries();
 
         Brewery brewery = new Brewery("1", "First Brewery", "y");
-        fBreweryDao.create(brewery);
+        fBreweries.create(brewery);
 
         Brewery brewery2 = new Brewery("2", "Best Brewery", "");
-        fBreweryDao.create(brewery2);
+        fBreweries.create(brewery2);
 
         fBeer1 = new Beer("1", "A Mild", 1f, "description1", fStyle1, "status1", brewery);
-        fBeerDao.create(fBeer1);
+        fBeers.create(fBeer1);
 
         fBeer2 = new Beer("2", "A Best Bitter", 2f, "description2", fStyle2, "status2", brewery);
-        fBeerDao.create(fBeer2);
+        fBeers.create(fBeer2);
 
         fBeer3 = new Beer("3", "A Stout", 3f, "description3", fStyle2, "status3", brewery2);
-        fBeerDao.create(fBeer3);
+        fBeers.create(fBeer3);
 
-        assertEquals(3, fBeerDao.getNumberOfBeers());
+        assertEquals(3, fBeers.getNumberOfBeers());
     }
 
     @Override
@@ -63,7 +63,7 @@ public class BeerDaoImplTest extends AndroidTestCase {
     }
 
     private List<Beer> doQuery(SortOrder sortOrder, CharSequence filterText, Set<String> stylesToHide) throws SQLException {
-        return fBeerDao.allBeersList(fBreweryDao, sortOrder, filterText, stylesToHide, stylesToHide);
+        return fBeers.allBeersList(sortOrder, filterText, stylesToHide, stylesToHide);
     }
 
     public void testFiltering() throws Exception {
@@ -85,7 +85,7 @@ public class BeerDaoImplTest extends AndroidTestCase {
         Set<String> styles = new HashSet<String>();
         styles.add("style1");
         styles.add("style2");
-        assertEquals(styles, fBeerDao.getAvailableStyles());
+        assertEquals(styles, fBeers.getAvailableStyles());
     }
 
 }

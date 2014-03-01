@@ -2,6 +2,7 @@ package ralcock.cbf.actions;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import ralcock.cbf.R;
 import ralcock.cbf.model.Beer;
 
@@ -18,27 +19,30 @@ public final class BeerSharer {
 
         String title = fContext.getResources().getString(R.string.share_this_beer_title);
         fContext.startActivity(Intent.createChooser(intent, title));
-
     }
 
     public Intent makeShareIntent(final Beer beer) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
 
-        String extraSubject = fContext.getResources().getString(R.string.share_this_beer_subject);
+        final Resources resources = fContext.getResources();
+
+        String festivalName = resources.getString(R.string.festival_name);
+        String extraSubject = resources.getString(R.string.share_intent_subject,
+                "beer", festivalName);
         intent.putExtra(Intent.EXTRA_SUBJECT, extraSubject);
 
-        String extraText;
-        int rating = beer.getRating();
-        if (rating > 0) {
-            extraText = fContext.getResources().getString(R.string.share_this_rated_beer_text,
-                    rating, beer.getBrewery().getName(), beer.getName());
-        } else {
-            extraText = fContext.getResources().getString(R.string.share_this_beer_text,
-                    beer.getBrewery().getName(), beer.getName());
-        }
+        String extraText = makeExtraText(resources, beer);
 
         intent.putExtra(Intent.EXTRA_TEXT, extraText);
         return intent;
+    }
+
+    private String makeExtraText(final Resources resources, final Beer beer) {
+        String stars = beer.getNumberOfStars().toFancyString();
+        String extraText = resources.getString(R.string.share_intent_text,
+                beer.getBrewery().getName(), beer.getName());
+        String hashTag = resources.getString(R.string.festival_hashtag);
+        return String.format("%s %s #%s", extraText, stars, hashTag);
     }
 }

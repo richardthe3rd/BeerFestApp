@@ -51,15 +51,15 @@ public class JsonBeerList implements Iterable<Beer> {
     }
 
     private Beer makeBeer(final Brewery brewery, final JSONObject product) throws JSONException {
-        return new Beer(
-                product.getString(IDENTIFIER),
-                product.getString(NAME),
-                (float) product.getDouble(ABV),
-                product.getString(DESCRIPTION),
-                product.has(STYLE) ? product.getString(STYLE) : "",
-                product.has(STATUS) ? product.getString(STATUS) : "",
-                brewery)
-                ;
+        return new BeerBuilder()
+                .fromBrewery(brewery)
+                .withFestivalId(product.getString(IDENTIFIER))
+                .called(product.getString(NAME))
+                .withDescription(product.getString(DESCRIPTION))
+                .withABV((float) product.getDouble(ABV))
+                .withStyle(product.has(STYLE) ? product.getString(STYLE) : "")
+                .withStatus(product.has(STATUS) ? product.getString(STATUS) : "")
+                .build();
     }
 
     private Brewery makeBrewery(final JSONObject producer) throws JSONException {

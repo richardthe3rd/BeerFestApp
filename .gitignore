@@ -7,6 +7,8 @@ keystore
 out/
 gen/
 bin/
+build/
 coverage
 proguard-project.txt
-libs/
+proguard_logs/
+.gradle/

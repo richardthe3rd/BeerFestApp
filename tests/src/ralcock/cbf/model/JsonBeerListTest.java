@@ -11,9 +11,35 @@ public class JsonBeerListTest extends AndroidTestCase {
     private final Brewery fBrewery1 = new Brewery("1", "BREWERY_ONE", "BREWERY_ONE_NOTES");
     private final Brewery fBrewery2 = new Brewery("2", "BREWERY_TWO", "BREWERY_TWO_NOTES");
 
-    private final Beer fBrewery1Beer1 = new Beer("1", "BEER_ONE", 1.1f, "BEER_ONE_NOTES", "STYLE1", "BEER_ONE_STATUS", fBrewery1);
-    private final Beer fBrewery1Beer2 = new Beer("2", "BEER_TWO", 2.2f, "BEER_TWO_NOTES", "STYLE2", "BEER_TWO_STATUS", fBrewery2);
-    private final Beer fBrewery2Beer3 = new Beer("3", "BEER_THREE", 3.3f, "BEER_THREE_NOTES", "STYLE2", "BEER_THREE_STATUS", fBrewery2);
+    private final Beer fBrewery1Beer1 = new BeerBuilder()
+            .withFestivalId("1")
+            .called("BEER_ONE")
+            .withABV(1.1f)
+            .withDescription("BEER_ONE_NOTES")
+            .withStyle("STYLE1")
+            .withStatus("BEER_ONE_STATUS")
+            .fromBrewery(fBrewery1)
+            .build();
+
+    private final Beer fBrewery2Beer2 = new BeerBuilder()
+            .withFestivalId("2")
+            .called("BEER_TWO")
+            .withABV(2.2f)
+            .withDescription("BEER_TWO_NOTES")
+            .withStyle("STYLE2")
+            .withStatus("BEER_TWO_STATUS")
+            .fromBrewery(fBrewery2)
+            .build();
+
+    private final Beer fBrewery2Beer3 = new BeerBuilder()
+            .withFestivalId("3")
+            .called("BEER_THREE")
+            .withABV(3.3f)
+            .withDescription("BEER_THREE_NOTES")
+            .withStyle("STYLE3")
+            .withStatus("BEER_THREE_STATUS")
+            .fromBrewery(fBrewery2)
+            .build();
 
     private static String convertStreamToString(InputStream is) {
         try {
@@ -37,7 +63,7 @@ public class JsonBeerListTest extends AndroidTestCase {
 
         List<Beer> expectedBeers = new Vector<Beer>(3);
         expectedBeers.add(fBrewery1Beer1);
-        expectedBeers.add(fBrewery1Beer2);
+        expectedBeers.add(fBrewery2Beer2);
         expectedBeers.add(fBrewery2Beer3);
 
         JsonBeerList jsonBeerList = new JsonBeerList(convertStreamToString(inputStream));

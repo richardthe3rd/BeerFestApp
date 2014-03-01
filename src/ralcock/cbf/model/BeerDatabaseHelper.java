@@ -7,8 +7,9 @@ import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import ralcock.cbf.R;
-import ralcock.cbf.model.dao.BeerDao;
-import ralcock.cbf.model.dao.BreweryDao;
+import ralcock.cbf.model.dao.Beers;
+import ralcock.cbf.model.dao.BeersImpl;
+import ralcock.cbf.model.dao.Breweries;
 
 import java.sql.SQLException;
 
@@ -20,8 +21,8 @@ public final class BeerDatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     private static final int DB_VERSION = 17; // cbf40
 
-    private BreweryDao fBreweryDao;
-    private BeerDao fBeerDao;
+    private Breweries fBreweries;
+    private Beers fBeers;
 
     public BeerDatabaseHelper(final Context context) {
         super(context, DATABASE_NAME, null, DB_VERSION, R.raw.ormlite_config);
@@ -51,23 +52,25 @@ public final class BeerDatabaseHelper extends OrmLiteSqliteOpenHelper {
         onCreate(sqLiteDatabase, connectionSource);
     }
 
-    public BeerDao getBeerDao() {
+    public Beers getBeers() {
         try {
-            if (fBeerDao == null) {
-                fBeerDao = DaoManager.createDao(getConnectionSource(), Beer.class);
+            if (fBeers == null) {
+                BeersImpl beers = DaoManager.createDao(getConnectionSource(), Beer.class);
+                beers.setBreweries(getBreweries());
+                fBeers = beers;
             }
-            return fBeerDao;
+            return fBeers;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public BreweryDao getBreweryDao() {
+    public Breweries getBreweries() {
         try {
-            if (fBreweryDao == null) {
-                fBreweryDao = DaoManager.createDao(getConnectionSource(), Brewery.class);
+            if (fBreweries == null) {
+                fBreweries = DaoManager.createDao(getConnectionSource(), Brewery.class);
             }
-            return fBreweryDao;
+            return fBreweries;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
