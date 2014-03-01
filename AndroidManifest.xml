@@ -12,8 +12,8 @@
             android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <uses-sdk
-            android:minSdkVersion="4"
-            android:targetSdkVersion="15"/>
+            android:minSdkVersion="7"
+            android:targetSdkVersion="19"/>
 
     <application
             android:label="Cambridge Beer Festival"
