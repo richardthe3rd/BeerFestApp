@@ -11,10 +11,12 @@ import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.DatabaseTableConfig;
 import ralcock.cbf.model.Beer;
+import ralcock.cbf.model.BeerChangedListener;
 import ralcock.cbf.model.Brewery;
 import ralcock.cbf.model.SortOrder;
 
 import java.sql.SQLException;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -25,6 +27,9 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
 
     private Breweries fBreweries;
 
+	private final CopyOnWriteArrayList<BeerChangedListener> fListeners 
+		= new CopyOnWriteArrayList<BeerChangedListener>(); 
+	
     private static BeerAccessException newBeerAccessException(final String msg, final SQLException cause) {
         Log.e(TAG, msg, cause);
         return new BeerAccessException(msg, cause);
@@ -101,10 +106,25 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
     public void updateBeer(final Beer beer) {
         try {
             update(beer);
+			fireBeerChanged(beer);
         } catch (SQLException e) {
             throw newBeerAccessException("Failed to update beer", e);
         }
     }
+	
+	public void addBeerChangedListener(BeerChangedListener l) {
+		fListeners.add(l);
+	}
+
+	public void removeBeerChangedListener(BeerChangedListener l) {
+		fListeners.remove(l);
+	}
+	
+	private void fireBeerChanged(final Beer beer) {
+		for(BeerChangedListener l : fListeners) {
+			l.beerChanged(beer);
+		}
+	}
 
     public List<Beer> allBeersList(final SortOrder sortOrder,
                                    final CharSequence filterText,

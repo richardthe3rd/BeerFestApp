@@ -2,14 +2,18 @@ package ralcock.cbf.model.dao;
 
 import com.j256.ormlite.dao.Dao;
 import ralcock.cbf.model.Beer;
+import ralcock.cbf.model.BeerChangedListener;
 import ralcock.cbf.model.SortOrder;
 
 import java.util.List;
 import java.util.Set;
 
 public interface Beers extends Dao<Beer, Long> {
-
-    Beer getBeerWithId(long id);
+	
+	void addBeerChangedListener(BeerChangedListener l);
+	void removeBeerChangedListener(BeerChangedListener l);
+    
+	Beer getBeerWithId(long id);
 
     long getNumberOfBeers();
 

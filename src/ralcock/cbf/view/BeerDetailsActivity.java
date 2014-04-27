@@ -14,6 +14,7 @@ import com.j256.ormlite.android.apptools.OpenHelperManager;
 import ralcock.cbf.R;
 import ralcock.cbf.actions.BeerSharer;
 import ralcock.cbf.model.Beer;
+import ralcock.cbf.model.BeerChangedListener;
 import ralcock.cbf.model.BeerDatabaseHelper;
 
 //OrmLiteBaseActivity<BeerDatabaseHelper>
@@ -67,6 +68,14 @@ public final class BeerDetailsActivity extends SherlockFragmentActivity {
 
         fShareActionProvider = (ShareActionProvider) (menu.findItem(R.id.shareBeer).getActionProvider());
         fShareActionProvider.setShareIntent(fBeerSharer.makeShareIntent(getBeer()));
+		
+		getHelper().getBeers().addBeerChangedListener(new BeerChangedListener() {
+			public void beerChanged(final Beer beer) {
+				fShareActionProvider.setShareIntent(
+					fBeerSharer.makeShareIntent(beer)
+				);				
+			}
+		});
         return true;
     }
 
