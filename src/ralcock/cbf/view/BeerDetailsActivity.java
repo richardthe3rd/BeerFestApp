@@ -82,7 +82,7 @@ public final class BeerDetailsActivity extends SherlockFragmentActivity {
         }
     }
 
-    @SuppressWarnings({"UnusedDeclaration"}) // Called from beer_details_activity.xml.xml
+    @SuppressWarnings({"UnusedDeclaration"}) // Called from beer_details_activity.xml
     public void shareBeer(View button) {
         fBeerSharer.shareBeer(getBeer());
     }
