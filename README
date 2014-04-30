@@ -1,1 +1,15 @@
 Android App for Cambridge Beer Festival.
+
+1. Get Git
+ apt-get install git
+
+2. Clone this repo
+ git clone https://github.com/richardthe3rd/BeerFestApp.git
+ cd BeerFestApp
+
+3. Install Java & Android SDKs
+ ./install-android-sdk 
+
+4. Build App
+ ./gradlew --daemon build
+
