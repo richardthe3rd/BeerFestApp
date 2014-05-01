@@ -19,7 +19,7 @@ dependencies {
     compile group: 'com.j256.ormlite',      name: 'ormlite-android',   version: '4+'
     compile group: 'com.android.support',   name: 'support-v13',       version: '18.0.+'
     compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
- }
+}
 
 android {
     compileSdkVersion 19
@@ -28,16 +28,17 @@ android {
     lintOptions {
         abortOnError false
     }
+
     signingConfigs {
-                   release {
-			storeFile file(System.getenv("KEYSTORE"))
-			storePassword System.getenv("KEYSTORE_PASSWORD")
-			keyAlias System.getenv("KEY_ALIAS")
-			keyPassword System.getenv("KEY_PASSWORD")
-		}
-	}
+        release {
+            storeFile file(System.getenv("KEYSTORE"))
+            storePassword System.getenv("KEYSTORE_PASSWORD")
+            keyAlias System.getenv("KEY_ALIAS")
+            keyPassword System.getenv("KEY_PASSWORD")
+        }
+    }
     
-	buildTypes {
+    buildTypes {
         release {
             signingConfig signingConfigs.release            
         }
