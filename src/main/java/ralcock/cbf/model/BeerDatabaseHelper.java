@@ -19,7 +19,7 @@ public final class BeerDatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     public static final String DATABASE_NAME = "BEERS";
 
-    private static final int DB_VERSION = 17; // cbf40
+    private static final int DB_VERSION = 18; // cbf41
 
     private Breweries fBreweries;
     private Beers fBeers;

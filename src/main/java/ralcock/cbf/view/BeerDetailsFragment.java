@@ -78,7 +78,7 @@ public class BeerDetailsFragment extends Fragment {
 
     private void rateBeer(Beer beer, StarRating rating) {
         beer.setNumberOfStars(rating);
-        getHelper().getBeers().updateBeer(beer);
+        getHelper().getBeers().updateBeer(beer);		
         displayBeer(beer);
     }
 

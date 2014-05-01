@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.8+'
+        classpath 'com.android.tools.build:gradle:0.9+'
     }
 }
 
@@ -28,8 +28,22 @@ android {
     lintOptions {
         abortOnError false
     }
+    signingConfigs {
+                   release {
+			storeFile file(System.getenv("KEYSTORE"))
+			storePassword System.getenv("KEYSTORE_PASSWORD")
+			keyAlias System.getenv("KEY_ALIAS")
+			keyPassword System.getenv("KEY_PASSWORD")
+		}
+	}
+    
+	buildTypes {
+        release {
+            signingConfig signingConfigs.release            
+        }
+    }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.10'
+    gradleVersion = '1.11'
 }
