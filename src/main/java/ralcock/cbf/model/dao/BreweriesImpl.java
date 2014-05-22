@@ -27,10 +27,11 @@ public class BreweriesImpl extends BaseDaoImpl<Brewery, Long> implements Breweri
     }
 
     public QueryBuilder<Brewery, Long> buildFilteredBreweryQuery(final CharSequence filterText) {
+        SelectArg filterTextArg = new SelectArg("%"+filterText+"%");
         QueryBuilder<Brewery, Long> qb = queryBuilder();
         qb.selectColumns(Brewery.ID_FIELD);
         try {
-            qb.where().like(Brewery.NAME_FIELD, "%" + filterText + "%");
+            qb.where().like(Brewery.NAME_FIELD, filterTextArg);
             return qb;
         } catch (SQLException e) {
             throw new RuntimeException(e);
