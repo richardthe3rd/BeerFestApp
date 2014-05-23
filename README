@@ -7,9 +7,14 @@ Android App for Cambridge Beer Festival.
  git clone https://github.com/richardthe3rd/BeerFestApp.git
  cd BeerFestApp
 
-3. Install Java & Android SDKs
+3. Install required packages including Java & Android SDK.
+Note: SDK will be installed to ~/.android-sdk-installer/android-sdk-linux
  ./install-android-sdk 
 
-4. Build App
+4. Sets ANDROID_HOME, PATH etc. (requires BASH)
+ . ~/.android-sdk-installer/env
+
+5. Build. APK will be in ./app/build/apk
  ./gradlew --daemon build
+
 
