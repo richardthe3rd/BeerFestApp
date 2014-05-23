@@ -1,1 +1,1 @@
-include ':app', ':libraries:beer'
+include ':app'
