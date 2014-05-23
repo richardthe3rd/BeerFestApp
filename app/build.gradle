@@ -15,6 +15,7 @@ repositories {
 }
 
 dependencies {
+    compile project(':libraries:beer')
     compile group: 'com.j256.ormlite',      name: 'ormlite-core',      version: '4+'
     compile group: 'com.j256.ormlite',      name: 'ormlite-android',   version: '4+'
     compile group: 'com.android.support',   name: 'support-v13',       version: '18.0.+'
