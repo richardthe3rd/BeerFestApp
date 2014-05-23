@@ -1,6 +1,5 @@
 package ralcock.cbf.model.dao;
 
-import android.util.Log;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.GenericRawResults;
 import com.j256.ormlite.stmt.PreparedUpdate;
@@ -15,6 +14,9 @@ import ralcock.cbf.model.BeerChangedListener;
 import ralcock.cbf.model.Brewery;
 import ralcock.cbf.model.SortOrder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.SQLException;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.List;
@@ -23,7 +25,7 @@ import java.util.TreeSet;
 
 public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
 
-    private static final String TAG = BeersImpl.class.getName();
+    private final Logger logger = LoggerFactory.getLogger(BeersImpl.class);
 
     private Breweries fBreweries;
 
@@ -31,7 +33,7 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
         = new CopyOnWriteArrayList<BeerChangedListener>();
 
     private static BeerAccessException newBeerAccessException(final String msg, final SQLException cause) {
-        Log.e(TAG, msg, cause);
+        LoggerFactory.getLogger(BeersImpl.class).error(msg, cause);
         return new BeerAccessException(msg, cause);
     }
 
@@ -47,7 +49,9 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
 
     public Beer getBeerWithId(final long id) {
         try {
-            return queryForId(id);
+            Beer beer = queryForId(id);
+            logger.info("Got Beer {} '{}'", id, beer.getName());
+            return beer;
         } catch (SQLException e) {
             throw newBeerAccessException("Failed to getBeerWithId " + id, e);
         }

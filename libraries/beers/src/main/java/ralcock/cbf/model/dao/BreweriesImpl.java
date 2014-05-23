@@ -1,6 +1,5 @@
 package ralcock.cbf.model.dao;
 
-import android.util.Log;
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.stmt.PreparedUpdate;
 import com.j256.ormlite.stmt.QueryBuilder;
@@ -10,11 +9,14 @@ import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.DatabaseTableConfig;
 import ralcock.cbf.model.Brewery;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.SQLException;
 
 public class BreweriesImpl extends BaseDaoImpl<Brewery, Long> implements Breweries {
 
-    private static final String TAG = BreweriesImpl.class.getName();
+    private final Logger logger = LoggerFactory.getLogger(BreweriesImpl.class);
 
     @SuppressWarnings("UnusedDeclaration")
     public BreweriesImpl(final ConnectionSource connectionSource) throws SQLException {
@@ -43,7 +45,7 @@ public class BreweriesImpl extends BaseDaoImpl<Brewery, Long> implements Breweri
             doUpdateOrCreate(brewery);
         } catch (SQLException e) {
             String msg = "Failed to update brewery " + brewery + " from festival description";
-            Log.e(TAG, msg, e);
+            logger.error(msg, e);
             throw new BeerAccessException(msg, e);
         }
     }
