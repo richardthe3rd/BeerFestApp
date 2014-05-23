@@ -15,7 +15,6 @@ repositories {
 }
 
 dependencies {
-    compile project(':libraries:beer')
     compile group: 'com.j256.ormlite',      name: 'ormlite-core',      version: '4+'
     compile group: 'com.j256.ormlite',      name: 'ormlite-android',   version: '4+'
     compile group: 'com.android.support',   name: 'support-v13',       version: '18.0.+'
@@ -25,24 +24,17 @@ dependencies {
 android {
     compileSdkVersion 19
     buildToolsVersion "19.0.2"
-    
+
     lintOptions {
         abortOnError false
     }
 
-    signingConfigs {
-        release {
-            storeFile file(System.getenv("KEYSTORE"))
-            storePassword System.getenv("KEYSTORE_PASSWORD")
-            keyAlias System.getenv("KEY_ALIAS")
-            keyPassword System.getenv("KEY_PASSWORD")
-        }
-    }
-    
-    buildTypes {
-        release {
-            signingConfig signingConfigs.release            
-        }
+    // See https://www.timroes.de/2013/09/22/handling-signing-configs-with-gradle/    
+    if(project.hasProperty("CamBeerFestApp.signing")
+       && new File(project.property("CamBeerFestApp.signing") + ".gradle").exists()){
+        apply from: project.property("CamBeerFestApp.signing") + ".gradle";
+    } else {
+        logger.warning("Signing not available." )
     }
 }
 
