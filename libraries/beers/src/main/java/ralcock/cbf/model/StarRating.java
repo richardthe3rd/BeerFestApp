@@ -40,8 +40,8 @@ public final class StarRating implements Serializable, Comparable<StarRating> {
 
 
     public int compareTo(final StarRating starRating) {
-        if (fRating > starRating.fRating) return -1;
+        if (fRating > starRating.fRating) return 1;
         if (fRating == starRating.fRating) return 0;
-        return 1;
+        return -1;
     }
 }
