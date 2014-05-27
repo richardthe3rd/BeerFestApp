@@ -19,8 +19,8 @@ public class BeersImplTest {
     private BeersImpl beersImpl;
     private BreweriesImpl breweriesImpl;
 
-    private static aBrewery() {
-        return new Brewery("festivalId", "name", "description")
+    private static Brewery aBrewery() {
+        return new Brewery("festivalId", "name", "description");
     }
 
     private static Beer aBeer() {
