@@ -20,14 +20,14 @@ dependencies {
     compile project(':libraries:beers')
     compile group: 'com.j256.ormlite',      name: 'ormlite-core',      version: '4+'
     compile group: 'com.j256.ormlite',      name: 'ormlite-android',   version: '4+'
-    compile group: 'com.android.support',   name: 'support-v13',       version: '18.0.+'
+    compile group: 'com.android.support',   name: 'support-v13',       version: '19.0.+'
     compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
     compile "org.slf4j:slf4j-android:1.7+"
 }
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion "19.1.0"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.0"
 
     lintOptions {
         abortOnError false
@@ -43,5 +43,5 @@ android {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.11'
+    gradleVersion = '2.0'
 }
