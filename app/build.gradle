@@ -1,10 +1,12 @@
 buildscript {
     repositories {
         mavenCentral()
+        maven { url 'https://jitpack.io' } // for sdk manager
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.13.+'
-        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.+'
+        classpath 'com.android.tools.build:gradle:2.1.0'
+        classpath 'com.github.JakeWharton:sdk-manager-plugin:0ce4cdf08009d79223850a59959d9d6e774d0f77'
+        //classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.+'
     }
 }
 
@@ -22,7 +24,7 @@ dependencies {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.0"
+    buildToolsVersion "23.0.1"
 
     lintOptions {
         abortOnError false
