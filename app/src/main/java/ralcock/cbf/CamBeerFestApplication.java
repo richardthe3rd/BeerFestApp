@@ -15,13 +15,13 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Toast;
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.Window;
-import com.actionbarsherlock.widget.SearchView;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.Window;
+import android.support.v7.widget.SearchView;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import ralcock.cbf.actions.BeerExporter;
 import ralcock.cbf.actions.BeerSearcher;
@@ -49,7 +49,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
-public class CamBeerFestApplication extends SherlockFragmentActivity {
+public class CamBeerFestApplication extends ActionBarActivity {
     private static final String TAG = CamBeerFestApplication.class.getName();
 
     private static final int SHOW_BEER_DETAILS_REQUEST_CODE = 1;

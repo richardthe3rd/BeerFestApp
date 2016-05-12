@@ -17,14 +17,22 @@ dependencies {
     compile project(':libraries:beers')
     compile group: 'com.j256.ormlite',      name: 'ormlite-core',      version: '4+'
     compile group: 'com.j256.ormlite',      name: 'ormlite-android',   version: '4+'
-    compile group: 'com.android.support',   name: 'support-v13',       version: '19.0.+'
-    compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
+    compile 'com.android.support:appcompat-v7:23.3.0'
+    compile 'com.android.support:support-v4:23.3.0'
+    compile 'com.android.support:design:23.3.0'
     compile "org.slf4j:slf4j-android:1.7+"
 }
 
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
+
+    defaultConfig {
+           versionCode 16
+           versionName "4.1.0"
+           minSdkVersion 7
+           targetSdkVersion 19
+       }
 
     lintOptions {
         abortOnError false
@@ -37,4 +45,8 @@ android {
     } else {
         logger.warning("Signing not available." )
     }
+}
+
+sdkManager {
+    emulatorVersion 'android-23'
 }

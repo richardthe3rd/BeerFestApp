@@ -1,34 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
             android:id="@+id/search"
             android:icon="@drawable/ic_action_search"
             android:title="@string/search_menu_label"
-            android:showAsAction="ifRoom|collapseActionView"
-            android:actionViewClass="com.actionbarsherlock.widget.SearchView"
+            app:showAsAction="ifRoom|collapseActionView"
+            app:actionViewClass="android.support.v7.widget.SearchView"
             />
 
     <item
             android:id="@+id/sort"
             android:icon="@drawable/ic_collections_sort_by_size"
             android:title="@string/sort_menu_label"
-            android:showAsAction="ifRoom"
+            app:showAsAction="ifRoom"
             />
 
     <item
             android:id="@+id/showOnlyStyle"
             android:title="@string/show_only_style_label"
             android:icon="@drawable/ic_action_filter"
-            android:showAsAction="ifRoom"
+            app:showAsAction="ifRoom"
             />
 
     <item
             android:id="@+id/hideUnavailable"
             android:visible="false"
             android:title="@string/show_only_available_label"
-            android:showAsAction="never"
+            app:showAsAction="never"
             />
 
     <item
@@ -41,7 +42,7 @@
             android:id="@+id/export"
             android:visible="false"
             android:title="@string/export_label"
-            android:showAsAction="ifRoom"
+            app:showAsAction="ifRoom"
             />
 
     <item

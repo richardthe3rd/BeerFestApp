@@ -2,8 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="ralcock.cbf"
           android:allowBackup="true"
-          android:versionCode="15"
-          android:versionName="4.0.4"
           android:installLocation="auto">
 
     <uses-permission
@@ -12,14 +10,13 @@
     <uses-permission
             android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
-    <uses-sdk
-            android:minSdkVersion="7"
-            android:targetSdkVersion="19"/>
-
     <application
             android:label="Cambridge Beer Festival"
-            android:theme="@style/Theme.Sherlock"
             android:icon="@drawable/ic_caskman">
+
+        <style name="AppBaseTheme"
+              parent="@style/Theme.AppCompat.Light.DarkActionBar">
+        </style>
 
         <activity
                 android:name=".CamBeerFestApplication"
