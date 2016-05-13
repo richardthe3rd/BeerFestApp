@@ -1,5 +1,6 @@
 package ralcock.cbf;
 
+import android.app.DialogFragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,20 +9,20 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.DialogFragment;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Toast;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
-import android.support.v7.widget.SearchView;
+import android.widget.AdapterView;
+import android.widget.Toast;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import ralcock.cbf.actions.BeerExporter;
 import ralcock.cbf.actions.BeerSearcher;
@@ -90,6 +91,9 @@ public class CamBeerFestApplication extends AppCompatActivity {
 
         final ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
+        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setDisplayUseLogoEnabled(false);
+        actionBar.setIcon(R.drawable.ic_caskman);
         actionBar.setTitle(fAppPreferences.getFilterText());
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
@@ -182,14 +186,6 @@ public class CamBeerFestApplication extends AppCompatActivity {
         }
     }
 
-    @Override
-    public boolean onKeyUp(final int keyCode, final KeyEvent event) {
-        if (event.getKeyCode() == KeyEvent.KEYCODE_SEARCH) {
-            // TODO: Expand SearchView
-        }
-        return super.onKeyUp(keyCode, event);
-    }
-
     private BeerDatabaseHelper getHelper() {
         if (fDBHelper == null) {
             fDBHelper = OpenHelperManager.getHelper(this, BeerDatabaseHelper.class);
@@ -213,7 +209,7 @@ public class CamBeerFestApplication extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.list_options_menu, menu);
 
-        final SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        final SearchView searchView = (SearchView) (MenuItemCompat.getActionView(menu.findItem(R.id.search)));
 
         searchView.setOnSearchClickListener(new View.OnClickListener() {
             public void onClick(final View view) {
@@ -223,6 +219,7 @@ public class CamBeerFestApplication extends AppCompatActivity {
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             public boolean onQueryTextSubmit(final String query) {
+                searchView.clearFocus();
                 filterBy(query.toString());
                 return true;
             }
@@ -232,13 +229,14 @@ public class CamBeerFestApplication extends AppCompatActivity {
                 return true;
             }
         });
+
         return true;
     }
 
     void filterBy(String filterText) {
         fireFilterTextChanged(filterText);
         fAppPreferences.setFilterText(filterText);
-        getActionBar().setTitle(filterText);
+        getSupportActionBar().setTitle(filterText);
     }
 
     @Override
@@ -301,21 +299,6 @@ public class CamBeerFestApplication extends AppCompatActivity {
         final DialogFragment newFragment = FilterByStyleDialogFragment.newInstance(stylesToHide, allStyles);
         newFragment.show(getFragmentManager(), "filterByStyle");
     }
-
-/*
-    @Override
-    public boolean onMenuItemSelected(final int featureId, final MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.searchBeer:
-                fBeerSearcher.searchBeer(getBeerFromMenuItem(item));
-                return true;
-            case R.id.shareBeer:
-                fBeerSharer.shareBeer(getBeerFromMenuItem(item));
-                return true;
-        }
-        return super.onMenuItemSelected(featureId, item);
-    }
-    */
 
     // Helper for onMenuItemSelected
     private Beer getBeerFromMenuItem(final MenuItem item) {
