@@ -3,7 +3,7 @@ package ralcock.cbf.view;
 import android.app.Activity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import com.actionbarsherlock.app.ActionBar;
+import android.support.v7.app.ActionBar;
 import ralcock.cbf.R;
 
 public class TabListener<T extends Fragment> implements ActionBar.TabListener {

@@ -8,7 +8,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
+import android.app.DialogFragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -16,7 +16,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Toast;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -49,7 +49,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
-public class CamBeerFestApplication extends ActionBarActivity {
+public class CamBeerFestApplication extends AppCompatActivity {
     private static final String TAG = CamBeerFestApplication.class.getName();
 
     private static final int SHOW_BEER_DETAILS_REQUEST_CODE = 1;
@@ -210,7 +210,7 @@ public class CamBeerFestApplication extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
-        MenuInflater inflater = getSupportMenuInflater();
+        MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.list_options_menu, menu);
 
         final SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
@@ -238,7 +238,7 @@ public class CamBeerFestApplication extends ActionBarActivity {
     void filterBy(String filterText) {
         fireFilterTextChanged(filterText);
         fAppPreferences.setFilterText(filterText);
-        getSupportActionBar().setTitle(filterText);
+        getActionBar().setTitle(filterText);
     }
 
     @Override
@@ -286,22 +286,23 @@ public class CamBeerFestApplication extends ActionBarActivity {
             fExceptionReporter.report(TAG, e.getMessage(), e);
         }
         DialogFragment newFragment = AboutDialogFragment.newInstance(appName, versionName);
-        newFragment.show(getSupportFragmentManager(), "about");
+        newFragment.show(getFragmentManager(), "about");
     }
 
     // Copied from http://developer.android.com/reference/android/app/DialogFragment.html
     private void showSortByDialog() {
         DialogFragment newFragment = SortByDialogFragment.newInstance(fAppPreferences.getSortOrder());
-        newFragment.show(getSupportFragmentManager(), "sortBy");
+        newFragment.show(getFragmentManager(), "sortBy");
     }
 
     private void showFilterByStyleDialog() {
         final Set<String> allStyles = getBeerDao().getAvailableStyles();
         final Set<String> stylesToHide = fAppPreferences.getStylesToHide();
         final DialogFragment newFragment = FilterByStyleDialogFragment.newInstance(stylesToHide, allStyles);
-        newFragment.show(getSupportFragmentManager(), "filterByStyle");
+        newFragment.show(getFragmentManager(), "filterByStyle");
     }
 
+/*
     @Override
     public boolean onMenuItemSelected(final int featureId, final MenuItem item) {
         switch (item.getItemId()) {
@@ -314,6 +315,7 @@ public class CamBeerFestApplication extends ActionBarActivity {
         }
         return super.onMenuItemSelected(featureId, item);
     }
+    */
 
     // Helper for onMenuItemSelected
     private Beer getBeerFromMenuItem(final MenuItem item) {

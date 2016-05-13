@@ -1,7 +1,7 @@
 package ralcock.cbf.view;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.text.Spannable;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
@@ -78,7 +78,7 @@ public class BeerDetailsFragment extends Fragment {
 
     private void rateBeer(Beer beer, StarRating rating) {
         beer.setNumberOfStars(rating);
-        getHelper().getBeers().updateBeer(beer);		
+        getHelper().getBeers().updateBeer(beer);
         displayBeer(beer);
     }
 
