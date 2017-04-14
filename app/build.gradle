@@ -39,10 +39,10 @@ android {
     }
 
     // See https://www.timroes.de/2013/09/22/handling-signing-configs-with-gradle/
-    if(project.hasProperty("CamBeerFestApp.signing")
-       && new File(project.property("CamBeerFestApp.signing") + ".gradle").exists()){
-        apply from: project.property("CamBeerFestApp.signing") + ".gradle";
+    if(project.hasProperty("CamBeerFestApp.signing.path")
+       && new File(project.property("CamBeerFestApp.signing.path") + "/CamBeerFestApp.gradle").exists()){
+        apply from: project.property("CamBeerFestApp.signing.path") + "/CamBeerFestApp.gradle";
     } else {
-        logger.warn("Signing not available: Project property 'CamBeerFestApp.signing' not set to directory" )
+        logger.warn("Signing not available: Project property 'CamBeerFestApp.signing.path' not set to directory that contains CamBeerFestApp.gradle file" )
     }
 }
