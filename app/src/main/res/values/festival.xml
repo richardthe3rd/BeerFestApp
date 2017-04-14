@@ -3,12 +3,12 @@
 
     <string name="festival_name">43rd Cambridge Beer Festival</string>
     <string name="festival_hashtag">cbf43</string>
-    <string name="festival_website_url">http://www.cambridgebeerfestival.com/viewnode.php?id=3</string>
+    <string name="festival_website_url">https://www.cambridgebeerfestival.com/</string>
 
     <string formatted="false" name="share_intent_subject">Drinking a %1$s at the %2$s</string>
     <string formatted="false" name="share_intent_text">Drinking %1$s %2$s</string>
 
     <!--<string name="beer_list_url">http://dl.dropbox.com/u/4457379/cbf39.json</string>-->
-    <string name="beer_list_url">http://www.cambridgebeerfestival.com/cbf/43/beer/json</string>
+    <string name="beer_list_url">https://data.cambridgebeerfestival.com/cbf43/beer.json</string>
 
 </resources>
