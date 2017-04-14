@@ -1,47 +1,48 @@
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
     }
-
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.9+'
-	classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.+'
+        classpath 'com.android.tools.build:gradle:2.3.1'
     }
 }
 
-apply plugin: 'android-sdk-manager'
-apply plugin: 'android'
-
-repositories {
-    mavenCentral()
-}
+apply plugin: 'com.android.application'
 
 dependencies {
     compile project(':libraries:beers')
     compile group: 'com.j256.ormlite',      name: 'ormlite-core',      version: '4+'
     compile group: 'com.j256.ormlite',      name: 'ormlite-android',   version: '4+'
-    compile group: 'com.android.support',   name: 'support-v13',       version: '18.0.+'
+    compile group: 'com.android.support',   name: 'support-v13',       version: '19.0.+'
     compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
     compile "org.slf4j:slf4j-android:1.7+"
 }
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion "19.0.2"
+    defaultConfig {
+        jackOptions {
+            enabled true
+        }
+
+        compileOptions {
+            targetCompatibility = JavaVersion.VERSION_1_7
+            sourceCompatibility = JavaVersion.VERSION_1_7
+        }
+    }
+
+    compileSdkVersion 23
+    buildToolsVersion "25.0.2"
 
     lintOptions {
         abortOnError false
     }
 
-    // See https://www.timroes.de/2013/09/22/handling-signing-configs-with-gradle/    
+    // See https://www.timroes.de/2013/09/22/handling-signing-configs-with-gradle/
     if(project.hasProperty("CamBeerFestApp.signing")
        && new File(project.property("CamBeerFestApp.signing") + ".gradle").exists()){
         apply from: project.property("CamBeerFestApp.signing") + ".gradle";
     } else {
-        logger.warning("Signing not available." )
+        logger.warn("Signing not available: Project property 'CamBeerFestApp.signing' not set to directory" )
     }
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '1.11'
 }
