@@ -19,7 +19,6 @@
             android:text="Comrade Bill Bartrams Egalitarian Anti Imperialist Soviet Stout"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
-            android:singleLine="false"
             android:layout_marginRight="75dp"/>
 
     <TextView
@@ -80,4 +79,3 @@
             android:layout_alignParentRight="true"
             />
 </RelativeLayout>
-

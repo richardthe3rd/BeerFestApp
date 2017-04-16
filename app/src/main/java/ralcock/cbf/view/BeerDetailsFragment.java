@@ -16,6 +16,7 @@ import ralcock.cbf.actions.BeerSearcher;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerDatabaseHelper;
 import ralcock.cbf.model.StarRating;
+import java.util.Locale;
 
 public class BeerDetailsFragment extends Fragment {
     private BeerDetailsView fBeerDetailsView;
@@ -45,7 +46,7 @@ public class BeerDetailsFragment extends Fragment {
     }
 
     public void displayBeer(final Beer beer) {
-        fBeerDetailsView.BeerNameAndAbv.setText(String.format("%s (%.1f%%)", beer.getName(), beer.getAbv()));
+        fBeerDetailsView.BeerNameAndAbv.setText(String.format(Locale.US, "%s (%.1f%%)", beer.getName(), beer.getAbv()));
         fBeerDetailsView.BeerDescription.setText(beer.getDescription());
         fBeerDetailsView.BeerStyle.setText(beer.getStyle());
 
@@ -78,7 +79,7 @@ public class BeerDetailsFragment extends Fragment {
 
     private void rateBeer(Beer beer, StarRating rating) {
         beer.setNumberOfStars(rating);
-        getHelper().getBeers().updateBeer(beer);		
+        getHelper().getBeers().updateBeer(beer);
         displayBeer(beer);
     }
 

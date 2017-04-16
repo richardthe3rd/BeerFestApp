@@ -17,6 +17,7 @@ import ralcock.cbf.model.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.List;
@@ -32,7 +33,7 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
     private final CopyOnWriteArrayList<BeerChangedListener> fListeners
         = new CopyOnWriteArrayList<BeerChangedListener>();
 
-    private static BeerAccessException newBeerAccessException(final String msg, final SQLException cause) {
+    private static BeerAccessException newBeerAccessException(final String msg, final Throwable cause) {
         LoggerFactory.getLogger(BeersImpl.class).error(msg, cause);
         return new BeerAccessException(msg, cause);
     }
@@ -89,7 +90,7 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
             if (results != null) {
                 try {
                     results.close();
-                } catch (SQLException e) {
+                } catch (IOException e) {
                     throw newBeerAccessException("Failed to close results.", e);
                 }
             }

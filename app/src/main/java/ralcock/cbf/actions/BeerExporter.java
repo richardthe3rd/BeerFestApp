@@ -6,6 +6,7 @@ import ralcock.cbf.model.Beer;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 public final class BeerExporter {
     private final Context fContext;
@@ -17,7 +18,7 @@ public final class BeerExporter {
     public void export(final List<Beer> ratedBeers) throws IOException {
         StringBuilder builder = new StringBuilder();
 
-        builder.append(String.format("%s, %s, %s, %s\n", "Beer", "Brewery", "Style", "Rating"));
+        builder.append(String.format(Locale.US, "%s, %s, %s, %s\n", "Beer", "Brewery", "Style", "Rating"));
 
         for (Beer b : ratedBeers) {
             builder.append(String.format("\"%s\", \"%s\", \"%s\", %d\n", b.getName(), b.getBrewery().getName(), b.getStyle(), b.getRating()));

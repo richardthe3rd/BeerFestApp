@@ -69,7 +69,7 @@ public final class AppPreferences {
         SharedPreferences settings = getSharedPreferences();
         SharedPreferences.Editor editor = settings.edit();
         editor.putLong(key, date.getTime());
-        editor.commit();
+        editor.apply();
     }
 
     private String getPreference(final String key, final String def) {
@@ -86,7 +86,7 @@ public final class AppPreferences {
         SharedPreferences settings = getSharedPreferences();
         SharedPreferences.Editor editor = settings.edit();
         editor.putString(key, value);
-        editor.commit();
+        editor.apply();
     }
 
     private void setPreference(final String key, final Set<String> strings) {
@@ -94,14 +94,14 @@ public final class AppPreferences {
         SharedPreferences.Editor editor = settings.edit();
         JSONArray json = new JSONArray(strings);
         editor.putString(key, json.toString());
-        editor.commit();
+        editor.apply();
     }
 
     private void setPreference(final String key, final boolean value) {
         SharedPreferences settings = getSharedPreferences();
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean(key, value);
-        editor.commit();
+        editor.apply();
     }
 
 

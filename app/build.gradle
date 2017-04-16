@@ -12,22 +12,17 @@ apply plugin: 'com.android.application'
 
 dependencies {
     compile project(':libraries:beers')
-    compile group: 'com.j256.ormlite',      name: 'ormlite-core',      version: '4+'
-    compile group: 'com.j256.ormlite',      name: 'ormlite-android',   version: '4+'
-    compile group: 'com.android.support',   name: 'support-v13',       version: '19.0.+'
+    compile group: 'com.j256.ormlite',      name: 'ormlite-core',      version: '5.0'
+    compile group: 'com.j256.ormlite',      name: 'ormlite-android',   version: '5.0'
+    compile group: 'com.android.support',   name: 'support-v13',       version: '25.3.1'
     compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
-    compile "org.slf4j:slf4j-android:1.7+"
+    compile "org.slf4j:slf4j-android:1.7.25"
 }
 
 android {
     defaultConfig {
         jackOptions {
             enabled true
-        }
-
-        compileOptions {
-            targetCompatibility = JavaVersion.VERSION_1_7
-            sourceCompatibility = JavaVersion.VERSION_1_7
         }
     }
 

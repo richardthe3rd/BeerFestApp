@@ -1,9 +1,8 @@
 package ralcock.cbf.model.dao;
 
-import java.sql.SQLException;
 
 public class BeerAccessException extends RuntimeException {
-    public BeerAccessException(final String msg, final SQLException cause) {
+    public BeerAccessException(final String msg, final Throwable cause) {
         super(msg, cause);
     }
 }
