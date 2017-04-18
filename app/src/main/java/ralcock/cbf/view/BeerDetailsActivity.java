@@ -3,14 +3,15 @@ package ralcock.cbf.view;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.Window;
-import com.actionbarsherlock.widget.ShareActionProvider;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MenuInflater;
+import android.view.Window;
+import android.support.v7.widget.ShareActionProvider;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBar;
 import ralcock.cbf.R;
 import ralcock.cbf.actions.BeerSharer;
 import ralcock.cbf.model.Beer;
@@ -18,11 +19,9 @@ import ralcock.cbf.model.BeerChangedListener;
 import ralcock.cbf.model.BeerDatabaseHelper;
 
 //OrmLiteBaseActivity<BeerDatabaseHelper>
-public final class BeerDetailsActivity extends SherlockFragmentActivity {
+public final class BeerDetailsActivity extends AppCompatActivity {
 
-    @SuppressWarnings("UnusedDeclaration")
     private static final String TAG = BeerDetailsActivity.class.getName();
-
     public static final String EXTRA_BEER_ID = "BEER";
 
     private final BeerSharer fBeerSharer;
@@ -63,17 +62,17 @@ public final class BeerDetailsActivity extends SherlockFragmentActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getSupportMenuInflater();
+        MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.details_options_menu, menu);
 
-        fShareActionProvider = (ShareActionProvider) (menu.findItem(R.id.shareBeer).getActionProvider());
+        fShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menu.findItem(R.id.shareBeer));
         fShareActionProvider.setShareIntent(fBeerSharer.makeShareIntent(getBeer()));
-		
+
 		getHelper().getBeers().addBeerChangedListener(new BeerChangedListener() {
 			public void beerChanged(final Beer beer) {
 				fShareActionProvider.setShareIntent(
 					fBeerSharer.makeShareIntent(beer)
-				);				
+				);
 			}
 		});
         return true;
@@ -91,7 +90,6 @@ public final class BeerDetailsActivity extends SherlockFragmentActivity {
         }
     }
 
-    @SuppressWarnings({"UnusedDeclaration"}) // Called from beer_details_activity.xml
     public void shareBeer(View button) {
         fBeerSharer.shareBeer(getBeer());
     }

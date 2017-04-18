@@ -18,7 +18,7 @@
 
     <application
             android:label="Cambridge Beer Festival"
-            android:theme="@style/Theme.Sherlock"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
             android:icon="@drawable/ic_caskman">
 
         <activity

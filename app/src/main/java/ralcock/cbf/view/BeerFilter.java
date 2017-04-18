@@ -4,7 +4,6 @@ import android.widget.Filter;
 import ralcock.cbf.model.BeerList;
 
 final class BeerFilter extends Filter {
-    private static final String TAG = BeerFilter.class.getName();
 
     private final BeerListAdapter fBeerListAdapter;
     private final BeerList fBeerList;

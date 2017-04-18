@@ -3,7 +3,7 @@ package ralcock.cbf.view;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
+import android.app.DialogFragment;
 import ralcock.cbf.R;
 
 public class LoadBeersProgressDialogFragment extends DialogFragment {

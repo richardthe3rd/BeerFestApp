@@ -9,7 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import com.actionbarsherlock.app.SherlockListFragment;
+import android.support.v4.app.ListFragment;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import ralcock.cbf.CamBeerFestApplication;
 import ralcock.cbf.R;
@@ -24,7 +24,7 @@ import ralcock.cbf.model.dao.Beers;
 
 import java.util.Set;
 
-public abstract class BeerListFragment extends SherlockListFragment implements ListChangedListener {
+public abstract class BeerListFragment extends ListFragment implements ListChangedListener {
     private static final String TAG = BeerListFragment.class.getName();
 
     private static final int SHOW_BEER_DETAILS_REQUEST_CODE = 1;
@@ -108,7 +108,7 @@ public abstract class BeerListFragment extends SherlockListFragment implements L
     private void toggleBookmark(final Beer beer) {
         beer.setIsOnWishList(!beer.isIsOnWishList());
         getBeers().updateBeer(beer);
-        beersChanged();
+        getCamBeerFestApplication().notifyBeersChanged();
     }
 
     private Beer getBeer(final long id) {

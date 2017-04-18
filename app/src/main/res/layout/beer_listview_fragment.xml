@@ -12,5 +12,4 @@
             android:smoothScrollbar="true"
             android:fastScrollEnabled="true"
             />
-
 </LinearLayout>

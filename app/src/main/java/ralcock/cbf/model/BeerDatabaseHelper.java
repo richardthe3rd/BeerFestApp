@@ -6,26 +6,23 @@ import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
-import ralcock.cbf.R;
 import ralcock.cbf.model.dao.Beers;
 import ralcock.cbf.model.dao.BeersImpl;
 import ralcock.cbf.model.dao.Breweries;
+import ralcock.cbf.R;
 
 import java.sql.SQLException;
 
 public final class BeerDatabaseHelper extends OrmLiteSqliteOpenHelper {
-    @SuppressWarnings("UnusedDeclaration")
-    private static final String TAG = BeerDatabaseHelper.class.getName();
-
     public static final String DATABASE_NAME = "BEERS";
 
-    private static final int DB_VERSION = 25; // cbf43
+    private static final int DB_VERSION = 26; // cbf44
 
     private Breweries fBreweries;
     private Beers fBeers;
 
     public BeerDatabaseHelper(final Context context) {
-        super(context, DATABASE_NAME, null, DB_VERSION, R.raw.ormlite_config);
+        super(context, DATABASE_NAME, null, DB_VERSION,  R.raw.ormlite_config);
     }
 
     @Override

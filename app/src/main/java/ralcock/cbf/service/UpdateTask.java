@@ -125,6 +125,7 @@ public class UpdateTask extends AsyncTask<UpdateTask.Params, UpdateTask.Progress
     }
 
     public final static class Progress implements Serializable {
+        private static final long serialVersionUID = 1L;
         private final int fCount;
         private final int fSize;
         private final Beer fBeer;
@@ -149,6 +150,7 @@ public class UpdateTask extends AsyncTask<UpdateTask.Params, UpdateTask.Progress
     }
 
     public abstract class Result implements Serializable {
+        private static final long serialVersionUID = 1L;
         public boolean success() {
             return true;
         }
@@ -167,11 +169,11 @@ public class UpdateTask extends AsyncTask<UpdateTask.Params, UpdateTask.Progress
     }
 
     public class NoUpdateRequiredResult extends Result {
-
+        private static final long serialVersionUID = 1L;
     }
 
     public class UpdateResult extends Result {
-
+        private static final long serialVersionUID = 1L;
         private final int fCount;
         private final String fDigest;
 
@@ -192,6 +194,7 @@ public class UpdateTask extends AsyncTask<UpdateTask.Params, UpdateTask.Progress
     }
 
     private class FailedUpdateResult extends Result {
+        private static final long serialVersionUID = 1L;
         private Throwable fThrowable;
 
         public FailedUpdateResult(final Throwable t) {

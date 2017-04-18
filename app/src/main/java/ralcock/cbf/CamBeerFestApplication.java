@@ -8,20 +8,22 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
+import android.support.design.widget.TabLayout;
+import android.app.DialogFragment;
+import android.support.v4.view.ViewPager;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.SearchView;
 import android.widget.Toast;
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.Window;
-import com.actionbarsherlock.widget.SearchView;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import ralcock.cbf.actions.BeerExporter;
 import ralcock.cbf.actions.BeerSearcher;
@@ -35,21 +37,17 @@ import ralcock.cbf.service.UpdateService;
 import ralcock.cbf.service.UpdateTask;
 import ralcock.cbf.util.ExceptionReporter;
 import ralcock.cbf.view.AboutDialogFragment;
-import ralcock.cbf.view.AllBeersListFragment;
-import ralcock.cbf.view.BookmarkedBeerListFragment;
 import ralcock.cbf.view.FilterByStyleDialogFragment;
 import ralcock.cbf.view.ListChangedListener;
 import ralcock.cbf.view.SortByDialogFragment;
-import ralcock.cbf.view.TabListener;
-
-import java.io.IOException;
+import ralcock.cbf.view.BeerListFragmentPagerAdapter;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
-public class CamBeerFestApplication extends SherlockFragmentActivity {
+public class CamBeerFestApplication extends AppCompatActivity {
     private static final String TAG = CamBeerFestApplication.class.getName();
 
     private static final int SHOW_BEER_DETAILS_REQUEST_CODE = 1;
@@ -88,26 +86,25 @@ public class CamBeerFestApplication extends SherlockFragmentActivity {
 
         setContentView(R.layout.beer_listview_activity);
 
+        ViewPager viewPager = (ViewPager)findViewById(R.id.viewpager);
+        viewPager.setOffscreenPageLimit(0);
+        viewPager.setAdapter(new BeerListFragmentPagerAdapter(
+                                 getSupportFragmentManager(), CamBeerFestApplication.this));
+        TabLayout tabLayout = (TabLayout)findViewById(R.id.sliding_tabs);
+        tabLayout.setupWithViewPager(viewPager);
+
+
         final ActionBar actionBar = getSupportActionBar();
-        assert actionBar != null;
+        if (actionBar==null) { Log.e(TAG, "ActionBar is null!"); }
+
         actionBar.setTitle(fAppPreferences.getFilterText());
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-        ActionBar.Tab allBeersTab = actionBar.newTab()
-                .setText("All Beers")
-                .setTabListener(new TabListener<AllBeersListFragment>(this, "all", AllBeersListFragment.class));
-
-        ActionBar.Tab availableBeersTab = actionBar.newTab()
-                .setText("Bookmarked Beers")
-                .setTabListener(new TabListener<BookmarkedBeerListFragment>(this, "bookmarks", BookmarkedBeerListFragment.class));
-
-        actionBar.addTab(allBeersTab);
-        actionBar.addTab(availableBeersTab);
-
+        /*
         if (savedInstanceState != null) {
             int selectedTab = savedInstanceState.getInt("selected.navigation.index");
             actionBar.setSelectedNavigationItem(selectedTab);
         }
+        */
 
         fLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
         fBroadcastReceiver = new BroadcastReceiver() {
@@ -203,18 +200,18 @@ public class CamBeerFestApplication extends SherlockFragmentActivity {
 
     @Override
     protected void onSaveInstanceState(final Bundle outState) {
-        int selectedTab = getSupportActionBar().getSelectedNavigationIndex();
-        outState.putInt("selected.navigation.index", selectedTab);
-        super.onSaveInstanceState(outState);
+        //int selectedTab = getSupportActionBar().getSelectedNavigationIndex();
+        //outState.putInt("selected.navigation.index", selectedTab);
+        //super.onSaveInstanceState(outState);
     }
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
-        MenuInflater inflater = getSupportMenuInflater();
+        MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.list_options_menu, menu);
 
         final SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-
+        /*
         searchView.setOnSearchClickListener(new View.OnClickListener() {
             public void onClick(final View view) {
                 searchView.setQueryHint(getResources().getString(R.string.filter_hint));
@@ -232,13 +229,14 @@ public class CamBeerFestApplication extends SherlockFragmentActivity {
                 return true;
             }
         });
+        */
         return true;
     }
 
     void filterBy(String filterText) {
         fireFilterTextChanged(filterText);
         fAppPreferences.setFilterText(filterText);
-        getSupportActionBar().setTitle(filterText);
+        getActionBar().setTitle(filterText);
     }
 
     @Override
@@ -286,33 +284,20 @@ public class CamBeerFestApplication extends SherlockFragmentActivity {
             fExceptionReporter.report(TAG, e.getMessage(), e);
         }
         DialogFragment newFragment = AboutDialogFragment.newInstance(appName, versionName);
-        newFragment.show(getSupportFragmentManager(), "about");
+        newFragment.show(getFragmentManager(), "about");
     }
 
     // Copied from http://developer.android.com/reference/android/app/DialogFragment.html
     private void showSortByDialog() {
         DialogFragment newFragment = SortByDialogFragment.newInstance(fAppPreferences.getSortOrder());
-        newFragment.show(getSupportFragmentManager(), "sortBy");
+        newFragment.show(getFragmentManager(), "sortBy");
     }
 
     private void showFilterByStyleDialog() {
         final Set<String> allStyles = getBeerDao().getAvailableStyles();
         final Set<String> stylesToHide = fAppPreferences.getStylesToHide();
         final DialogFragment newFragment = FilterByStyleDialogFragment.newInstance(stylesToHide, allStyles);
-        newFragment.show(getSupportFragmentManager(), "filterByStyle");
-    }
-
-    @Override
-    public boolean onMenuItemSelected(final int featureId, final MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.searchBeer:
-                fBeerSearcher.searchBeer(getBeerFromMenuItem(item));
-                return true;
-            case R.id.shareBeer:
-                fBeerSharer.shareBeer(getBeerFromMenuItem(item));
-                return true;
-        }
-        return super.onMenuItemSelected(featureId, item);
+        newFragment.show(getFragmentManager(), "filterByStyle");
     }
 
     // Helper for onMenuItemSelected
@@ -333,7 +318,7 @@ public class CamBeerFestApplication extends SherlockFragmentActivity {
     public void notifyBeersChanged() {
         fireBeerListChanged();
     }
-
+    /*
     private void doExport() {
         try {
             List<Beer> ratedBeers = getBeerDao().getRatedBeers();
@@ -343,7 +328,7 @@ public class CamBeerFestApplication extends SherlockFragmentActivity {
             fExceptionReporter.report(TAG, e.getMessage(), e);
         }
     }
-
+    */
     private void visitFestivalWebsite() {
         Uri festivalUri = Uri.parse(getString(R.string.festival_website_url));
         Intent launchBrowser = new Intent(Intent.ACTION_VIEW, festivalUri);
@@ -369,11 +354,12 @@ public class CamBeerFestApplication extends SherlockFragmentActivity {
         fAppPreferences.setStylesToHide(stylesToHide);
     }
 
+    /*
     private void statusToShow(StatusToShow statusToShow) {
         fireStatusToShowChanged(statusToShow);
         fAppPreferences.setHideUnavailableBeers(StatusToShow.AVAILABLE_ONLY == statusToShow);
     }
-
+    */
     public void addListChangedListener(final ListChangedListener listChangedListener) {
         fListChangedListeners.add(listChangedListener);
     }
@@ -400,12 +386,13 @@ public class CamBeerFestApplication extends SherlockFragmentActivity {
         }
     }
 
+    /*
     private void fireStatusToShowChanged(final StatusToShow statusToShow) {
         for (ListChangedListener l : fListChangedListeners) {
             l.statusToShowChanged(statusToShow);
         }
     }
-
+    */
     private void fireBeerListChanged() {
         for (ListChangedListener l : fListChangedListeners) {
             l.beersChanged();
