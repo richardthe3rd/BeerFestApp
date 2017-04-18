@@ -17,13 +17,14 @@
             android:targetSdkVersion="25"/>
 
     <application
-            android:label="Cambridge Beer Festival"
+            android:label="@string/app_name"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
             android:icon="@drawable/ic_caskman">
 
         <activity
-                android:name=".CamBeerFestApplication"
-                android:windowSoftInputMode="stateAlwaysHidden">
+            android:label="@string/app_name"
+            android:name=".CamBeerFestApplication"
+            android:windowSoftInputMode="stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

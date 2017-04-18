@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.app.DialogFragment;
+import android.app.SearchManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -22,7 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.SearchView;
+import android.support.v7.widget.SearchView;
 import android.widget.Toast;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import ralcock.cbf.actions.BeerExporter;
@@ -64,7 +65,6 @@ public class CamBeerFestApplication extends AppCompatActivity {
 
     private LocalBroadcastManager fLocalBroadcastManager;
     private BroadcastReceiver fBroadcastReceiver;
-
     public CamBeerFestApplication() {
         super();
         fAppPreferences = new AppPreferences(this);
@@ -210,8 +210,17 @@ public class CamBeerFestApplication extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.list_options_menu, menu);
 
-        final SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        // Associate searchable configuration with the SearchView
         /*
+        SearchManager searchManager =
+            (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView =
+            (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(
+            searchManager.getSearchableInfo(getComponentName()));
+
+        */
+        final SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setOnSearchClickListener(new View.OnClickListener() {
             public void onClick(final View view) {
                 searchView.setQueryHint(getResources().getString(R.string.filter_hint));
@@ -229,14 +238,13 @@ public class CamBeerFestApplication extends AppCompatActivity {
                 return true;
             }
         });
-        */
         return true;
     }
 
     void filterBy(String filterText) {
         fireFilterTextChanged(filterText);
         fAppPreferences.setFilterText(filterText);
-        getActionBar().setTitle(filterText);
+        getSupportActionBar().setTitle(filterText);
     }
 
     @Override

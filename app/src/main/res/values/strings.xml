@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="sort_dialog_title">Order by</string>
     <string name="search_this_beer_title">Search for this beer online</string>
     <string name="share_this_beer_title">Share this beer</string>
