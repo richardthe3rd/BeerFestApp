@@ -87,7 +87,6 @@ public class CamBeerFestApplication extends AppCompatActivity {
         setContentView(R.layout.beer_listview_activity);
 
         ViewPager viewPager = (ViewPager)findViewById(R.id.viewpager);
-        viewPager.setOffscreenPageLimit(0);
         viewPager.setAdapter(new BeerListFragmentPagerAdapter(
                                  getSupportFragmentManager(), CamBeerFestApplication.this));
         TabLayout tabLayout = (TabLayout)findViewById(R.id.sliding_tabs);
@@ -98,13 +97,14 @@ public class CamBeerFestApplication extends AppCompatActivity {
         if (actionBar==null) { Log.e(TAG, "ActionBar is null!"); }
 
         actionBar.setTitle(fAppPreferences.getFilterText());
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_USE_LOGO);
 
-        /*
+
         if (savedInstanceState != null) {
             int selectedTab = savedInstanceState.getInt("selected.navigation.index");
-            actionBar.setSelectedNavigationItem(selectedTab);
+            Log.i(TAG, "restoring tab " + selectedTab);
+            viewPager.setCurrentItem(selectedTab);
         }
-        */
 
         fLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
         fBroadcastReceiver = new BroadcastReceiver() {
@@ -200,9 +200,11 @@ public class CamBeerFestApplication extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(final Bundle outState) {
-        //int selectedTab = getSupportActionBar().getSelectedNavigationIndex();
-        //outState.putInt("selected.navigation.index", selectedTab);
-        //super.onSaveInstanceState(outState);
+        ViewPager viewPager = (ViewPager)findViewById(R.id.viewpager);
+        int selectedTab = viewPager.getCurrentItem();
+        Log.i(TAG, "onSaveInstanceState saving " + selectedTab);
+        outState.putInt("selected.navigation.index", selectedTab);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -210,16 +212,6 @@ public class CamBeerFestApplication extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.list_options_menu, menu);
 
-        // Associate searchable configuration with the SearchView
-        /*
-        SearchManager searchManager =
-            (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView =
-            (SearchView) menu.findItem(R.id.search).getActionView();
-        searchView.setSearchableInfo(
-            searchManager.getSearchableInfo(getComponentName()));
-
-        */
         final SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setOnSearchClickListener(new View.OnClickListener() {
             public void onClick(final View view) {
