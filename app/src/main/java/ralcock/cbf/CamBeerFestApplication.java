@@ -25,6 +25,7 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.support.v7.widget.SearchView;
 import android.widget.Toast;
+import android.support.v7.widget.Toolbar;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import ralcock.cbf.actions.BeerExporter;
 import ralcock.cbf.actions.BeerSearcher;
@@ -80,11 +81,14 @@ public class CamBeerFestApplication extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "In onCreate");
 
-        requestWindowFeature(Window.FEATURE_ACTION_BAR);
-
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.beer_listview_activity);
+
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        myToolbar.setLogo(R.drawable.ic_caskman);
 
         ViewPager viewPager = (ViewPager)findViewById(R.id.viewpager);
         viewPager.setAdapter(new BeerListFragmentPagerAdapter(
@@ -93,12 +97,13 @@ public class CamBeerFestApplication extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
 
 
+        /*
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar==null) { Log.e(TAG, "ActionBar is null!"); }
 
         actionBar.setTitle(fAppPreferences.getFilterText());
         actionBar.setDisplayOptions(ActionBar.DISPLAY_USE_LOGO);
-
+        */
 
         if (savedInstanceState != null) {
             int selectedTab = savedInstanceState.getInt("selected.navigation.index");

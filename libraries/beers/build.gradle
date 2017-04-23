@@ -16,7 +16,7 @@ apply plugin: 'jacoco'
 // In this section you declare the dependencies for your production and test code
 dependencies {
     compile group: 'com.j256.ormlite',      name: 'ormlite-core',      version: '5.0'
-    compile "org.json:json:20090211"
+    compile "org.json:json:20160810"
     compile "org.slf4j:slf4j-api:1.7.25"
     testCompile "junit:junit:4.11"
     testCompile "org.hamcrest:hamcrest-all:1.3"

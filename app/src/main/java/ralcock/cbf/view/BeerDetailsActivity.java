@@ -12,6 +12,7 @@ import com.j256.ormlite.android.apptools.OpenHelperManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import ralcock.cbf.R;
 import ralcock.cbf.actions.BeerSharer;
 import ralcock.cbf.model.Beer;
@@ -47,18 +48,19 @@ public final class BeerDetailsActivity extends AppCompatActivity {
 
     public void onCreate(Bundle savedInstanceState) {
 
-        requestWindowFeature(Window.FEATURE_ACTION_BAR);
-
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.beer_details_activity);
 
         fBeerId = getIntent().getExtras().getLong(EXTRA_BEER_ID);
-        Log.i(TAG, "In BeerDetailsActivity.onCreate with ID " + fBeerId);
 
-        final ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle(getBeer().getName());
+        setContentView(R.layout.beer_details_activity);
+
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        myToolbar.setTitle(getBeer().getName());
+        setSupportActionBar(myToolbar);
+
+        Log.i(TAG, "In BeerDetailsActivity.onCreate with ID " + fBeerId);
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -68,13 +70,13 @@ public final class BeerDetailsActivity extends AppCompatActivity {
         fShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menu.findItem(R.id.shareBeer));
         fShareActionProvider.setShareIntent(fBeerSharer.makeShareIntent(getBeer()));
 
-		getHelper().getBeers().addBeerChangedListener(new BeerChangedListener() {
-			public void beerChanged(final Beer beer) {
-				fShareActionProvider.setShareIntent(
-					fBeerSharer.makeShareIntent(beer)
-				);
-			}
-		});
+        getHelper().getBeers().addBeerChangedListener(new BeerChangedListener() {
+                public void beerChanged(final Beer beer) {
+                    fShareActionProvider.setShareIntent(
+                        fBeerSharer.makeShareIntent(beer)
+                        );
+                }
+            });
         return true;
     }
 
