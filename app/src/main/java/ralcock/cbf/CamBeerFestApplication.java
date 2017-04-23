@@ -97,14 +97,6 @@ public class CamBeerFestApplication extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
 
 
-        /*
-        final ActionBar actionBar = getSupportActionBar();
-        if (actionBar==null) { Log.e(TAG, "ActionBar is null!"); }
-
-        actionBar.setTitle(fAppPreferences.getFilterText());
-        actionBar.setDisplayOptions(ActionBar.DISPLAY_USE_LOGO);
-        */
-
         if (savedInstanceState != null) {
             int selectedTab = savedInstanceState.getInt("selected.navigation.index");
             Log.i(TAG, "restoring tab " + selectedTab);

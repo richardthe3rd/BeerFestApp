@@ -52,6 +52,8 @@ public class BeerDetailsFragment extends Fragment {
 
         fBeerDetailsView.BeerStatus.setText(beer.getStatus());
 
+        //fBeerDetailsView.BeerDispense.setText(beer.getDispenseMethod());
+
         fBeerDetailsView.BreweryName.setText(beer.getBrewery().getName());
         fBeerDetailsView.BreweryDescription.setText(beer.getBrewery().getDescription());
 
@@ -89,6 +91,7 @@ public class BeerDetailsFragment extends Fragment {
         final TextView BeerStyle;
         final TextView BeerDescription;
         final RatingBar BeerRatingBar;
+        //final TextView BeerDispense;
         final TextView BreweryName;
         final TextView BreweryDescription;
         final TextView BeerStatus;
@@ -101,6 +104,7 @@ public class BeerDetailsFragment extends Fragment {
             BreweryName = (TextView) view.findViewById(R.id.detailsViewBreweryName);
             BreweryDescription = (TextView) view.findViewById(R.id.detailsViewBreweryDescription);
             BeerRatingBar = (RatingBar) view.findViewById(R.id.detailsViewBeerRatingBar);
+            //BeerDispense =(TextView)view.findViewById(R.id.detailsViewBeerDispenseMethod);
             BeerStatus = (TextView) view.findViewById(R.id.detailsViewBeerStatus);
             SearchOnline = (TextView) view.findViewById(R.id.clickToSearchOnline);
             SearchOnline.setMovementMethod(LinkMovementMethod.getInstance());

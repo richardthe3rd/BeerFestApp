@@ -75,7 +75,7 @@ public class BeerStyleListAdapter extends BaseAdapter {
             });
         }
         return view;
-    }
+   }
 
     private void toggleShowAllStyles() {
         if (fStylesToHide.isEmpty()) {

@@ -1,6 +1,7 @@
 package ralcock.cbf.view;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,12 +53,16 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
 
         beerListItemView.BeerStatus.setText(beer.getStatus());
         beerListItemView.BeerStyle.setText(beer.getStyle());
+        beerListItemView.BeerDispense.setText(beer.getDispenseMethod());
 
         if (beer.isIsOnWishList()) {
-            beerListItemView.BookmarkStatus.setText("Bookmarked");
+            beerListItemView.BeerName.setTypeface(beerListItemView.BeerName.getTypeface(),
+                                                  Typeface.BOLD_ITALIC);
         } else {
-            beerListItemView.BookmarkStatus.setText("");
+            beerListItemView.BeerName.setTypeface(beerListItemView.BeerName.getTypeface(),
+                                                  Typeface.BOLD);
         }
+
     }
 
     public int getCount() {
@@ -90,6 +95,7 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
         TextView BeerStyle;
         TextView BeerStatus;
         RatingBar BeerRatingBar;
+        TextView BeerDispense;
         TextView BookmarkStatus;
 
         BeerListItemView(final View view) {
@@ -98,7 +104,8 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
             BeerStatus = findTextViewById(view, R.id.beerStatus);
             BeerStyle = findTextViewById(view, R.id.beerStyle);
             BeerRatingBar = (RatingBar) view.findViewById(R.id.beerRatingBar);
-            BookmarkStatus = findTextViewById(view, R.id.bookmarkStatus);
+            BeerDispense = findTextViewById(view, R.id.beerDispense);
+            //BookmarkStatus = findTextViewById(view, R.id.bookmarkStatus);
         }
 
         private TextView findTextViewById(final View view, final int id) {

@@ -1,4 +1,3 @@
-
 package ralcock.cbf.model;
 
 public class BeerBuilder {
@@ -8,6 +7,7 @@ public class BeerBuilder {
     private String fDescription = "";
     private String fStyle = "";
     private String fStatus = "";
+    private String fDispense = "";
     private Brewery fBrewery = null;
 
     public static BeerBuilder aBeer() {
@@ -44,13 +44,18 @@ public class BeerBuilder {
         return this;
     }
 
+    public BeerBuilder withDispenseMethod(String dispense) {
+        fDispense = dispense;
+        return this;
+    }
+
     public BeerBuilder fromBrewery(Brewery brewery) {
         fBrewery = brewery;
         return this;
     }
 
     public Beer build() {
-        return new Beer(fFestivalId, fName, fAbv, fDescription, fStyle, fStatus, fBrewery);
+        return new Beer(fFestivalId, fName, fAbv, fDescription, fStyle, fStatus, fDispense, fBrewery);
     }
 
     public BeerBuilder from(final BreweryBuilder breweryBuilder) {

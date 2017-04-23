@@ -16,7 +16,7 @@
             android:layout_width="wrap_content"
             android:textStyle="bold"
             android:textSize="18sp"
-            android:text="Comrade Bill Bartrams Egalitarian Anti Imperialist Soviet Stout"
+            android:text="[BEER]"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_marginRight="75dp"/>
@@ -26,9 +26,9 @@
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:textSize="14sp"
-            android:text="Bartrams Brewery"
+            android:text="[BREWERY]"
             android:layout_alignParentLeft="false"
-            android:layout_below="@id/beerName"/>
+            android:layout_below="@+id/beerName"/>
 
     <RatingBar
             android:id="@+id/beerRatingBar"
@@ -50,9 +50,22 @@
             android:layout_width="wrap_content"
             android:textSize="14sp"
             android:layout_gravity="top|right"
-            android:text="Stout"
+            android:text="[STYLE]"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"/>
+
+    <TextView
+            android:id="@+id/beerDispense"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textSize="12sp"
+            android:textStyle="italic"
+            android:layout_gravity="center|right"
+            android:text="[DISPENSE]"
+            android:textAllCaps="true"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            />
 
     <TextView
             android:id="@+id/beerStatus"
@@ -60,12 +73,12 @@
             android:layout_width="wrap_content"
             android:textSize="12sp"
             android:textStyle="italic"
-            android:layout_gravity="center|right"
-            android:text="Ordered"
+            android:layout_gravity="bottom|right"
+            android:text="[STATUS]"
+            android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_below="@+id/beerStyle"/>
-
+            android:layout_below="@+id/beerDispense"/>
+<!--
     <TextView
             android:id="@+id/bookmarkStatus"
             android:layout_height="wrap_content"
@@ -78,4 +91,5 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             />
+            -->
 </RelativeLayout>

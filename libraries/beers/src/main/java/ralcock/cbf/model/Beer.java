@@ -18,6 +18,7 @@ public final class Beer implements Serializable {
     public static final String STATUS_FIELD = "status";
     public static final String FESTIVAL_ID_FIELD = "festival_id";
     public static final String STYLE_FIELD = "style";
+    public static final String DISPENSE_FIELD = "dispense";
 
     public static final String RATING_FIELD = "rating";
     public static final String ON_WISH_LIST_FIELD = "on_wish_list";
@@ -50,6 +51,9 @@ public final class Beer implements Serializable {
     @DatabaseField(columnName = STYLE_FIELD, index = true)
     private String fStyle;
 
+    @DatabaseField(columnName = DISPENSE_FIELD)
+    private String fDispense;
+
     @DatabaseField(columnName = ON_WISH_LIST_FIELD, index = true)
     private boolean fIsOnWishList;
 
@@ -67,6 +71,7 @@ public final class Beer implements Serializable {
                 final String description,
                 final String style,
                 final String status,
+                final String dispense,
                 final Brewery brewery) {
         fFestivalID = festivalId;
         fBrewery = brewery;
@@ -75,6 +80,7 @@ public final class Beer implements Serializable {
         fDescription = description;
         fStyle = style;
         fStatus = status;
+        fDispense = dispense;
     }
 
     public String getFestivalID() {
@@ -145,6 +151,14 @@ public final class Beer implements Serializable {
         fUserComments = userComments;
     }
 
+    public String getDispenseMethod() {
+        return fDispense;
+    }
+
+    public void setDispenseMethod(String dispense) {
+        fDispense = dispense;
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
@@ -161,6 +175,7 @@ public final class Beer implements Serializable {
         if (fName != null ? !fName.equals(beer.fName) : beer.fName != null) return false;
         if (fStatus != null ? !fStatus.equals(beer.fStatus) : beer.fStatus != null) return false;
         if (fStyle != null ? !fStyle.equals(beer.fStyle) : beer.fStyle != null) return false;
+        if (fDispense != null ? !fStyle.equals(beer.fDispense) : beer.fDispense != null) return false;
         if (fUserComments != null ? !fUserComments.equals(beer.fUserComments) : beer.fUserComments != null)
             return false;
 
@@ -177,6 +192,7 @@ public final class Beer implements Serializable {
         result = 31 * result + fRating;
         result = 31 * result + (fFestivalID != null ? fFestivalID.hashCode() : 0);
         result = 31 * result + (fStyle != null ? fStyle.hashCode() : 0);
+        result = 31 * result + (fDispense != null ? fDispense.hashCode() : 0);
         result = 31 * result + (fIsOnWishList ? 1 : 0);
         result = 31 * result + (fUserComments != null ? fUserComments.hashCode() : 0);
         return result;
@@ -195,6 +211,7 @@ public final class Beer implements Serializable {
         sb.append(", fRating=").append(fRating);
         sb.append(", fFestivalID='").append(fFestivalID).append('\'');
         sb.append(", fStyle='").append(fStyle).append('\'');
+        sb.append(", fDispense='").append(fDispense).append('\'');
         sb.append(", fIsOnWishList=").append(fIsOnWishList);
         sb.append(", fUserComments='").append(fUserComments).append('\'');
         sb.append('}');

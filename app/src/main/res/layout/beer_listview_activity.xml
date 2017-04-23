@@ -15,7 +15,7 @@
         android:elevation="4dp"
         android:logo="@drawable/ic_caskman"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"/>
 
     <android.support.design.widget.TabLayout
         android:id="@+id/sliding_tabs"
