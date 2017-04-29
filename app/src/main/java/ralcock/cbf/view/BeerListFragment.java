@@ -58,7 +58,7 @@ public abstract class BeerListFragment extends ListFragment implements ListChang
         application.addListChangedListener(this);
 
         fBeerList = makeBeerList(getBeers());
-        fAdapter = new BeerListAdapter(getActivity(), fBeerList);
+        fAdapter = new BeerListAdapter(getActivity(), fBeerList, this);
         setListAdapter(fAdapter);
 
         // Add list click listener.
@@ -105,7 +105,7 @@ public abstract class BeerListFragment extends ListFragment implements ListChang
         }
     }
 
-    private void toggleBookmark(final Beer beer) {
+    /*package*/ void toggleBookmark(final Beer beer) {
         beer.setIsOnWishList(!beer.isIsOnWishList());
         getBeers().updateBeer(beer);
         getCamBeerFestApplication().notifyBeersChanged();

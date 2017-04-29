@@ -4,12 +4,14 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.ImageView;
 import ralcock.cbf.R;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerList;
@@ -20,11 +22,15 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
     private final Context fContext;
     private final BeerList fBeerList;
     private final BeerFilter fFilter;
+    private final BeerListFragment fBeerListFragment;
 
-    public BeerListAdapter(final Context context, final BeerList beerList) {
+    public BeerListAdapter(final Context context,
+                           final BeerList beerList,
+                           final BeerListFragment fragment) {
         fContext = context;
         fBeerList = beerList;
         fFilter = new BeerFilter(this, fBeerList);
+        fBeerListFragment = fragment;
     }
 
     @Override
@@ -56,13 +62,22 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
         beerListItemView.BeerDispense.setText(beer.getDispenseMethod());
 
         if (beer.isIsOnWishList()) {
+            beerListItemView.BookmarkImage.setImageResource(R.drawable.ic_bookmark_black_48dp);
             beerListItemView.BeerName.setTypeface(beerListItemView.BeerName.getTypeface(),
                                                   Typeface.BOLD_ITALIC);
         } else {
+            beerListItemView.BookmarkImage.setImageResource(R.drawable.ic_bookmark_border_black_48dp);
             beerListItemView.BeerName.setTypeface(beerListItemView.BeerName.getTypeface(),
                                                   Typeface.BOLD);
         }
 
+        beerListItemView.BookmarkImage.setClickable(true);
+        beerListItemView.BookmarkImage.setOnClickListener(new OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    fBeerListFragment.toggleBookmark(beer);
+                }
+            });
     }
 
     public int getCount() {
@@ -96,7 +111,7 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
         TextView BeerStatus;
         RatingBar BeerRatingBar;
         TextView BeerDispense;
-        TextView BookmarkStatus;
+        ImageView BookmarkImage;
 
         BeerListItemView(final View view) {
             BreweryName = findTextViewById(view, R.id.breweryName);
@@ -105,7 +120,7 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
             BeerStyle = findTextViewById(view, R.id.beerStyle);
             BeerRatingBar = (RatingBar) view.findViewById(R.id.beerRatingBar);
             BeerDispense = findTextViewById(view, R.id.beerDispense);
-            //BookmarkStatus = findTextViewById(view, R.id.bookmarkStatus);
+            BookmarkImage = (ImageView)view.findViewById(R.id.bookmark_image);
         }
 
         private TextView findTextViewById(final View view, final int id) {
