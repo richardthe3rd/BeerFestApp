@@ -68,6 +68,7 @@
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:src="@drawable/ic_bookmark_border_black_48dp"
+            android:alpha="0.5"
             android:scaleType="centerInside"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
