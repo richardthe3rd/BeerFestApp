@@ -1,5 +1,6 @@
 package ralcock.cbf;
 
+import android.app.DialogFragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,53 +10,43 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.app.DialogFragment;
-import android.app.SearchManager;
-import android.support.v4.view.ViewPager;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.ActionBar;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.widget.AdapterView;
-import android.support.v7.widget.SearchView;
 import android.widget.Toast;
-import android.support.v7.widget.Toolbar;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
-import ralcock.cbf.actions.BeerExporter;
-import ralcock.cbf.actions.BeerSearcher;
-import ralcock.cbf.actions.BeerSharer;
-import ralcock.cbf.model.Beer;
-import ralcock.cbf.model.BeerDatabaseHelper;
-import ralcock.cbf.model.SortOrder;
-import ralcock.cbf.model.StatusToShow;
-import ralcock.cbf.model.dao.Beers;
-import ralcock.cbf.service.UpdateService;
-import ralcock.cbf.service.UpdateTask;
-import ralcock.cbf.util.ExceptionReporter;
-import ralcock.cbf.view.AboutDialogFragment;
-import ralcock.cbf.view.FilterByStyleDialogFragment;
-import ralcock.cbf.view.ListChangedListener;
-import ralcock.cbf.view.SortByDialogFragment;
-import ralcock.cbf.view.BeerListFragmentPagerAdapter;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import ralcock.cbf.model.BeerDatabaseHelper;
+import ralcock.cbf.model.SortOrder;
+import ralcock.cbf.model.dao.Beers;
+import ralcock.cbf.service.UpdateService;
+import ralcock.cbf.service.UpdateTask;
+import ralcock.cbf.util.ExceptionReporter;
+import ralcock.cbf.view.AboutDialogFragment;
+import ralcock.cbf.view.BeerListFragmentPagerAdapter;
+import ralcock.cbf.view.FilterByStyleDialogFragment;
+import ralcock.cbf.view.ListChangedListener;
+import ralcock.cbf.view.SortByDialogFragment;
 
 public class CamBeerFestApplication extends AppCompatActivity {
     private static final String TAG = CamBeerFestApplication.class.getName();
 
     private static final int SHOW_BEER_DETAILS_REQUEST_CODE = 1;
 
-    private final BeerSharer fBeerSharer;
-    private final BeerSearcher fBeerSearcher;
+    //private final BeerSharer fBeerSharer;
+    //private final BeerSearcher fBeerSearcher;
     private final ExceptionReporter fExceptionReporter;
 
     private final AppPreferences fAppPreferences;
@@ -69,8 +60,8 @@ public class CamBeerFestApplication extends AppCompatActivity {
     public CamBeerFestApplication() {
         super();
         fAppPreferences = new AppPreferences(this);
-        fBeerSharer = new BeerSharer(this);
-        fBeerSearcher = new BeerSearcher(this);
+        //fBeerSharer = new BeerSharer(this);
+        //fBeerSearcher = new BeerSearcher(this);
         fExceptionReporter = new ExceptionReporter(this);
     }
 
@@ -297,12 +288,6 @@ public class CamBeerFestApplication extends AppCompatActivity {
         newFragment.show(getFragmentManager(), "filterByStyle");
     }
 
-    // Helper for onMenuItemSelected
-    private Beer getBeerFromMenuItem(final MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        return getBeerDao().getBeerWithId(info.id);
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == SHOW_BEER_DETAILS_REQUEST_CODE) {
@@ -315,17 +300,7 @@ public class CamBeerFestApplication extends AppCompatActivity {
     public void notifyBeersChanged() {
         fireBeerListChanged();
     }
-    /*
-    private void doExport() {
-        try {
-            List<Beer> ratedBeers = getBeerDao().getRatedBeers();
-            BeerExporter exporter = new BeerExporter(this);
-            exporter.export(ratedBeers);
-        } catch (IOException e) {
-            fExceptionReporter.report(TAG, e.getMessage(), e);
-        }
-    }
-    */
+
     private void visitFestivalWebsite() {
         Uri festivalUri = Uri.parse(getString(R.string.festival_website_url));
         Intent launchBrowser = new Intent(Intent.ACTION_VIEW, festivalUri);
@@ -351,12 +326,6 @@ public class CamBeerFestApplication extends AppCompatActivity {
         fAppPreferences.setStylesToHide(stylesToHide);
     }
 
-    /*
-    private void statusToShow(StatusToShow statusToShow) {
-        fireStatusToShowChanged(statusToShow);
-        fAppPreferences.setHideUnavailableBeers(StatusToShow.AVAILABLE_ONLY == statusToShow);
-    }
-    */
     public void addListChangedListener(final ListChangedListener listChangedListener) {
         fListChangedListeners.add(listChangedListener);
     }
@@ -383,13 +352,6 @@ public class CamBeerFestApplication extends AppCompatActivity {
         }
     }
 
-    /*
-    private void fireStatusToShowChanged(final StatusToShow statusToShow) {
-        for (ListChangedListener l : fListChangedListeners) {
-            l.statusToShowChanged(statusToShow);
-        }
-    }
-    */
     private void fireBeerListChanged() {
         for (ListChangedListener l : fListChangedListeners) {
             l.beersChanged();

@@ -192,21 +192,21 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
                                 final Set<String> stylesToHide,
                                 final Set<String> statusToHide) throws SQLException {
         //noinspection unchecked
-        SelectArg nameFilter = new SelectArg();
-        SelectArg styleFilter = new SelectArg();
+        SelectArg nameFilter = new SelectArg("%"+filterText+"%");
+        SelectArg styleFilter = new SelectArg("%"+filterText+"%");
+        SelectArg descFilter = new SelectArg("%"+filterText+"%");
         where.and(
                 where.not().in(Beer.STATUS_FIELD, statusToHide),
                 where.not().in(Beer.STYLE_FIELD, stylesToHide),
                 where.or(
                         where.or(
                                 where.like(Beer.NAME_FIELD, nameFilter),
-                                where.like(Beer.STYLE_FIELD, styleFilter)
+                                where.like(Beer.STYLE_FIELD, styleFilter),
+                                where.like(Beer.DESCRIPTION_FIELD, descFilter)
                         ),
                         where.in(Beer.BREWERY_FIELD, breweries.buildFilteredBreweryQuery(filterText))
                 )
         );
-        nameFilter.setValue("%"+filterText+"%");
-        styleFilter.setValue("%"+filterText+"%");
     }
 
     public void updateFromFestivalOrCreate(final Beer festivalBeerDescription) {

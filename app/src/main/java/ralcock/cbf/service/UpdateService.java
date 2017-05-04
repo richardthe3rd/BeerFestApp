@@ -69,7 +69,7 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
                 if (ni.isConnected()) {
                     haveConnectedMobile = true;
                     break;
-                }
+                 }
             }
         }
         return haveConnectedWifi || haveConnectedMobile;

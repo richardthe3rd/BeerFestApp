@@ -104,8 +104,12 @@ public class UpdateTask extends AsyncTask<UpdateTask.Params, UpdateTask.Progress
         for (Beer beer : newBeers) {
             beers.updateFromFestivalOrCreate(beer);
             count++;
-            Progress p = new Progress(count, size, beer);
+            Progress p = new Progress(count, size);
             publishProgress(p);
+            try {
+                Thread.sleep(0,1);
+            } catch (InterruptedException ix)
+            {}
         }
         return count;
     }
@@ -128,7 +132,6 @@ public class UpdateTask extends AsyncTask<UpdateTask.Params, UpdateTask.Progress
         private static final long serialVersionUID = 1L;
         private final int fCount;
         private final int fSize;
-        private final Beer fBeer;
 
         public int getProgress() {
             return fCount;
@@ -138,14 +141,9 @@ public class UpdateTask extends AsyncTask<UpdateTask.Params, UpdateTask.Progress
             return fSize;
         }
 
-        public Progress(final int count, final int size, final Beer beer) {
+        public Progress(final int count, final int size) {
             fCount = count;
             fSize = size;
-            fBeer = beer;
-        }
-
-        public Beer getBeer() {
-            return fBeer;
         }
     }
 
