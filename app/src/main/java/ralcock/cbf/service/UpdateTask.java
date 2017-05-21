@@ -106,10 +106,16 @@ public class UpdateTask extends AsyncTask<UpdateTask.Params, UpdateTask.Progress
             count++;
             Progress p = new Progress(count, size);
             publishProgress(p);
-            try {
-                Thread.sleep(0,1);
-            } catch (InterruptedException ix)
-            {}
+
+            // Makes the progress bar update
+            if ((count % 10) == 0) {
+                try {
+                    Thread.sleep(0,1);
+                } catch (InterruptedException ix)
+                {
+                    Thread.currentThread().interrupt();
+                }
+            }
         }
         return count;
     }

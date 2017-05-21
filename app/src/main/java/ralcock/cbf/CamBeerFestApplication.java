@@ -45,8 +45,6 @@ public class CamBeerFestApplication extends AppCompatActivity {
 
     private static final int SHOW_BEER_DETAILS_REQUEST_CODE = 1;
 
-    //private final BeerSharer fBeerSharer;
-    //private final BeerSearcher fBeerSearcher;
     private final ExceptionReporter fExceptionReporter;
 
     private final AppPreferences fAppPreferences;
@@ -60,8 +58,6 @@ public class CamBeerFestApplication extends AppCompatActivity {
     public CamBeerFestApplication() {
         super();
         fAppPreferences = new AppPreferences(this);
-        //fBeerSharer = new BeerSharer(this);
-        //fBeerSearcher = new BeerSearcher(this);
         fExceptionReporter = new ExceptionReporter(this);
     }
 
@@ -80,6 +76,9 @@ public class CamBeerFestApplication extends AppCompatActivity {
         setSupportActionBar(myToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         myToolbar.setLogo(R.drawable.ic_caskman);
+
+        // Reset search (TODO: better way of doing this!)
+        filterBy("");
 
         ViewPager viewPager = (ViewPager)findViewById(R.id.viewpager);
         viewPager.setAdapter(new BeerListFragmentPagerAdapter(

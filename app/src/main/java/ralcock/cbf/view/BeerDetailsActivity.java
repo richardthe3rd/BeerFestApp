@@ -6,18 +6,15 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuInflater;
-import android.view.Window;
 import android.support.v7.widget.ShareActionProvider;
-import com.j256.ormlite.android.apptools.OpenHelperManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import ralcock.cbf.R;
 import ralcock.cbf.actions.BeerSharer;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerChangedListener;
-import ralcock.cbf.model.BeerDatabaseHelper;
+import ralcock.cbf.model.BeerAccessor;
 
 //OrmLiteBaseActivity<BeerDatabaseHelper>
 public final class BeerDetailsActivity extends AppCompatActivity {
@@ -26,24 +23,17 @@ public final class BeerDetailsActivity extends AppCompatActivity {
     public static final String EXTRA_BEER_ID = "BEER";
 
     private final BeerSharer fBeerSharer;
-
-    private BeerDatabaseHelper fDBHelper;
+    private final BeerAccessor fBeerAccessor;
     private ShareActionProvider fShareActionProvider;
     private long fBeerId;
 
     public BeerDetailsActivity() {
         fBeerSharer = new BeerSharer(this);
-    }
-
-    private BeerDatabaseHelper getHelper() {
-        if (fDBHelper == null) {
-            fDBHelper = OpenHelperManager.getHelper(this, BeerDatabaseHelper.class);
-        }
-        return fDBHelper;
+        fBeerAccessor = new BeerAccessor(this);
     }
 
     Beer getBeer() {
-        return getHelper().getBeers().getBeerWithId(fBeerId);
+        return fBeerAccessor.getBeer(fBeerId);
     }
 
     public void onCreate(Bundle savedInstanceState) {
@@ -70,7 +60,7 @@ public final class BeerDetailsActivity extends AppCompatActivity {
         fShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menu.findItem(R.id.shareBeer));
         fShareActionProvider.setShareIntent(fBeerSharer.makeShareIntent(getBeer()));
 
-        getHelper().getBeers().addBeerChangedListener(new BeerChangedListener() {
+        fBeerAccessor.getBeers().addBeerChangedListener(new BeerChangedListener() {
                 public void beerChanged(final Beer beer) {
                     fShareActionProvider.setShareIntent(
                         fBeerSharer.makeShareIntent(beer)
