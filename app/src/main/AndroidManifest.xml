@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="ralcock.cbf"
           android:allowBackup="true"
-          android:versionCode="17"
+          android:versionCode="18"
           android:versionName="4.0.5.2"
           android:installLocation="auto">
 
