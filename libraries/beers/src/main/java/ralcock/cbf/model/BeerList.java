@@ -43,9 +43,13 @@ public class BeerList {
             SearchText = searchText;
             return this;
         }
+
+        public Config withStylesToHide(Set<String> stylesToHide) {
+            StylesToHide = stylesToHide;
+            return this;
+        }
     }
 
-    ;
 
     private final Beers fBeers;
 
