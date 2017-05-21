@@ -9,11 +9,9 @@ import java.util.List;
 import java.util.Set;
 
 public interface Beers extends Dao<Beer, Long> {
-	
-	void addBeerChangedListener(BeerChangedListener l);
-	void removeBeerChangedListener(BeerChangedListener l);
-    
-	Beer getBeerWithId(long id);
+    void addBeerChangedListener(BeerChangedListener l);
+    void removeBeerChangedListener(BeerChangedListener l);
+    Beer getBeerWithId(long id);
 
     long getNumberOfBeers();
 
