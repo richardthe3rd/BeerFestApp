@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
-import android.net.Network;
 import android.net.NetworkInfo;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
@@ -51,14 +50,16 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
         return getHelper().getBeers().getNumberOfBeers();
     }
 
+    private NetworkInfo[] getAllNetworkInfo() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getAllNetworkInfo();
+    }
+
     private boolean haveNetworkConnection() {
         boolean haveConnectedWifi = false;
         boolean haveConnectedMobile = false;
-
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        Network[] networks = cm.getAllNetworks();
-        for (Network nw : networks) {
-            NetworkInfo ni = cm.getNetworkInfo(nw);
+        NetworkInfo[] info = getAllNetworkInfo();
+        for (NetworkInfo ni : info) {
             if (ni.getTypeName().equalsIgnoreCase("WIFI")) {
                 if (ni.isConnected()) {
                     haveConnectedWifi = true;
