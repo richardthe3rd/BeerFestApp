@@ -4,8 +4,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -50,32 +48,6 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
         return getHelper().getBeers().getNumberOfBeers();
     }
 
-    private NetworkInfo[] getAllNetworkInfo() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        return cm.getAllNetworkInfo();
-    }
-
-    private boolean haveNetworkConnection() {
-        boolean haveConnectedWifi = false;
-        boolean haveConnectedMobile = false;
-        NetworkInfo[] info = getAllNetworkInfo();
-        for (NetworkInfo ni : info) {
-            if (ni.getTypeName().equalsIgnoreCase("WIFI")) {
-                if (ni.isConnected()) {
-                    haveConnectedWifi = true;
-                    break;
-                }
-            }
-            if (ni.getTypeName().equalsIgnoreCase("MOBILE")) {
-                if (ni.isConnected()) {
-                    haveConnectedMobile = true;
-                    break;
-                 }
-            }
-        }
-        return haveConnectedWifi || haveConnectedMobile;
-    }
-
     public UpdateService() {
         fAppPreferences = new AppPreferences(this);
     }
@@ -105,13 +77,6 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
 
     private void doUpdate(final boolean cleanUpdate) {
         Log.d(TAG, "doUpdate: cleanUpdate=" + cleanUpdate);
-
-        if (!haveNetworkConnection()) {
-            Log.i(TAG, "No network connection - not updating.");
-            Toast.makeText(this, "No network connection - not updating.", Toast.LENGTH_LONG).show();
-            return;
-        }
-
         UpdateTask task = new UpdateTask() {
             @Override
             protected void onProgressUpdate(final Progress... values) {
@@ -176,10 +141,22 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
 
             @Override
             boolean updateDue() {
+                return true;
+                /*
                 Date nextUpdate = fAppPreferences.getNextUpdateTime();
                 Log.i(TAG, "Beer update due after " + nextUpdate);
                 Date currentTime = new Date();
-                return getBeerCount() == 0 || currentTime.after(nextUpdate);
+                if (currentTime.after(nextUpdate)) {
+                    return true;
+                } else {
+                    try {
+                        return (getBeerCount() == 0);
+                    } catch (Throwable t) {
+                        Log.e(TAG, "Failed to get beer count - assuming we need to update", t);
+                        return true;
+                    }
+                }
+                */
             }
         };
         task.execute(p);

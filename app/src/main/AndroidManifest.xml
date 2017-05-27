@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="ralcock.cbf"
           android:allowBackup="true"
-          android:versionCode="19"
-          android:versionName="4.0.5.3"
+          android:versionCode="21"
+          android:versionName="4.0.5.5"
           android:installLocation="auto">
 
     <uses-permission
@@ -12,7 +12,9 @@
     <uses-permission
             android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
-    <uses-sdk android:minSdkVersion="14"/>
+    <uses-sdk
+            android:minSdkVersion="14"
+            android:targetSdkVersion="23"/>
 
     <application
         android:label="@string/app_name"
@@ -26,7 +28,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
+            </intent-filter>x1
         </activity>
 
         <activity android:name=".view.BeerDetailsActivity">
