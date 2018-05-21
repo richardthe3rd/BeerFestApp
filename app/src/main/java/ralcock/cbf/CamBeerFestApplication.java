@@ -122,7 +122,7 @@ public class CamBeerFestApplication extends AppCompatActivity {
     private Date calcNextUpdateTime() {
         Date now = new Date();
         // Can't use TimeUnit.Day on older Androids.
-        long one_day = 24 * 60 * 60 * TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS);
+        long one_day = 4 * 60 * 60 * TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS);
         return new Date(now.getTime() + one_day);
     }
 
