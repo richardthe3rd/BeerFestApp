@@ -141,8 +141,6 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
 
             @Override
             boolean updateDue() {
-                return true;
-                /*
                 Date nextUpdate = fAppPreferences.getNextUpdateTime();
                 Log.i(TAG, "Beer update due after " + nextUpdate);
                 Date currentTime = new Date();
@@ -156,7 +154,6 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
                         return true;
                     }
                 }
-                */
             }
         };
         task.execute(p);
