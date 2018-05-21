@@ -23,8 +23,8 @@ android {
     compileSdkVersion 26
 
     defaultConfig {
-           versionCode 22
-           versionName "4.0.6.0"
+           versionCode 23
+           versionName "4.0.6.1"
            minSdkVersion 14
            targetSdkVersion 26
        }
@@ -41,4 +41,3 @@ android {
         logger.warn("Signing not available: Project property 'CamBeerFestApp.signing.path' not set to directory that contains CamBeerFestApp.gradle file" )
     }
 }
-
