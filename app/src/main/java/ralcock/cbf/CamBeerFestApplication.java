@@ -229,36 +229,36 @@ public class CamBeerFestApplication extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.sort:
-                showSortByDialog();
-                return true;
-            case R.id.showOnlyStyle:
-                showFilterByStyleDialog();
-                return true;
-            case R.id.hideUnavailable:
-                return true;
-            case R.id.visitFestivalWebsite:
-                visitFestivalWebsite();
-                return true;
-            case R.id.aboutApplication:
-                showAboutDialog();
-                return true;
-            case R.id.export:
-                //doExport();
-                return true;
-            case R.id.refreshDatabase:
-                // Start the update service
-                startService(new Intent(this, UpdateService.class));
-                return true;
-            case R.id.reloadDatabase:
-                // Start the update service with the CLEAN_UPDATE flag
-                final Intent intent = new Intent(this, UpdateService.class);
-                intent.putExtra(UpdateService.CLEAN_UPDATE, true);
-                startService(intent);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        int itemId = item.getItemId();
+        if (itemId == R.id.sort) {
+            showSortByDialog();
+            return true;
+        } else if (itemId == R.id.showOnlyStyle) {
+            showFilterByStyleDialog();
+            return true;
+        } else if (itemId == R.id.hideUnavailable) {
+            return true;
+        } else if (itemId == R.id.visitFestivalWebsite) {
+            visitFestivalWebsite();
+            return true;
+        } else if (itemId == R.id.aboutApplication) {
+            showAboutDialog();
+            return true;
+        } else if (itemId == R.id.export) {
+            //doExport();
+            return true;
+        } else if (itemId == R.id.refreshDatabase) {
+            // Start the update service
+            startService(new Intent(this, UpdateService.class));
+            return true;
+        } else if (itemId == R.id.reloadDatabase) {
+            // Start the update service with the CLEAN_UPDATE flag
+            final Intent intent = new Intent(this, UpdateService.class);
+            intent.putExtra(UpdateService.CLEAN_UPDATE, true);
+            startService(intent);
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
         }
     }
 
