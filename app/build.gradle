@@ -35,6 +35,7 @@ android {
 
     // See https://www.timroes.de/2013/09/22/handling-signing-configs-with-gradle/
     if(project.hasProperty("RELEASE") && new File("release.gradle").exists()){
+        logger.info("Build release")
         apply from: "release.gradle";
     } else {
         logger.info("Building debug" )
