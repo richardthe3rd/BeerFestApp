@@ -21,12 +21,22 @@ jobs:
         cache: gradle
     - name: Setup Android SDK
       uses: android-actions/setup-android@v2
+    - name: Decode Keystore
+        id: decode_keystore
+        uses: timheuer/base64-to-file@v1
+        with:
+          fileName: 'keystore/your_signing_keystore.jks'
+          encodedString: ${{ secrets.KEYSTORE }}
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      run: ./gradlew build
+      run: ./gradlew -PRELEASE build --info
+      env:
+        SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+        SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
     - name: Archive build results
       uses: actions/upload-artifact@v3
       with:
-        name: apk
-        path: ./app/build/apk/*
+        name: Build Artifacts
+        path: ./app/build/outputs/
