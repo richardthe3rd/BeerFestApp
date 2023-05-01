@@ -40,21 +40,24 @@ jobs:
         SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
         SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
         SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
-    - name: Run instrumented test
-      uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: 30
-        target: default
-        arch: x86_64
-        profile: Nexus 6P
-        script: ./gradle connectedCheck
     - name: Archive build results
       uses: actions/upload-artifact@v3
       with:
         name: build-artifacts
         path: ./app/build/outputs/
-    - name: Archive test results
-      uses: actions/upload-artifact@v3
-      with:
-        name: test-results
-        path: ./app/build/reports/androidTests/connected/
+  test:
+    runs-on: macos-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          script: ./gradlew connectedCheck
+      - name: Archive test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: ./app/build/reports/androidTests/connected/
