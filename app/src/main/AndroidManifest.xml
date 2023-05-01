@@ -25,7 +25,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".view.BeerDetailsActivity" android:exported="false">
+        <activity android:name=".view.BeerDetailsActivity" android:exported="true">
             <intent-filter>
                 <action android:name="ralcock.cbf.VIEW_BEER_DETAILS"/>
             </intent-filter>
