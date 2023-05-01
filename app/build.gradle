@@ -20,7 +20,7 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 31
     namespace 'ralcock.cbf'
     defaultConfig {
            versionCode 24
