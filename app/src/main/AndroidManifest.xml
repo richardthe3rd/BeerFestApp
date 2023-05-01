@@ -17,14 +17,15 @@
         <activity
             android:label="@string/app_name"
             android:name=".CamBeerFestApplication"
-            android:windowSoftInputMode="stateAlwaysHidden">
+            android:windowSoftInputMode="stateAlwaysHidden"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
-        <activity android:name=".view.BeerDetailsActivity">
+        <activity android:name=".view.BeerDetailsActivity" android:exported="false">
             <intent-filter>
                 <action android:name="ralcock.cbf.VIEW_BEER_DETAILS"/>
             </intent-filter>
