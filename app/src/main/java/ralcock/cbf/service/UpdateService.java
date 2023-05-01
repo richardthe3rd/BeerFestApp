@@ -68,7 +68,8 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addParentStack(CamBeerFestApplication.class);
         stackBuilder.addNextIntent(resultIntent);
-        PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, 
+            PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         fBuilder.setContentIntent(pendingIntent);
 
         doUpdate(intent.getBooleanExtra(CLEAN_UPDATE, false));
