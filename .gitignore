@@ -12,3 +12,4 @@ coverage
 proguard-project.txt
 proguard_logs/
 .gradle/
+android-sdk

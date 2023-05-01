@@ -87,21 +87,21 @@ public abstract class BeerListFragment extends ListFragment implements ListChang
     public boolean onContextItemSelected(final MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         Beer beer = getBeer(info.id);
-        switch (item.getItemId()) {
-            case R.id.bookmarkBeer:
-                toggleBookmark(beer);
-                return true;
-            case R.id.unBookmarkBeer:
-                toggleBookmark(beer);
-                return true;
-            case R.id.shareBeer:
-                fBeerSharer.shareBeer(beer);
-                return true;
-            case R.id.searchBeer:
-                fBeerSearcher.searchBeer(beer);
-                return true;
-            default:
-                return super.onContextItemSelected(item);
+        int itemId = item.getItemId();
+        if (itemId == R.id.bookmarkBeer) {
+            toggleBookmark(beer);
+            return true;
+        } else if (itemId == R.id.unBookmarkBeer) {
+            toggleBookmark(beer);
+            return true;
+        } else if (itemId == R.id.shareBeer) {
+            fBeerSharer.shareBeer(beer);
+            return true;
+        } else if (itemId == R.id.searchBeer) {
+            fBeerSearcher.searchBeer(beer);
+            return true;
+        } else {
+            return super.onContextItemSelected(item);
         }
     }
 
