@@ -22,7 +22,7 @@ public class CamBeerFestApplicationInstrumentedTest {
 
     @Test
     public void testCamBeerFestApplicationStarts() {
-        onView(withId(R.layout.beer_listview_activity))
+        onView(withId(R.id.mainListView))
             .check(matches(isDisplayed()));
     }
 }
