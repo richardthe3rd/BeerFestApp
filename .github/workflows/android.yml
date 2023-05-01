@@ -42,7 +42,7 @@ jobs:
         target: default
         arch: x86_64
         profile: Nexus 6P
-        actions: instrumented-test
+        script: ./gradle connectedCheck
     - name: Archive build results
       uses: actions/upload-artifact@v3
       with:
