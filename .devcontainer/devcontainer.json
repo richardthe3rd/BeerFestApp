@@ -7,11 +7,21 @@
 
 	"features": {
 		"ghcr.io/devcontainers/features/java:1": {
-			"version": "none",
-			"installMaven": "false",
-			"installGradle": "false"
+			"installGradle": true,
+			"version": "17",
+			"jdkDistro": "tem",
+			"gradleVersion": "latest",
+			"mavenVersion": "latest",
+			"antVersion": "latest"
 		},
-		"ghcr.io/devcontainers-contrib/features/actionlint:1": {}
+		"ghcr.io/devcontainers-contrib/features/actionlint:1": {
+			"version": "latest"
+		},
+		"ghcr.io/devcontainers-contrib/features/gradle-sdkman:2": {
+			"version": "latest",
+			"jdkVersion": "17",
+			"jdkDistro": "tem"
+		}
 	}
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
