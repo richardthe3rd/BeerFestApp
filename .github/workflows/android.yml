@@ -89,10 +89,7 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: |
-            adb logcat -c
-            adb logcat &
-            gradle connectedCheck
+          script: gradle connectedCheck
       - name: Archive test results
         uses: actions/upload-artifact@v3
         with:
