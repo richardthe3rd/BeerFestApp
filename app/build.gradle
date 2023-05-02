@@ -1,6 +1,5 @@
 buildscript {
     repositories {
-        jcenter()
         google()
         mavenCentral()
     }
@@ -13,10 +12,10 @@ apply plugin: 'com.android.application'
 
 dependencies {
     implementation project(':libraries:beers')
-    implementation group: 'com.j256.ormlite',      name: 'ormlite-core',     version: '5.0'
-    implementation group: 'com.j256.ormlite',      name: 'ormlite-android',  version: '5.0'
-    implementation group: 'com.android.support',   name: 'design',           version: '24.2.1'
-    implementation group: 'org.slf4j',             name: 'slf4j-android',    version: '1.7.25'
+    implementation group: 'com.j256.ormlite',            name: 'ormlite-core',     version: '5.0'
+    implementation group: 'com.j256.ormlite',            name: 'ormlite-android',  version: '5.0'
+    implementation group: 'com.google.android.material', name: 'material',         version: '1.8.0'
+    implementation group: 'org.slf4j',                   name: 'slf4j-android',    version: '1.7.25'
 
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.3.0'
@@ -25,13 +24,13 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
     namespace 'ralcock.cbf'
     defaultConfig {
            versionCode 24
            versionName "4.1.0.0"
            minSdkVersion 14
-           targetSdkVersion 31
+           targetSdkVersion 33
 
            testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
        }
