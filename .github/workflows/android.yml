@@ -7,7 +7,7 @@ on:
       - 'README'
       - 'LICENSE'
       - '.gitignore'
-      - '.devcontainer/*'
+      - '.devcontainer/**'
 
   pull_request:
     branches: [ "main" ]
@@ -15,7 +15,7 @@ on:
       - 'README'
       - 'LICENSE'
       - '.gitignore'
-      - '.devcontainer/*'
+      - '.devcontainer/**'
 
 jobs:
   build:
@@ -37,8 +37,6 @@ jobs:
       with:
         fileName: 'keystore/your_signing_keystore.jks'
         encodedString: ${{ secrets.KEYSTORE }}
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
     - name: Build with Gradle
       uses: gradle/gradle-build-action@v2
       with:
