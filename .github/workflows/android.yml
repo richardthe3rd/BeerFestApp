@@ -50,6 +50,12 @@ jobs:
         SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
         SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
         SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+    - name: Archive build reports
+      uses: actions/upload-artifact@v3
+      if: success() || failure()
+      with:
+        name: build-reports
+        path: ./app/build/reports/
     - name: Archive build results
       uses: actions/upload-artifact@v3
       with:
@@ -100,8 +106,9 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: gradle connectedCheck --scan
-      - name: Archive test results
+      - name: Archive test reports
         uses: actions/upload-artifact@v3
+        if: success() || failure()
         with:
-          name: test-results
+          name: test-reports
           path: ./app/build/reports/androidTests/connected/
