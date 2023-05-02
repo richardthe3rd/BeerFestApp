@@ -3,8 +3,19 @@ name: Android CI
 on:
   push:
     branches: [ "main" ]
+    paths-ignore:
+      - 'README'
+      - 'LICENSE'
+      - '.gitignore'
+      - '.devcontainer/*'
+
   pull_request:
     branches: [ "main" ]
+    paths-ignore:
+      - 'README'
+      - 'LICENSE'
+      - '.gitignore'
+      - '.devcontainer/*'
 
 jobs:
   build:
