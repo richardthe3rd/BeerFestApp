@@ -44,6 +44,7 @@ jobs:
         arguments: |
           build
           -PRELEASE
+          --scan
       env:
         SIGNING_KEYSTORE: ${{ steps.decode_keystore.outputs.filePath }}
         SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
@@ -98,7 +99,7 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: gradle connectedCheck
+          script: gradle connectedCheck --scan
       - name: Archive test results
         uses: actions/upload-artifact@v3
         with:
