@@ -24,7 +24,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
-
 public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
     private static final String TAG = UpdateService.class.getName();
 
@@ -63,13 +62,14 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
                 .setContentTitle(getString(R.string.update_notification_title))
                 .setContentText(getString(R.string.update_in_progress_notification_text));
 
-        // See http://developer.android.com/guide/topics/ui/notifiers/notifications.html#SimpleNotification
+        // See
+        // http://developer.android.com/guide/topics/ui/notifiers/notifications.html#SimpleNotification
         Intent resultIntent = new Intent(this, CamBeerFestApplication.class);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addParentStack(CamBeerFestApplication.class);
         stackBuilder.addNextIntent(resultIntent);
-        PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, 
-            PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent = stackBuilder.getPendingIntent(0,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         fBuilder.setContentIntent(pendingIntent);
 
         doUpdate(intent.getBooleanExtra(CLEAN_UPDATE, false));

@@ -15,7 +15,7 @@ import java.util.Set;
 public class FilterByStyleDialogFragment extends DialogFragment {
 
     public static DialogFragment newInstance(final Set<String> stylesToHide,
-                                             final Set<String> allStyles) {
+            final Set<String> allStyles) {
         FilterByStyleDialogFragment fragment = new FilterByStyleDialogFragment();
         Bundle args = new Bundle();
         putStringSet(args, "stylesToHide", stylesToHide);

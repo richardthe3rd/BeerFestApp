@@ -9,7 +9,6 @@ public class AllBeersListFragment extends BeerListFragment {
         super();
     }
 
-
     @Override
     BeerList makeBeerList(final Beers beers) {
         AppPreferences preferences = new AppPreferences(this.getActivity());

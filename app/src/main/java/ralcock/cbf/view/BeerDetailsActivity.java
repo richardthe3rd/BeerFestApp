@@ -51,7 +51,6 @@ public final class BeerDetailsActivity extends AppCompatActivity {
         Log.i(TAG, "In BeerDetailsActivity.onCreate with ID " + fBeerId);
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -61,12 +60,11 @@ public final class BeerDetailsActivity extends AppCompatActivity {
         fShareActionProvider.setShareIntent(fBeerSharer.makeShareIntent(getBeer()));
 
         fBeerAccessor.getBeers().addBeerChangedListener(new BeerChangedListener() {
-                public void beerChanged(final Beer beer) {
-                    fShareActionProvider.setShareIntent(
-                        fBeerSharer.makeShareIntent(beer)
-                        );
-                }
-            });
+            public void beerChanged(final Beer beer) {
+                fShareActionProvider.setShareIntent(
+                        fBeerSharer.makeShareIntent(beer));
+            }
+        });
         return true;
     }
 
