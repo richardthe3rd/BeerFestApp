@@ -47,3 +47,8 @@ android {
         logger.quiet("Building debug" )
     }
 }
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << '-Xlint:unchecked'
+    options.deprecation = true
+}
