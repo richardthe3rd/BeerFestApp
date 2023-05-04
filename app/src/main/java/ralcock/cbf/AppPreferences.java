@@ -104,7 +104,6 @@ public final class AppPreferences {
         editor.apply();
     }
 
-
     private Set<String> getPreference(final String key, final Set<String> strings) {
         SharedPreferences settings = getSharedPreferences();
 

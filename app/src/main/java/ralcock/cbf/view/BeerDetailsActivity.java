@@ -6,10 +6,10 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuInflater;
-import android.support.v7.widget.ShareActionProvider;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.widget.ShareActionProvider;
+import androidx.core.view.MenuItemCompat;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import ralcock.cbf.R;
 import ralcock.cbf.actions.BeerSharer;
 import ralcock.cbf.model.Beer;
@@ -51,7 +51,6 @@ public final class BeerDetailsActivity extends AppCompatActivity {
         Log.i(TAG, "In BeerDetailsActivity.onCreate with ID " + fBeerId);
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -61,12 +60,11 @@ public final class BeerDetailsActivity extends AppCompatActivity {
         fShareActionProvider.setShareIntent(fBeerSharer.makeShareIntent(getBeer()));
 
         fBeerAccessor.getBeers().addBeerChangedListener(new BeerChangedListener() {
-                public void beerChanged(final Beer beer) {
-                    fShareActionProvider.setShareIntent(
-                        fBeerSharer.makeShareIntent(beer)
-                        );
-                }
-            });
+            public void beerChanged(final Beer beer) {
+                fShareActionProvider.setShareIntent(
+                        fBeerSharer.makeShareIntent(beer));
+            }
+        });
         return true;
     }
 

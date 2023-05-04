@@ -110,9 +110,8 @@ public class UpdateTask extends AsyncTask<UpdateTask.Params, UpdateTask.Progress
             // Makes the progress bar update
             if ((count % 10) == 0) {
                 try {
-                    Thread.sleep(0,1);
-                } catch (InterruptedException ix)
-                {
+                    Thread.sleep(0, 1);
+                } catch (InterruptedException ix) {
                     Thread.currentThread().interrupt();
                 }
             }
@@ -155,6 +154,7 @@ public class UpdateTask extends AsyncTask<UpdateTask.Params, UpdateTask.Progress
 
     public abstract class Result implements Serializable {
         private static final long serialVersionUID = 1L;
+
         public boolean success() {
             return true;
         }

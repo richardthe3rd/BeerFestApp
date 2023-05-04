@@ -9,7 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.support.v4.app.ListFragment;
+import androidx.fragment.app.ListFragment;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import ralcock.cbf.CamBeerFestApplication;
 import ralcock.cbf.R;
@@ -40,7 +40,8 @@ public abstract class BeerListFragment extends ListFragment implements ListChang
     }
 
     @Override
-    public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+            final Bundle savedInstanceState) {
         return inflater.inflate(R.layout.beer_listview_fragment, container, false);
     }
 
@@ -72,7 +73,8 @@ public abstract class BeerListFragment extends ListFragment implements ListChang
         });
 
         getListView().setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
-            public void onCreateContextMenu(ContextMenu contextMenu, final View view, final ContextMenu.ContextMenuInfo contextMenuInfo) {
+            public void onCreateContextMenu(ContextMenu contextMenu, final View view,
+                    final ContextMenu.ContextMenuInfo contextMenuInfo) {
                 getActivity().getMenuInflater().inflate(R.menu.list_context_menu, contextMenu);
                 AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) contextMenuInfo;
                 Beer beer = getBeer(info.id);
@@ -105,7 +107,7 @@ public abstract class BeerListFragment extends ListFragment implements ListChang
         }
     }
 
-    /*package*/ void toggleBookmark(final Beer beer) {
+    /* package */ void toggleBookmark(final Beer beer) {
         beer.setIsOnWishList(!beer.isIsOnWishList());
         getBeers().updateBeer(beer);
         getCamBeerFestApplication().notifyBeersChanged();

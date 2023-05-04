@@ -1,7 +1,7 @@
 package ralcock.cbf.view;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.text.Spannable;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
@@ -32,9 +32,9 @@ public class BeerDetailsFragment extends Fragment {
         return fDBHelper;
     }
 
-
     @Override
-    public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+            final Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.beer_details_fragment, container, false);
         fBeerDetailsView = new BeerDetailsView(view);
         return view;
@@ -54,7 +54,7 @@ public class BeerDetailsFragment extends Fragment {
 
         fBeerDetailsView.BeerStatus.setText(beer.getStatus());
 
-        //fBeerDetailsView.BeerDispense.setText(beer.getDispenseMethod());
+        // fBeerDetailsView.BeerDispense.setText(beer.getDispenseMethod());
 
         fBeerDetailsView.BreweryName.setText(beer.getBrewery().getName());
         fBeerDetailsView.BreweryDescription.setText(beer.getBrewery().getDescription());
@@ -75,13 +75,12 @@ public class BeerDetailsFragment extends Fragment {
             fBeerDetailsView.BookmarkImage.setImageResource(R.drawable.ic_bookmark_border_black_48dp);
         }
 
-        fBeerDetailsView.BookmarkImage.setOnClickListener(new OnClickListener(){
-                @Override
-                public void onClick(View v){
-                    toggleBookmark(beer);
-                }
-            });
-
+        fBeerDetailsView.BookmarkImage.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleBookmark(beer);
+            }
+        });
 
         ClickableSpan clickableSpan = new ClickableSpan() {
             @Override
@@ -102,7 +101,7 @@ public class BeerDetailsFragment extends Fragment {
         displayBeer(beer);
     }
 
-    private void toggleBookmark(Beer beer){
+    private void toggleBookmark(Beer beer) {
         beer.setIsOnWishList(!beer.isIsOnWishList());
         getHelper().getBeers().updateBeer(beer);
         displayBeer(beer);
@@ -114,7 +113,7 @@ public class BeerDetailsFragment extends Fragment {
         final TextView BeerStyle;
         final TextView BeerDescription;
         final RatingBar BeerRatingBar;
-        //final TextView BeerDispense;
+        // final TextView BeerDispense;
         final TextView BreweryName;
         final TextView BreweryDescription;
         final TextView BeerStatus;
@@ -129,12 +128,13 @@ public class BeerDetailsFragment extends Fragment {
             BreweryName = (TextView) view.findViewById(R.id.detailsViewBreweryName);
             BreweryDescription = (TextView) view.findViewById(R.id.detailsViewBreweryDescription);
             BeerRatingBar = (RatingBar) view.findViewById(R.id.detailsViewBeerRatingBar);
-            //BeerDispense =(TextView)view.findViewById(R.id.detailsViewBeerDispenseMethod);
+            // BeerDispense
+            // =(TextView)view.findViewById(R.id.detailsViewBeerDispenseMethod);
             BeerStatus = (TextView) view.findViewById(R.id.detailsViewBeerStatus);
             SearchOnline = (TextView) view.findViewById(R.id.clickToSearchOnline);
             SearchOnline.setMovementMethod(LinkMovementMethod.getInstance());
-            BookmarkImage = (ImageView)view.findViewById(R.id.bookmark_image);
-            BeerDispense = (TextView)view.findViewById(R.id.detailsViewBeerDispense);
+            BookmarkImage = (ImageView) view.findViewById(R.id.bookmark_image);
+            BeerDispense = (TextView) view.findViewById(R.id.detailsViewBeerDispense);
         }
     }
 }

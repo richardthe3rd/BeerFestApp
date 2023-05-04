@@ -1,20 +1,19 @@
 package ralcock.cbf.view;
 
 import android.util.Log;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
 import android.content.Context;
 
-public class BeerListFragmentPagerAdapter extends FragmentPagerAdapter
-{
+public class BeerListFragmentPagerAdapter extends FragmentPagerAdapter {
     private static final String TAG = BeerListFragmentPagerAdapter.class.getName();
-    private final String tabTitles[] = new String[] { "All Beers", "Bookmarks"};
-    //private Context context;
+    private final String tabTitles[] = new String[] { "All Beers", "Bookmarks" };
+    // private Context context;
 
     public BeerListFragmentPagerAdapter(FragmentManager fm, Context context) {
         super(fm);
-        //this.context = context;
+        // this.context = context;
     }
 
     @Override

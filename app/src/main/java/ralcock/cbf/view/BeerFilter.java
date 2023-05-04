@@ -9,7 +9,7 @@ final class BeerFilter extends Filter {
     private final BeerList fBeerList;
 
     public BeerFilter(final BeerListAdapter adapter,
-                      final BeerList beerList) {
+            final BeerList beerList) {
         fBeerListAdapter = adapter;
         fBeerList = beerList;
     }

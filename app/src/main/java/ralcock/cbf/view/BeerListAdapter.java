@@ -25,8 +25,8 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
     private final BeerListFragment fBeerListFragment;
 
     public BeerListAdapter(final Context context,
-                           final BeerList beerList,
-                           final BeerListFragment fragment) {
+            final BeerList beerList,
+            final BeerListFragment fragment) {
         fContext = context;
         fBeerList = beerList;
         fFilter = new BeerFilter(this, fBeerList);
@@ -64,20 +64,20 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
         if (beer.isIsOnWishList()) {
             beerListItemView.BookmarkImage.setImageResource(R.drawable.ic_bookmark_black_48dp);
             beerListItemView.BeerName.setTypeface(beerListItemView.BeerName.getTypeface(),
-                                                  Typeface.BOLD_ITALIC);
+                    Typeface.BOLD_ITALIC);
         } else {
             beerListItemView.BookmarkImage.setImageResource(R.drawable.ic_bookmark_border_black_48dp);
             beerListItemView.BeerName.setTypeface(beerListItemView.BeerName.getTypeface(),
-                                                  Typeface.BOLD);
+                    Typeface.BOLD);
         }
 
         beerListItemView.BookmarkImage.setClickable(true);
-        beerListItemView.BookmarkImage.setOnClickListener(new OnClickListener(){
-                @Override
-                public void onClick(View v){
-                    fBeerListFragment.toggleBookmark(beer);
-                }
-            });
+        beerListItemView.BookmarkImage.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fBeerListFragment.toggleBookmark(beer);
+            }
+        });
     }
 
     public int getCount() {
@@ -120,7 +120,7 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
             BeerStyle = findTextViewById(view, R.id.beerStyle);
             BeerRatingBar = (RatingBar) view.findViewById(R.id.beerRatingBar);
             BeerDispense = findTextViewById(view, R.id.beerDispense);
-            BookmarkImage = (ImageView)view.findViewById(R.id.bookmark_image);
+            BookmarkImage = (ImageView) view.findViewById(R.id.bookmark_image);
         }
 
         private TextView findTextViewById(final View view, final int id) {

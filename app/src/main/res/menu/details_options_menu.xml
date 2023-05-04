@@ -6,6 +6,6 @@
             android:id="@+id/shareBeer"
             android:title="@string/share_this_beer_title"
             app:showAsAction="ifRoom"
-            app:actionProviderClass="android.support.v7.widget.ShareActionProvider"
+            app:actionProviderClass="androidx.appcompat.widget.ShareActionProvider"
             />
 </menu>

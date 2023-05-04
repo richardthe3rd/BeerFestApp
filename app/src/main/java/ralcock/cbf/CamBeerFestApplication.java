@@ -9,12 +9,12 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.tabs.TabLayout;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -55,6 +55,7 @@ public class CamBeerFestApplication extends AppCompatActivity {
 
     private LocalBroadcastManager fLocalBroadcastManager;
     private BroadcastReceiver fBroadcastReceiver;
+
     public CamBeerFestApplication() {
         super();
         fAppPreferences = new AppPreferences(this);
@@ -80,12 +81,11 @@ public class CamBeerFestApplication extends AppCompatActivity {
         // Reset search (TODO: better way of doing this!)
         filterBy("");
 
-        ViewPager viewPager = (ViewPager)findViewById(R.id.viewpager);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         viewPager.setAdapter(new BeerListFragmentPagerAdapter(
-                                 getSupportFragmentManager(), CamBeerFestApplication.this));
-        TabLayout tabLayout = (TabLayout)findViewById(R.id.sliding_tabs);
+                getSupportFragmentManager(), CamBeerFestApplication.this));
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
         tabLayout.setupWithViewPager(viewPager);
-
 
         if (savedInstanceState != null) {
             int selectedTab = savedInstanceState.getInt("selected.navigation.index");
@@ -99,7 +99,8 @@ public class CamBeerFestApplication extends AppCompatActivity {
             public void onReceive(final Context context, final Intent intent) {
                 if (intent.getAction().equals(UpdateService.UPDATE_SERVICE_RESULT)) {
                     Log.i(TAG, "Received " + UpdateService.UPDATE_SERVICE_RESULT);
-                    UpdateTask.Result result = (UpdateTask.Result) intent.getSerializableExtra(UpdateService.RESULT_EXTRA);
+                    UpdateTask.Result result = (UpdateTask.Result) intent
+                            .getSerializableExtra(UpdateService.RESULT_EXTRA);
                     doReceivedUpdateServiceResult(result);
                 }
             }
@@ -187,7 +188,7 @@ public class CamBeerFestApplication extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(final Bundle outState) {
-        ViewPager viewPager = (ViewPager)findViewById(R.id.viewpager);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         int selectedTab = viewPager.getCurrentItem();
         Log.i(TAG, "onSaveInstanceState saving " + selectedTab);
         outState.putInt("selected.navigation.index", selectedTab);
@@ -245,7 +246,7 @@ public class CamBeerFestApplication extends AppCompatActivity {
             showAboutDialog();
             return true;
         } else if (itemId == R.id.export) {
-            //doExport();
+            // doExport();
             return true;
         } else if (itemId == R.id.refreshDatabase) {
             // Start the update service
@@ -275,7 +276,8 @@ public class CamBeerFestApplication extends AppCompatActivity {
         newFragment.show(getFragmentManager(), "about");
     }
 
-    // Copied from http://developer.android.com/reference/android/app/DialogFragment.html
+    // Copied from
+    // http://developer.android.com/reference/android/app/DialogFragment.html
     private void showSortByDialog() {
         DialogFragment newFragment = SortByDialogFragment.newInstance(fAppPreferences.getSortOrder());
         newFragment.show(getFragmentManager(), "sortBy");
