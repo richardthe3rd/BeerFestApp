@@ -27,8 +27,8 @@ android {
     compileSdkVersion 33
     namespace 'ralcock.cbf'
     defaultConfig {
-           versionCode 24
-           versionName "4.1.0.0"
+           versionCode 25
+           versionName "2023.0.0.1"
            minSdkVersion 14
            targetSdkVersion 33
 
