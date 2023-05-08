@@ -28,7 +28,7 @@ android {
     namespace 'ralcock.cbf'
     defaultConfig {
            versionCode 25
-           versionName "2023.0.0.0"
+           versionName "2023.0.0.1"
            minSdkVersion 14
            targetSdkVersion 33
 
