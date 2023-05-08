@@ -1,1 +1,1 @@
-The app doesn not collect any useer data.
+The app does not collect any user data.
