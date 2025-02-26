@@ -59,7 +59,7 @@ jobs:
         name: build-reports
         path: ./app/build/reports/
     - name: Archive build results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: build-artifacts
         path: ./app/build/outputs/
@@ -135,7 +135,7 @@ jobs:
           script: gradle connectedCheck --scan
 
       - name: Archive test reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: success() || failure()
         with:
           name: test-reports
