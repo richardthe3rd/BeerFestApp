@@ -16,7 +16,7 @@ import java.sql.SQLException;
 public final class BeerDatabaseHelper extends OrmLiteSqliteOpenHelper {
     public static final String DATABASE_NAME = "BEERS";
 
-    private static final int DB_VERSION = 31; // cbf2024
+    private static final int DB_VERSION = 32; // cbf2025
 
     private Breweries fBreweries;
     private Beers fBeers;
