@@ -39,14 +39,10 @@ jobs:
       with:
         fileName: 'keystore/your_signing_keystore.jks'
         encodedString: ${{ secrets.KEYSTORE }}
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
     - name: Build with Gradle
-      uses: gradle/gradle-build-action@v2
-      with:
-        gradle-version: 8.1.1
-        arguments: |
-          build
-          -PRELEASE
-          --scan
+      run: ./gradlew build -PRELEASE --scan
       env:
         SIGNING_KEYSTORE: ${{ steps.decode_keystore.outputs.filePath }}
         SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
@@ -67,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        api-level: [33]
+        api-level: [34]
     steps:
       - name: Delete unnecessary tools 🔧
         uses: jlumbroso/free-disk-space@v1.3.1
@@ -98,7 +94,7 @@ jobs:
           cache: gradle
 
       - name: Gradle cache
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v4
 
       - name: AVD cache
         uses: actions/cache@v3
@@ -132,7 +128,7 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: gradle connectedCheck --scan
+          script: ./gradlew connectedCheck --scan
 
       - name: Archive test reports
         uses: actions/upload-artifact@v4
