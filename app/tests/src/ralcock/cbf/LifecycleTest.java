@@ -1,6 +1,7 @@
 package ralcock.cbf;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.test.ActivityUnitTestCase;
 import android.test.UiThreadTest;
@@ -13,7 +14,11 @@ public class LifecycleTest extends ActivityUnitTestCase<CamBeerFestApplication> 
         super(CamBeerFestApplication.class);
     }
 
-    public void setUp(){
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        Intent intent = new Intent(getInstrumentation().getTargetContext(), CamBeerFestApplication.class);
+        startActivity(intent, null, null);
         fActivity = getActivity();
     }
 
