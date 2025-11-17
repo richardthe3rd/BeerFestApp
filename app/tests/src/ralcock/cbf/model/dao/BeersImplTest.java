@@ -36,6 +36,9 @@ public class BeersImplTest extends AndroidTestCase {
         fBeers = fBeerDatabaseHelper.getBeers();
         fBreweries = fBeerDatabaseHelper.getBreweries();
 
+        // Clear any existing data to avoid unique constraint violations
+        fBeerDatabaseHelper.deleteAll();
+
         Brewery brewery = new Brewery("1", "First Brewery", "y");
         fBreweries.create(brewery);
 

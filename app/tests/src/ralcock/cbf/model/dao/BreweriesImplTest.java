@@ -19,6 +19,9 @@ public class BreweriesImplTest extends AndroidTestCase {
                 BreweriesImplTest.class.getSimpleName() + ".");
         fBeerDatabaseHelper = new BeerDatabaseHelper(fContext);
         fBreweries = fBeerDatabaseHelper.getBreweries();
+
+        // Clear any existing data to avoid unique constraint violations
+        fBeerDatabaseHelper.deleteAll();
     }
 
     @Override
