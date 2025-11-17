@@ -10,16 +10,19 @@
 
 ## Overview
 
-The BeerFestApp currently has **8 instrumented tests**:
-- **7 legacy tests** in `app/tests/src/` (ANT-based, AndroidTestCase framework)
+The BeerFestApp currently has **7 instrumented tests running**:
+- **6 legacy tests** in `app/tests/src/` (ANT-based, AndroidTestCase framework)
 - **1 modern test** in `app/src/androidTest/` (Gradle-based, AndroidJUnit4 framework)
+- **1 deleted test** (`LifecycleTest.java`) - removed due to deprecated framework, needs replacement
 
 **Current state (as of Nov 2025):**
 - ✅ Quick fix implemented: Gradle configured to run legacy tests via sourceSets
+- ✅ 7/7 tests passing in CI (was 1/8 before)
 - ❌ Tests still use deprecated `AndroidTestCase` framework (pre-2013)
 - ❌ Tests not in standard Gradle location
+- ❌ LifecycleTest removed - needs modern ActivityScenario replacement
 
-**Goal:** Migrate all tests to modern AndroidJUnit4 framework in standard location.
+**Goal:** Migrate all tests to modern AndroidJUnit4 framework in standard location, and add modern ActivityScenario-based lifecycle test.
 
 ---
 
@@ -27,17 +30,17 @@ The BeerFestApp currently has **8 instrumented tests**:
 
 ### Legacy Tests (app/tests/src/)
 
-| Test File | Lines | Test Methods | Dependencies |
-|-----------|-------|--------------|--------------|
-| `LifecycleTest.java` | ? | ? | AndroidTestCase |
-| `CamBeerFestApplicationTest.java` | ? | ? | AndroidTestCase |
-| `actions/BeerSharerTest.java` | 84 | 3 | AndroidTestCase, Resources |
-| `model/JsonBeerListTest.java` | 78 | 2 | AndroidTestCase, JSON resources |
-| `model/BeerListTest.java` | ? | ? | AndroidTestCase |
-| `model/dao/BeersImplTest.java` | ? | ? | AndroidTestCase, OrmLite |
-| `model/dao/BreweriesImplTest.java` | ? | ? | AndroidTestCase, OrmLite |
+| Test File | Lines | Test Methods | Status | Dependencies |
+|-----------|-------|--------------|--------|--------------|
+| ~~`LifecycleTest.java`~~ | 45 | 1 | ❌ **DELETED** | ActivityUnitTestCase (removed - see below) |
+| `CamBeerFestApplicationTest.java` | ? | ? | ✅ Running | AndroidTestCase |
+| `actions/BeerSharerTest.java` | 84 | 3 | ✅ Running | AndroidTestCase, Resources |
+| `model/JsonBeerListTest.java` | 78 | 2 | ✅ Running | AndroidTestCase, JSON resources |
+| `model/BeerListTest.java` | ? | ? | ✅ Running | AndroidTestCase, EasyMock |
+| `model/dao/BeersImplTest.java` | ? | 2 | ✅ Running | AndroidTestCase, OrmLite |
+| `model/dao/BreweriesImplTest.java` | ? | 3 | ✅ Running | AndroidTestCase, OrmLite |
 
-**Total:** 7 test classes
+**Total:** 6 test classes running (1 deleted)
 
 ### Modern Tests (app/src/androidTest/)
 
@@ -122,13 +125,95 @@ The BeerFestApp currently has **8 instrumented tests**:
 **Migrate in this order (simplest to most complex):**
 
 1. ✅ `CamBeerFestApplicationInstrumentedTest.java` (already migrated)
-2. `LifecycleTest.java` (likely simple state tests)
+2. ❌ ~~`LifecycleTest.java`~~ (**DELETED** - see replacement strategy below)
 3. `BeerSharerTest.java` (Intent tests, medium complexity)
 4. `JsonBeerListTest.java` (requires resource migration)
 5. `BeerListTest.java` (unknown complexity)
 6. `CamBeerFestApplicationTest.java` (may overlap with instrumented test)
 7. `BeersImplTest.java` (DAO/database tests, complex)
 8. `BreweriesImplTest.java` (DAO/database tests, complex)
+
+---
+
+## Special Case: LifecycleTest Replacement
+
+**Status:** Deleted (commit 3df0096)
+**Reason:** `ActivityUnitTestCase` is deprecated and incompatible with modern Android testing
+
+### What It Was Testing
+
+The old `LifecycleTest` tested activity lifecycle state transitions:
+- Starting activity
+- Saving instance state
+- Destroying activity
+- Recreating from saved state
+
+### Modern Replacement Strategy
+
+**Replace with ActivityScenario** (AndroidX Test Library):
+
+```java
+package ralcock.cbf;
+
+import androidx.test.core.app.ActivityScenario;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import static androidx.test.core.app.ActivityScenario.launch;
+import static org.junit.Assert.assertNotNull;
+
+@RunWith(AndroidJUnit4.class)
+public class CamBeerFestApplicationLifecycleTest {
+
+    @Test
+    public void testActivityRecreation() {
+        // Launch activity
+        try (ActivityScenario<CamBeerFestApplication> scenario =
+                launch(CamBeerFestApplication.class)) {
+
+            // Test activity is created
+            scenario.onActivity(activity -> {
+                assertNotNull(activity);
+            });
+
+            // Simulate configuration change (recreate activity)
+            scenario.recreate();
+
+            // Verify activity survives recreation
+            scenario.onActivity(activity -> {
+                assertNotNull(activity);
+                // Add assertions to verify state was restored
+            });
+        }
+    }
+
+    @Test
+    public void testActivityStateTransitions() {
+        try (ActivityScenario<CamBeerFestApplication> scenario =
+                launch(CamBeerFestApplication.class)) {
+
+            // Move through lifecycle states
+            scenario.moveToState(Lifecycle.State.STARTED);
+            scenario.moveToState(Lifecycle.State.RESUMED);
+            scenario.moveToState(Lifecycle.State.CREATED);
+            scenario.moveToState(Lifecycle.State.DESTROYED);
+
+            // ActivityScenario handles the lifecycle automatically
+        }
+    }
+}
+```
+
+**Key Differences:**
+- `ActivityScenario` is modern, not deprecated
+- Much simpler API - no manual lifecycle calls needed
+- Better integration with AndroidX Test libraries
+- Automatic cleanup with try-with-resources
+
+**Migration Priority:** Medium-Low (after other tests are migrated)
+
+**Effort:** 30-45 minutes
 
 ---
 
@@ -288,20 +373,29 @@ If migration causes issues:
 | Phase | Effort | Notes |
 |-------|--------|-------|
 | Phase 1: Setup ✅ | 30 min | Complete |
-| Phase 2: Migrate 7 tests | 2-3 hours | ~15-25 min per test |
+| Phase 2a: Migrate 6 legacy tests | 2-2.5 hours | ~15-25 min per test |
+| Phase 2b: Create new LifecycleTest | 30-45 min | Using ActivityScenario |
 | Phase 3: Cleanup | 15 min | Delete old files, update docs |
-| **Total** | **2.5-3.5 hours** | Can be done incrementally |
+| **Total** | **3-3.5 hours** | Can be done incrementally |
+
+**Note:** LifecycleTest is a new test (not a migration) since the old one was deleted.
 
 ---
 
 ## Success Criteria
 
-- [ ] All 8 tests migrated to `app/src/androidTest/`
-- [ ] All tests use AndroidJUnit4 framework
+- [ ] 6 legacy tests migrated to `app/src/androidTest/`
+- [ ] New ActivityScenario-based lifecycle test created
+- [ ] All 8 tests use modern frameworks (AndroidJUnit4, Espresso, ActivityScenario)
 - [ ] All tests pass in CI (`./gradlew connectedCheck`)
 - [ ] `app/tests/` directory deleted
 - [ ] `sourceSets` configuration removed from `app/build.gradle`
 - [ ] Documentation updated
+
+**Current Progress:**
+- ✅ 1/8 tests already modern (`CamBeerFestApplicationInstrumentedTest`)
+- ✅ 6/8 tests running via legacy framework
+- ❌ 1/8 tests deleted (LifecycleTest - needs ActivityScenario replacement)
 
 ---
 
