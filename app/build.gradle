@@ -35,6 +35,13 @@ android {
            testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
        }
 
+    sourceSets {
+        androidTest {
+            java.srcDirs += ['tests/src']
+            manifest.srcFile 'tests/AndroidManifest.xml'
+        }
+    }
+
     lintOptions {
         abortOnError false
     }
