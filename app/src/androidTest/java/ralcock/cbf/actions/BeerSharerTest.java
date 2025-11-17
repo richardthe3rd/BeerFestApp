@@ -1,15 +1,32 @@
 package ralcock.cbf.actions;
 
+import android.content.Context;
 import android.content.Intent;
-import android.test.AndroidTestCase;
+
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import ralcock.cbf.R;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.StarRating;
 
+import static org.junit.Assert.assertTrue;
 import static ralcock.cbf.model.BeerBuilder.aBeer;
 import static ralcock.cbf.model.BreweryBuilder.aBrewery;
 
-public class BeerSharerTest extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class BeerSharerTest {
+
+    private Context context;
+
+    @Before
+    public void setUp() {
+        context = ApplicationProvider.getApplicationContext();
+    }
 
     private static void assertNoStars(String extraText) {
         char star = 0x272F;
@@ -23,7 +40,8 @@ public class BeerSharerTest extends AndroidTestCase {
                 extraText.contains(stars));
     }
 
-    public void testExtraTextUnrated() throws Exception {
+    @Test
+    public void testExtraTextUnrated() {
         String theBeerName = "TheBeerName";
         final String theBreweryName = "TheBreweryName";
         Beer beer = aBeer()
@@ -31,9 +49,9 @@ public class BeerSharerTest extends AndroidTestCase {
                 .from(aBrewery().called(theBreweryName))
                 .build();
 
-        String theHashTag = getContext().getResources().getString(R.string.festival_hashtag);
+        String theHashTag = context.getResources().getString(R.string.festival_hashtag);
 
-        BeerSharer sharer = new BeerSharer(getContext());
+        BeerSharer sharer = new BeerSharer(context);
         Intent intent = sharer.makeShareIntent(beer);
         String extraText = intent.getStringExtra(Intent.EXTRA_TEXT);
         assertTrue("'" + extraText + "' should contain '" + theBeerName + "'", extraText.contains(theBeerName));
@@ -42,7 +60,8 @@ public class BeerSharerTest extends AndroidTestCase {
         assertNoStars(extraText);
     }
 
-    public void testExtraTextWithStars() throws Exception {
+    @Test
+    public void testExtraTextWithStars() {
         String theBeerName = "AnotherBeerName";
         final String theBreweryName = "AnotherBreweryName";
 
@@ -51,10 +70,10 @@ public class BeerSharerTest extends AndroidTestCase {
                 .from(aBrewery().called(theBreweryName))
                 .build();
 
-        String theHashTag = getContext().getResources().getString(R.string.festival_hashtag);
+        String theHashTag = context.getResources().getString(R.string.festival_hashtag);
         beer.setNumberOfStars(new StarRating(3));
 
-        BeerSharer sharer = new BeerSharer(getContext());
+        BeerSharer sharer = new BeerSharer(context);
         Intent intent = sharer.makeShareIntent(beer);
         String extraText = intent.getStringExtra(Intent.EXTRA_TEXT);
 
@@ -64,7 +83,8 @@ public class BeerSharerTest extends AndroidTestCase {
         assertStars(3, extraText);
     }
 
-    public void testShareSubject() throws Exception {
+    @Test
+    public void testShareSubject() {
         String theBeerName = "Yet Another Beer";
         final String theBreweryName = "Yet Another Brewery";
 
@@ -73,11 +93,11 @@ public class BeerSharerTest extends AndroidTestCase {
                 .from(aBrewery().called(theBreweryName))
                 .build();
 
-        BeerSharer sharer = new BeerSharer(getContext());
+        BeerSharer sharer = new BeerSharer(context);
         Intent intent = sharer.makeShareIntent(beer);
         String extraSubject = intent.getStringExtra(Intent.EXTRA_SUBJECT);
 
-        final CharSequence theFestivalName = getContext().getResources().getString(R.string.festival_name);
+        final CharSequence theFestivalName = context.getResources().getString(R.string.festival_name);
         assertTrue("'" + extraSubject + "' should contain '" + theFestivalName + '"', extraSubject.contains(theFestivalName));
 
     }
