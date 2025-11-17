@@ -14,16 +14,12 @@ public class LifecycleTest extends ActivityUnitTestCase<CamBeerFestApplication> 
         super(CamBeerFestApplication.class);
     }
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        Intent intent = new Intent(getInstrumentation().getTargetContext(), CamBeerFestApplication.class);
-        startActivity(intent, null, null);
-        fActivity = getActivity();
-    }
-
     @UiThreadTest
     public void testLifeCycle(){
+        Intent intent = new Intent(getInstrumentation().getTargetContext(), CamBeerFestApplication.class);
+        startActivity(intent, new Bundle(), null);
+        fActivity = getActivity();
+
         getInstrumentation().callActivityOnStart(fActivity);
         getInstrumentation().callActivityOnResume(fActivity);
 
