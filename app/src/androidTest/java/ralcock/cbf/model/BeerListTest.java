@@ -1,6 +1,6 @@
 package ralcock.cbf.model;
 
-import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.runner.AndroidJUnit4;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
