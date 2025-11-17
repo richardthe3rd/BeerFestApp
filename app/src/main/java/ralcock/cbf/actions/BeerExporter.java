@@ -2,6 +2,7 @@ package ralcock.cbf.actions;
 
 import android.content.Context;
 import android.content.Intent;
+import ralcock.cbf.R;
 import ralcock.cbf.model.Beer;
 
 import java.io.IOException;
@@ -16,6 +17,11 @@ public final class BeerExporter {
     }
 
     public void export(final List<Beer> ratedBeers) throws IOException {
+        Intent intent = makeExportIntent(ratedBeers);
+        fContext.startActivity(Intent.createChooser(intent, "Send beer ratings as CSV"));
+    }
+
+    public Intent makeExportIntent(final List<Beer> ratedBeers) {
         StringBuilder builder = new StringBuilder();
 
         builder.append(String.format(Locale.US, "%s, %s, %s, %s\n", "Beer", "Brewery", "Style", "Rating"));
@@ -27,9 +33,11 @@ public final class BeerExporter {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
 
-        intent.putExtra(Intent.EXTRA_SUBJECT, "Beers from cbf39");
+        String festivalName = fContext.getResources().getString(R.string.festival_name);
+        String subject = String.format("Beers from %s", festivalName);
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
         intent.putExtra(Intent.EXTRA_TEXT, builder.toString());
 
-        fContext.startActivity(Intent.createChooser(intent, "Send beer ratings as CSV"));
+        return intent;
     }
 }
