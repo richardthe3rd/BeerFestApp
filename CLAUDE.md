@@ -68,6 +68,7 @@ This document provides comprehensive guidance for AI assistants working with the
 - Create a script to automate annual updates (see [Common Development Tasks](#common-development-tasks))
 - Add pre-commit hooks to validate version consistency
 - Consider externalizing configuration to a single source of truth
+- **RECOMMENDED: Dynamic festival loading** (see below for detailed design)
 
 #### 2. Insufficient Testing
 **Problem:** Testing coverage is inadequate for production use:
@@ -164,6 +165,322 @@ This document provides comprehensive guidance for AI assistants working with the
 | No multi-language support | English only | Festival is UK-based, low priority |
 | Min SDK 14 (old) | Maintenance burden for old APIs | Consider raising to SDK 21+ |
 | No dark mode | User preference ignored | Add theme support |
+| Dated UI/UX design | Looks outdated compared to modern apps | Material Design 3 refresh |
+
+### UI/UX Modernization
+
+**Current Status:** App uses older Material Design patterns (pre-2020 design language)
+
+**Modern UI Improvements Needed:**
+
+#### 1. Material Design 3 (Material You)
+```gradle
+// Upgrade to Material 3
+implementation 'com.google.android.material:material:1.11.0'
+```
+
+**Key Changes:**
+- **Dynamic color theming** - Adapts to user's wallpaper (Android 12+)
+- **Updated components** - Filled buttons, outlined cards, elevated surfaces
+- **New typography scale** - Better readability
+- **Motion and transitions** - Smoother animations
+
+**Example Updates:**
+```xml
+<!-- OLD: Material Design 2 -->
+<com.google.android.material.button.MaterialButton
+    style="@style/Widget.MaterialComponents.Button" />
+
+<!-- NEW: Material Design 3 -->
+<com.google.android.material.button.MaterialButton
+    style="@style/Widget.Material3.Button.FilledTonal" />
+```
+
+#### 2. Dark Mode Support
+**User Benefit:** Reduce eye strain, battery savings on OLED screens
+
+**Implementation:**
+```xml
+<!-- res/values/themes.xml -->
+<style name="Theme.BeerFest" parent="Theme.Material3.DayNight">
+    <item name="colorPrimary">@color/beer_amber</item>
+    <item name="colorOnPrimary">@color/white</item>
+    <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+</style>
+
+<!-- res/values-night/themes.xml -->
+<style name="Theme.BeerFest" parent="Theme.Material3.DayNight">
+    <item name="colorPrimary">@color/beer_amber_dark</item>
+    <item name="colorSurface">@color/dark_surface</item>
+</style>
+```
+
+#### 3. Modern Layout Patterns
+
+**Replace:**
+- ListView → RecyclerView with modern adapters
+- FragmentTransaction → Navigation Component
+- AsyncTask → Coroutines or WorkManager
+- Manual state handling → ViewModel + LiveData
+
+**Example: Beer List Modernization**
+```kotlin
+// Convert to Kotlin + modern architecture
+class BeerListViewModel : ViewModel() {
+    private val repository = BeerRepository()
+
+    val beers: LiveData<List<Beer>> = repository.getBeers()
+
+    val filteredBeers: LiveData<List<Beer>> = beers.map { list ->
+        list.filter { it.matchesCurrentFilter() }
+    }
+}
+
+class BeerListFragment : Fragment() {
+    private val viewModel: BeerListViewModel by viewModels()
+    private lateinit var binding: FragmentBeerListBinding
+
+    override fun onCreateView(...): View {
+        binding = FragmentBeerListBinding.inflate(inflater)
+
+        // Modern list with DiffUtil for smooth updates
+        val adapter = BeerListAdapter()
+        binding.recyclerView.adapter = adapter
+
+        viewModel.filteredBeers.observe(viewLifecycleOwner) { beers ->
+            adapter.submitList(beers)
+        }
+
+        return binding.root
+    }
+}
+```
+
+#### 4. Enhanced Beer Card Design
+
+**Current:** Basic list items
+**Modern:** Rich cards with imagery and information hierarchy
+
+```xml
+<!-- Modern beer card with Material 3 -->
+<com.google.android.material.card.MaterialCardView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardElevation="2dp"
+    app:cardCornerRadius="16dp"
+    app:strokeWidth="0dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:padding="16dp">
+
+        <!-- Beer style icon/badge -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/styleChip"
+            style="@style/Widget.Material3.Chip.Suggestion"
+            android:text="IPA" />
+
+        <!-- Beer name - prominent -->
+        <TextView
+            android:id="@+id/beerName"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- Brewery - secondary -->
+        <TextView
+            android:id="@+id/breweryName"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+
+        <!-- ABV with icon -->
+        <LinearLayout>
+            <ImageView
+                android:src="@drawable/ic_alcohol"
+                android:tint="?attr/colorPrimary" />
+            <TextView
+                android:id="@+id/abv"
+                android:text="5.2% ABV" />
+        </LinearLayout>
+
+        <!-- Rating stars (interactive) -->
+        <com.google.android.material.rating.RatingBar
+            android:id="@+id/ratingBar"
+            style="@style/Widget.Material3.RatingBar.Small" />
+
+        <!-- Bookmark FAB (floating action button) -->
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/bookmarkFab"
+            app:icon="@drawable/ic_bookmark_border"
+            android:text="Save" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>
+```
+
+#### 5. Modern Navigation
+
+**Replace:** Custom fragments with Navigation Component
+
+```gradle
+// Add Navigation Component
+implementation "androidx.navigation:navigation-fragment:2.7.6"
+implementation "androidx.navigation:navigation-ui:2.7.6"
+```
+
+```xml
+<!-- res/navigation/nav_graph.xml -->
+<navigation>
+    <fragment
+        android:id="@+id/festivalSelectionFragment"
+        android:name="ralcock.cbf.view.FestivalSelectionFragment">
+        <action
+            android:id="@+id/action_selectFestival"
+            app:destination="@id/beerListFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/beerListFragment"
+        android:name="ralcock.cbf.view.BeerListFragment">
+        <argument
+            android:name="festivalId"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_viewBeerDetails"
+            app:destination="@id/beerDetailsFragment" />
+    </fragment>
+</navigation>
+```
+
+#### 6. Visual Enhancements
+
+**Add:**
+- **Beer style color coding** - Different colors for IPA, Stout, Lager, etc.
+- **ABV visualization** - Progress bar or gauge
+- **Brewery logos** - If available in data feed
+- **Search with suggestions** - Material SearchView with autocomplete
+- **Smooth animations** - Shared element transitions between screens
+- **Empty states** - Beautiful illustrations when no results
+- **Loading states** - Skeleton screens instead of blank/spinner
+
+**Example: ABV Gauge**
+```xml
+<com.google.android.material.progressindicator.CircularProgressIndicator
+    android:id="@+id/abvGauge"
+    android:layout_width="48dp"
+    android:layout_height="48dp"
+    app:indicatorColor="?attr/colorPrimary"
+    app:trackColor="?attr/colorSurfaceVariant"
+    app:trackThickness="4dp" />
+```
+
+#### 7. Accessibility Improvements
+
+```xml
+<!-- Add content descriptions -->
+<ImageView
+    android:contentDescription="@string/bookmark_beer" />
+
+<!-- Increase touch targets -->
+<Button
+    android:minWidth="48dp"
+    android:minHeight="48dp" />
+
+<!-- Support screen readers -->
+<TextView
+    android:importantForAccessibility="yes"
+    android:accessibilityTraversalBefore="@id/nextElement" />
+```
+
+#### 8. Bottom Navigation (if adding more features)
+
+```xml
+<com.google.android.material.bottomnavigation.BottomNavigationView
+    app:menu="@menu/bottom_nav_menu">
+
+    <!-- Menu items -->
+    <item
+        android:id="@+id/navigation_festivals"
+        android:icon="@drawable/ic_festival"
+        android:title="@string/festivals" />
+
+    <item
+        android:id="@+id/navigation_beers"
+        android:icon="@drawable/ic_beer"
+        android:title="@string/beers" />
+
+    <item
+        android:id="@+id/navigation_bookmarks"
+        android:icon="@drawable/ic_bookmark"
+        android:title="@string/bookmarks" />
+
+    <item
+        android:id="@+id/navigation_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/settings" />
+</com.google.android.material.bottomnavigation.BottomNavigationView>
+```
+
+#### 9. Splash Screen (Android 12+)
+
+```xml
+<!-- res/values/themes.xml -->
+<style name="Theme.BeerFest.Splash" parent="Theme.SplashScreen">
+    <item name="windowSplashScreenBackground">?attr/colorPrimary</item>
+    <item name="windowSplashScreenAnimatedIcon">@drawable/app_icon</item>
+    <item name="postSplashScreenTheme">@style/Theme.BeerFest</item>
+</style>
+```
+
+#### 10. Typography Refresh
+
+```xml
+<!-- res/values/type.xml -->
+<resources>
+    <!-- Material 3 type scale -->
+    <style name="TextAppearance.BeerFest.DisplayLarge" parent="TextAppearance.Material3.DisplayLarge">
+        <item name="fontFamily">@font/inter_bold</item>
+    </style>
+
+    <style name="TextAppearance.BeerFest.TitleMedium" parent="TextAppearance.Material3.TitleMedium">
+        <item name="fontFamily">@font/inter_medium</item>
+    </style>
+
+    <style name="TextAppearance.BeerFest.BodyLarge" parent="TextAppearance.Material3.BodyLarge">
+        <item name="fontFamily">@font/inter_regular</item>
+    </style>
+</resources>
+```
+
+#### Implementation Priority
+
+**Phase 1: Foundation (Quick Wins)**
+1. Upgrade to Material 3 library
+2. Add dark mode support
+3. Update button and card styles
+4. Improve beer list item design
+
+**Phase 2: Architecture (Medium Effort)**
+5. Migrate to ViewModels and LiveData
+6. Replace AsyncTask with WorkManager
+7. Add Navigation Component
+8. Implement proper loading states
+
+**Phase 3: Polish (Nice to Have)**
+9. Custom animations and transitions
+10. Brewery logos and beer style icons
+11. Advanced filtering UI
+12. Accessibility enhancements
+
+#### Estimated Effort
+- **Phase 1 (Quick wins):** 1-2 weeks
+- **Phase 2 (Architecture):** 3-4 weeks
+- **Phase 3 (Polish):** 2-3 weeks
+- **Total:** 6-9 weeks for complete modernization
+
+#### Design Resources
+- [Material Design 3 Guidelines](https://m3.material.io/)
+- [Android Design Guidelines](https://developer.android.com/design)
+- [Material Theme Builder](https://material-foundation.github.io/material-theme-builder/)
 
 ---
 
@@ -714,6 +1031,369 @@ fi
 
 echo "✓ Version consistency check passed (CBF $VERSION_YEAR)"
 ```
+
+### Future-Proof Solution: Dynamic Festival Loading
+
+**VISION:** Eliminate annual app releases by loading festival configurations dynamically from a remote JSON resource.
+
+#### Current vs. Proposed Architecture
+
+**Current (Manual Release Each Year):**
+```
+User Downloads App → Hardcoded 2025 Config → Downloads cbf2025 beer list
+                   → Next year: NEW APP RELEASE REQUIRED
+```
+
+**Proposed (Dynamic Multi-Festival):**
+```
+User Downloads App → Fetches festival list JSON → Shows available festivals
+                   → User selects CBF 2025 → Downloads cbf2025 beer list
+                   → User selects CBF 2024 → Shows cached 2024 data
+                   → CBF 2026 added to JSON → Automatically appears in app!
+```
+
+#### Implementation Design
+
+**1. Festival Catalog JSON** (hosted at centralized URL)
+
+```json
+{
+  "festivals": [
+    {
+      "id": "cbf2026",
+      "name": "Cambridge Beer Festival 2026",
+      "year": 2026,
+      "hashtag": "cbf2026",
+      "website": "https://www.cambridgebeerfestival.com/",
+      "beerListUrl": "https://data.cambridgebeerfestival.com/cbf2026/beer.json",
+      "startDate": "2026-05-25",
+      "endDate": "2026-05-30",
+      "active": true
+    },
+    {
+      "id": "cbf2025",
+      "name": "Cambridge Beer Festival 2025",
+      "year": 2025,
+      "hashtag": "cbf2025",
+      "website": "https://www.cambridgebeerfestival.com/",
+      "beerListUrl": "https://data.cambridgebeerfestival.com/cbf2025/beer.json",
+      "startDate": "2025-05-26",
+      "endDate": "2025-05-31",
+      "active": true
+    },
+    {
+      "id": "cbf2024",
+      "name": "Cambridge Beer Festival 2024",
+      "year": 2024,
+      "hashtag": "cbf2024",
+      "website": "https://www.cambridgebeerfestival.com/",
+      "beerListUrl": "https://data.cambridgebeerfestival.com/cbf2024/beer.json",
+      "startDate": "2024-05-20",
+      "endDate": "2024-05-25",
+      "active": false,
+      "archived": true
+    }
+  ],
+  "catalogVersion": 3,
+  "lastUpdated": "2026-01-15T10:00:00Z"
+}
+```
+
+**Catalog URL:**
+```java
+// In festival.xml or AppPreferences
+public static final String FESTIVAL_CATALOG_URL =
+    "https://data.cambridgebeerfestival.com/festivals.json";
+```
+
+**2. Database Schema Changes**
+
+```java
+// Add Festival table
+@DatabaseTable(tableName = "festivals")
+public class Festival {
+    @DatabaseField(id = true)
+    private String id; // "cbf2026"
+
+    @DatabaseField
+    private String name;
+
+    @DatabaseField
+    private int year;
+
+    @DatabaseField
+    private String hashtag;
+
+    @DatabaseField
+    private String beerListUrl;
+
+    @DatabaseField
+    private String startDate;
+
+    @DatabaseField
+    private String endDate;
+
+    @DatabaseField
+    private boolean active;
+
+    @DatabaseField
+    private boolean archived;
+
+    @DatabaseField
+    private long lastDownloaded; // Timestamp
+}
+
+// Update Beer table to link to Festival
+@DatabaseTable(tableName = "beers")
+public class Beer {
+    // ... existing fields ...
+
+    @DatabaseField(foreign = true)
+    private Festival festival; // Link beer to festival
+}
+```
+
+**3. UI Changes**
+
+```java
+// New: Festival Selection Fragment
+public class FestivalSelectionFragment extends Fragment {
+    // Shows list of available festivals
+    // - Current festival (highlighted)
+    // - Past festivals (if data downloaded)
+    // - Future festivals (if announced)
+
+    private void loadFestivals() {
+        // Fetch from FESTIVAL_CATALOG_URL
+        // Display in RecyclerView
+    }
+
+    private void onFestivalSelected(Festival festival) {
+        // Download beer list for selected festival
+        // Switch database context to that festival
+    }
+}
+
+// Updated: Main Activity
+public class CamBeerFestApplication extends AppCompatActivity {
+    private Festival currentFestival;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Load festival catalog
+        loadFestivalCatalog();
+
+        // Determine current/default festival
+        currentFestival = getCurrentFestival();
+
+        // Load beer list for current festival
+        loadBeersForFestival(currentFestival);
+    }
+
+    private Festival getCurrentFestival() {
+        // 1. Check if user has manually selected a festival
+        // 2. Otherwise, use most recent active festival
+        // 3. Fall back to latest festival in catalog
+    }
+}
+```
+
+**4. Data Persistence Strategy**
+
+```java
+// Keep historical data from previous festivals
+public class MultiFestivalDatabaseHelper extends OrmLiteSqliteOpenHelper {
+
+    // Option A: Single database with festival FK (RECOMMENDED)
+    public Beers getBeersForFestival(String festivalId) {
+        return beers.queryForFestival(festivalId);
+    }
+
+    // Option B: Separate database per festival
+    public BeerDatabaseHelper getHelperForFestival(String festivalId) {
+        String dbName = "BEERS_" + festivalId; // BEERS_cbf2025
+        return new BeerDatabaseHelper(context, dbName);
+    }
+}
+```
+
+**5. Migration Path**
+
+```java
+// Backward compatibility: migrate existing data
+@Override
+public void onUpgrade(SQLiteDatabase db, ConnectionSource conn,
+                      int oldVersion, int newVersion) {
+    if (oldVersion < 33) { // Adding festival support
+        // 1. Create Festival table
+        TableUtils.createTable(conn, Festival.class);
+
+        // 2. Create a "cbf2025" festival entry for existing data
+        Festival cbf2025 = new Festival();
+        cbf2025.setId("cbf2025");
+        cbf2025.setName("Cambridge Beer Festival 2025");
+        // ... set other fields ...
+
+        Festivals festivals = getDao(Festival.class);
+        festivals.create(cbf2025);
+
+        // 3. Add festival_id column to beers table
+        db.execSQL("ALTER TABLE beers ADD COLUMN festival_id TEXT");
+
+        // 4. Link all existing beers to cbf2025
+        db.execSQL("UPDATE beers SET festival_id = 'cbf2025'");
+    }
+}
+```
+
+**6. Update Service Changes**
+
+```java
+// New: Festival Catalog Update Service
+public class FestivalCatalogUpdateService extends IntentService {
+    @Override
+    protected void onHandleIntent(Intent intent) {
+        try {
+            // 1. Download festivals.json
+            String json = downloadCatalog(FESTIVAL_CATALOG_URL);
+
+            // 2. Parse festival list
+            FestivalCatalog catalog = parseCatalog(json);
+
+            // 3. Save to database
+            saveFestivals(catalog.getFestivals());
+
+            // 4. Check if current festival needs update
+            Festival current = getCurrentFestival();
+            if (current.needsUpdate()) {
+                // Download beer list for current festival
+                downloadBeerList(current);
+            }
+
+            // 5. Notify UI
+            broadcastCatalogUpdated();
+
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to update festival catalog", e);
+        }
+    }
+}
+
+// Updated: Beer List Update Service
+public class BeerListUpdateService extends IntentService {
+    @Override
+    protected void onHandleIntent(Intent intent) {
+        String festivalId = intent.getStringExtra("festival_id");
+        Festival festival = getFestival(festivalId);
+
+        // Download beer list for specific festival
+        downloadAndSaveBeers(festival);
+    }
+}
+```
+
+#### Benefits
+
+**For Users:**
+- ✅ No app updates required when new festival announced
+- ✅ Browse historical festival data (past years)
+- ✅ Compare beers across different years
+- ✅ App automatically shows new festivals
+
+**For Developers:**
+- ✅ No annual app releases required
+- ✅ Update festival data via JSON file only
+- ✅ No Play Store review delays
+- ✅ Instant updates worldwide
+- ✅ A/B test different festivals
+- ✅ Support multiple festivals simultaneously
+
+**For Maintenance:**
+- ✅ Eliminates manual version updates
+- ✅ No database version increment needed
+- ✅ Centralized configuration management
+- ✅ Rollback capability (edit JSON)
+
+#### Rollout Strategy
+
+**Phase 1: Foundation (v2.0)**
+- Add Festival model and table
+- Migrate existing cbf2025 data to festival-aware schema
+- Internal festival selector (hidden UI)
+- Test with cbf2024 and cbf2025 data
+
+**Phase 2: Dynamic Loading (v2.1)**
+- Implement festival catalog download
+- Add FestivalSelectionFragment UI
+- Update UpdateService for multi-festival support
+- Release with cbf2024 and cbf2025 pre-loaded
+
+**Phase 3: Full Production (v2.2)**
+- Remove hardcoded festival.xml (keep catalog URL only)
+- Add automatic catalog refresh
+- Historical data retention settings
+- User can browse all past festivals
+
+#### Annual Update Process (New)
+
+**Before (Current):**
+```bash
+1. Update build.gradle version
+2. Update festival.xml (3 places)
+3. Update BeerDatabaseHelper DB_VERSION
+4. Test, commit, build, release to Play Store
+5. Wait for review (1-7 days)
+6. Users update app
+Total time: 1-2 weeks
+```
+
+**After (Dynamic):**
+```bash
+1. Add new entry to festivals.json
+2. Upload to data.cambridgebeerfestival.com
+3. App auto-fetches and shows new festival
+Total time: 5 minutes, instant worldwide
+```
+
+#### Files to Modify
+
+**New Files:**
+- `libraries/beers/src/main/java/ralcock/cbf/model/Festival.java`
+- `libraries/beers/src/main/java/ralcock/cbf/model/FestivalCatalog.java`
+- `libraries/beers/src/main/java/ralcock/cbf/model/dao/Festivals.java`
+- `app/src/main/java/ralcock/cbf/service/FestivalCatalogUpdateService.java`
+- `app/src/main/java/ralcock/cbf/view/FestivalSelectionFragment.java`
+
+**Modified Files:**
+- `Beer.java` - Add festival foreign key
+- `BeerDatabaseHelper.java` - Add Festival table, migration logic
+- `CamBeerFestApplication.java` - Festival selection support
+- `UpdateService.java` - Multi-festival awareness
+- `festival.xml` - Keep only catalog URL
+
+#### Risks and Mitigation
+
+| Risk | Mitigation |
+|------|------------|
+| Catalog URL unreachable | Bundle festivals.json in app as fallback |
+| Invalid JSON format | Validate with JSON schema, catch parse errors |
+| Database migration failure | Extensive testing, backup/restore mechanism |
+| Increased app complexity | Phased rollout, comprehensive documentation |
+| User confusion | Clear UI, default to current festival |
+| Increased database size | Add cleanup for very old festivals (>3 years) |
+
+#### Estimated Effort
+
+- Database schema changes: 2-3 days
+- Festival catalog service: 2-3 days
+- UI changes: 3-4 days
+- Migration logic: 2-3 days
+- Testing: 3-4 days
+- **Total: 12-17 days** (2-3 weeks of development)
+
+**ROI:** One-time 2-3 week investment eliminates all future annual release work (saves ~1 week/year forever)
 
 ---
 
@@ -1762,28 +2442,72 @@ PRAGMA user_version;
 **Long-term Solution:**
 See [Known Issues - Beverage Type Limitation](#4-beverage-type-limitation) for implementation plan.
 
-#### Issue 5: Share Function Not Working
+#### Issue 5: Share Function Not Working / Incomplete
 
 **Symptoms:**
 - Share button doesn't work
 - Wrong hashtag in shared posts
 - Share text incomplete
+- **BUG: Share widget from beer details view doesn't show all sharing options** (unlike long press on list)
 
 **Diagnosis:**
 ```bash
 # Check festival.xml configuration
 grep festival_hashtag app/src/main/res/values/festival.xml
 # Should output: <string name="festival_hashtag">cbf2025</string>
+
+# Check BeerSharer implementation
+grep -n "createChooser\|Intent.ACTION_SEND" app/src/main/java/ralcock/cbf/actions/BeerSharer.java
 ```
+
+**Root Cause of Sharing Options Bug:**
+The share intent from beer details view may not be using `Intent.createChooser()` properly, limiting available share targets.
 
 **Common Fixes:**
 1. **Update hashtag** in `festival.xml` for new year
+
 2. **Check BeerSharer.java** for null checks:
    ```java
    if (beer == null || beer.getName() == null) {
        return; // Don't share incomplete data
    }
    ```
+
+3. **Fix share intent to show all options:**
+   ```java
+   // INCORRECT: Limited sharing options
+   Intent shareIntent = new Intent(Intent.ACTION_SEND);
+   shareIntent.setType("text/plain");
+   startActivity(shareIntent); // Missing chooser!
+
+   // CORRECT: Shows all available share targets
+   Intent shareIntent = new Intent(Intent.ACTION_SEND);
+   shareIntent.setType("text/plain");
+   shareIntent.putExtra(Intent.EXTRA_TEXT, shareText);
+   shareIntent.putExtra(Intent.EXTRA_SUBJECT, shareSubject);
+
+   Intent chooser = Intent.createChooser(shareIntent, "Share beer via...");
+   if (shareIntent.resolveActivity(getPackageManager()) != null) {
+       startActivity(chooser);
+   }
+   ```
+
+4. **Ensure consistency** between list long-press and details view share:
+   ```java
+   // Extract to common method in BeerSharer
+   public Intent createShareIntent(Beer beer) {
+       String shareText = formatShareText(beer);
+       Intent intent = new Intent(Intent.ACTION_SEND);
+       intent.setType("text/plain");
+       intent.putExtra(Intent.EXTRA_TEXT, shareText);
+       return Intent.createChooser(intent, "Share beer");
+   }
+   ```
+
+**Files to Check:**
+- `BeerSharer.java` - Share action implementation
+- `BeerDetailsFragment.java` - Share button click handler
+- `BeerListFragment.java` - Long-press share handler (working version)
 
 #### Issue 6: Build Failures in CI/CD
 
@@ -1934,6 +2658,249 @@ cat app/build/outputs/mapping/release/mapping.txt
 # View project structure
 ./gradlew projects
 ```
+
+---
+
+## Documentation Structure Recommendations
+
+**Current Status:** Single large CLAUDE.md file (2600+ lines)
+
+**Problem:** As documentation grows, it becomes harder to navigate and maintain. Progressive disclosure is better for usability.
+
+### Recommended Structure
+
+**Proposed hierarchy for better progressive disclosure:**
+
+```
+docs/
+├── README.md                          # Documentation hub (what you're reading)
+├── getting-started.md                 # Quick start for new contributors
+├── architecture/
+│   ├── overview.md                    # High-level architecture
+│   ├── database-schema.md             # Database design and ORM
+│   ├── dependency-injection.md        # DI patterns
+│   └── navigation-flow.md             # UI navigation
+├── development/
+│   ├── setup.md                       # Dev environment setup
+│   ├── build-and-test.md              # Build commands and testing
+│   ├── coding-conventions.md          # Code style guide
+│   └── git-workflow.md                # Branching and commits
+├── annual-updates/
+│   ├── README.md                      # Annual update overview
+│   ├── manual-process.md              # Step-by-step manual updates
+│   ├── automation-scripts.md          # Automation tools
+│   └── checklist.md                   # Verification checklist
+├── troubleshooting/
+│   ├── README.md                      # Common issues overview
+│   ├── crashes.md                     # App crashes debugging
+│   ├── anr.md                         # ANR issues
+│   ├── stale-data.md                  # Beer list update problems
+│   ├── build-failures.md              # CI/CD issues
+│   └── sharing-bugs.md                # Share functionality bugs
+├── features/
+│   ├── dynamic-festivals.md           # Festival loading proposal
+│   ├── cider-mead-support.md          # Beverage type expansion
+│   ├── ui-modernization.md            # Material Design 3 upgrade
+│   └── testing-improvements.md        # Test coverage plan
+├── cicd/
+│   ├── github-actions.md              # CI/CD pipeline docs
+│   ├── release-process.md             # How to release
+│   └── signing-keys.md                # Keystore management
+└── api/
+    ├── data-models.md                 # Beer, Brewery, Festival models
+    ├── dao-layer.md                   # Data access objects
+    └── json-format.md                 # Beer list JSON spec
+
+CLAUDE.md (top level)                  # Overview + links to detailed docs
+```
+
+### Top-Level CLAUDE.md (Proposed Refactor)
+
+**Purpose:** Entry point with high-level overview and links to detailed documentation
+
+**Contents:**
+```markdown
+# CLAUDE.md - AI Assistant Guide
+
+## Quick Links
+- [Getting Started](docs/getting-started.md) - Setup and first contribution
+- [Annual Updates](docs/annual-updates/README.md) - **Most common task**
+- [Troubleshooting](docs/troubleshooting/README.md) - Debug common issues
+- [Architecture](docs/architecture/overview.md) - System design
+- [Feature Proposals](docs/features/) - Future enhancements
+
+## At a Glance
+
+**Project:** Cambridge Beer Festival Android App
+**Language:** Java (Android)
+**Status:** Production, annual updates
+**Pain Points:** Manual yearly releases, crashes, stale data
+
+## Critical Information
+
+### For Annual Updates
+See [Annual Updates Guide](docs/annual-updates/README.md)
+- 3 files to modify
+- ~15 minutes with automation script
+- Zero-downtime with dynamic festivals (proposed)
+
+### For Bug Fixes
+See [Troubleshooting Guide](docs/troubleshooting/README.md)
+- Known issues with solutions
+- Debugging commands
+- Root cause analysis
+
+### For New Features
+See [Feature Proposals](docs/features/)
+- Dynamic festival loading (RECOMMENDED)
+- Cider/mead support
+- UI modernization
+
+## Repository Structure
+[Brief 10-line overview, link to architecture/overview.md]
+
+## Essential Commands
+[5 most common commands, link to development/build-and-test.md]
+
+---
+*For detailed information, browse the [docs/](docs/) directory*
+```
+
+### Migration Plan
+
+**Phase 1: Create Structure (No Breaking Changes)**
+```bash
+# Create docs directory structure
+mkdir -p docs/{architecture,development,annual-updates,troubleshooting,features,cicd,api}
+
+# Extract sections from CLAUDE.md to individual files
+# Keep CLAUDE.md as overview with links
+```
+
+**Phase 2: Refactor Content**
+1. Split Known Issues → `troubleshooting/*.md`
+2. Split Architecture → `architecture/*.md`
+3. Split Annual Update → `annual-updates/*.md`
+4. Split Features → `features/*.md`
+5. Update CLAUDE.md to be hub with summaries + links
+
+**Phase 3: Add Navigation**
+- Add README.md in each subdirectory
+- Cross-link related documents
+- Add "breadcrumbs" navigation
+- Generate table of contents
+
+### Benefits
+
+**Progressive Disclosure:**
+- ✅ Readers start with overview
+- ✅ Dive deeper as needed
+- ✅ Less overwhelming
+- ✅ Easier to find specific info
+
+**Maintainability:**
+- ✅ Smaller, focused files
+- ✅ Easier to update individual sections
+- ✅ Multiple people can edit different docs
+- ✅ Git conflicts reduced
+
+**Discoverability:**
+- ✅ Clear categorization
+- ✅ READMEs guide exploration
+- ✅ Links between related topics
+- ✅ Searchable by topic
+
+### Example: Annual Updates Extraction
+
+**From:** Large section in CLAUDE.md
+
+**To:** Dedicated docs/annual-updates/ directory:
+
+```
+docs/annual-updates/
+├── README.md                     # Overview + quick links
+├── manual-process.md             # Step-by-step manual updates
+│   ├── 1. Update build.gradle
+│   ├── 2. Update festival.xml
+│   ├── 3. Increment DB version
+│   ├── 4. Test
+│   └── 5. Commit
+├── automation-scripts.md         # Bash/Gradle automation
+│   ├── Option 1: Bash script
+│   ├── Option 2: Gradle task
+│   └── Option 3: Pre-commit hook
+├── checklist.md                  # Printable checklist
+└── testing-guide.md              # What to test before release
+```
+
+**docs/annual-updates/README.md:**
+```markdown
+# Annual Festival Updates
+
+**Time Required:** 15 minutes (manual) or 5 minutes (automated)
+**Frequency:** Once per year
+**Files Modified:** 3
+
+## Quick Start
+
+Using automation (recommended):
+```bash
+./scripts/update-festival-year.sh 2026
+```
+
+Manual process:
+1. [Update build.gradle](manual-process.md#1-update-buildgradle)
+2. [Update festival.xml](manual-process.md#2-update-festivalxml)
+3. [Increment DB version](manual-process.md#3-increment-db-version)
+
+[Full manual process guide →](manual-process.md)
+
+## Automation Options
+
+- [Bash script](automation-scripts.md#bash-script)
+- [Gradle task](automation-scripts.md#gradle-task)
+- [Pre-commit hook](automation-scripts.md#pre-commit-hook)
+
+## Future: Zero-Maintenance Updates
+
+[Dynamic festival loading](../features/dynamic-festivals.md) eliminates
+annual releases entirely. One-time 2-3 week investment, saves 1 week/year forever.
+```
+
+### Implementation
+
+**Script to Auto-Generate Structure:**
+```bash
+#!/bin/bash
+# scripts/generate-docs-structure.sh
+
+# Create directory structure
+mkdir -p docs/{architecture,development,annual-updates,troubleshooting,features,cicd,api}
+
+# Extract sections from CLAUDE.md using sed/awk
+# (Would need custom extraction logic)
+
+# Generate README files
+for dir in docs/*/; do
+    cat > "$dir/README.md" <<EOF
+# $(basename $dir)
+
+[Auto-generated overview]
+EOF
+done
+
+echo "Documentation structure created in docs/"
+```
+
+### Estimated Effort
+
+- Directory structure creation: 30 minutes
+- Content extraction/splitting: 4-6 hours
+- README generation and linking: 2-3 hours
+- Review and polish: 2-3 hours
+- **Total: 1-2 days**
+
+**Benefits:** Much easier to maintain long-term, better contributor experience
 
 ---
 
