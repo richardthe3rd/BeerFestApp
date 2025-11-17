@@ -15,17 +15,7 @@ import static ralcock.cbf.model.BreweryBuilder.aBrewery;
 /**
  * Tests for BeerExporter CSV export functionality.
  *
- * NOTE: These tests have limited coverage because BeerExporter.export() calls startActivity()
- * directly, making it difficult to verify the Intent contents without refactoring. These tests
- * primarily verify that CSV formatting doesn't crash with various inputs.
- *
- * FUTURE IMPROVEMENT: Refactor BeerExporter to have a makeExportIntent() method (similar to
- * BeerSharer.makeShareIntent()) that returns the Intent without starting the activity. This
- * would allow tests to verify:
- * - CSV header format
- * - CSV row format
- * - Proper escaping of quotes and commas
- * - Intent action, type, and extras
+ * Tests verify CSV formatting, Intent contents, and edge case handling.
  */
 public class BeerExporterTest extends AndroidTestCase {
 
@@ -37,7 +27,62 @@ public class BeerExporterTest extends AndroidTestCase {
         fExporter = new BeerExporter(getContext());
     }
 
-    public void testExportSingleBeer() throws Exception {
+    public void testIntentAction() throws Exception {
+        Beer beer = aBeer()
+                .called("Test Beer")
+                .from(aBrewery().called("Test Brewery"))
+                .withStyle("IPA")
+                .build();
+        beer.setNumberOfStars(new StarRating(3));
+
+        Intent intent = fExporter.makeExportIntent(Arrays.asList(beer));
+
+        assertEquals("Intent action should be ACTION_SEND", Intent.ACTION_SEND, intent.getAction());
+    }
+
+    public void testIntentType() throws Exception {
+        Beer beer = aBeer()
+                .called("Test Beer")
+                .from(aBrewery().called("Test Brewery"))
+                .withStyle("IPA")
+                .build();
+
+        Intent intent = fExporter.makeExportIntent(Arrays.asList(beer));
+
+        assertEquals("Intent type should be text/plain", "text/plain", intent.getType());
+    }
+
+    public void testIntentSubject() throws Exception {
+        Beer beer = aBeer()
+                .called("Test Beer")
+                .from(aBrewery().called("Test Brewery"))
+                .withStyle("IPA")
+                .build();
+
+        Intent intent = fExporter.makeExportIntent(Arrays.asList(beer));
+
+        String subject = intent.getStringExtra(Intent.EXTRA_SUBJECT);
+        assertNotNull("Intent should have EXTRA_SUBJECT", subject);
+        assertTrue("Subject should contain 'Beers from'", subject.startsWith("Beers from "));
+        assertTrue("Subject should contain festival name", subject.contains("Cambridge Beer Festival"));
+    }
+
+    public void testCSVHeader() throws Exception {
+        Beer beer = aBeer()
+                .called("Test Beer")
+                .from(aBrewery().called("Test Brewery"))
+                .withStyle("IPA")
+                .build();
+        beer.setNumberOfStars(new StarRating(3));
+
+        Intent intent = fExporter.makeExportIntent(Arrays.asList(beer));
+
+        String csv = intent.getStringExtra(Intent.EXTRA_TEXT);
+        assertNotNull("CSV should not be null", csv);
+        assertTrue("CSV should contain header", csv.startsWith("Beer, Brewery, Style, Rating\n"));
+    }
+
+    public void testCSVSingleBeerFormat() throws Exception {
         Beer beer = aBeer()
                 .called("Test Beer")
                 .from(aBrewery().called("Test Brewery"))
@@ -45,18 +90,16 @@ public class BeerExporterTest extends AndroidTestCase {
                 .build();
         beer.setNumberOfStars(new StarRating(4));
 
-        List<Beer> beers = Arrays.asList(beer);
+        Intent intent = fExporter.makeExportIntent(Arrays.asList(beer));
 
-        // Method calls startActivity, so we verify it doesn't crash
-        try {
-            fExporter.export(beers);
-            // If we get here without exception, the CSV was formatted correctly
-        } catch (Exception e) {
-            fail("Export should not throw exception for single valid beer: " + e.getMessage());
-        }
+        String csv = intent.getStringExtra(Intent.EXTRA_TEXT);
+        String[] lines = csv.split("\n");
+        assertEquals("CSV should have 2 lines (header + 1 beer)", 2, lines.length);
+        assertEquals("Beer, Brewery, Style, Rating", lines[0]);
+        assertEquals("\"Test Beer\", \"Test Brewery\", \"IPA\", 4", lines[1]);
     }
 
-    public void testExportMultipleBeers() throws Exception {
+    public void testCSVMultipleBeers() throws Exception {
         Beer beer1 = aBeer()
                 .called("First Beer")
                 .from(aBrewery().called("First Brewery"))
@@ -78,26 +121,27 @@ public class BeerExporterTest extends AndroidTestCase {
                 .build();
         beer3.setNumberOfStars(new StarRating(2));
 
-        List<Beer> beers = Arrays.asList(beer1, beer2, beer3);
+        Intent intent = fExporter.makeExportIntent(Arrays.asList(beer1, beer2, beer3));
 
-        try {
-            fExporter.export(beers);
-        } catch (Exception e) {
-            fail("Export should not throw exception for multiple valid beers: " + e.getMessage());
-        }
+        String csv = intent.getStringExtra(Intent.EXTRA_TEXT);
+        String[] lines = csv.split("\n");
+        assertEquals("CSV should have 4 lines (header + 3 beers)", 4, lines.length);
+        assertEquals("\"First Beer\", \"First Brewery\", \"Pale Ale\", 3", lines[1]);
+        assertEquals("\"Second Beer\", \"Second Brewery\", \"Stout\", 5", lines[2]);
+        assertEquals("\"Third Beer\", \"Third Brewery\", \"Lager\", 2", lines[3]);
     }
 
-    public void testExportEmptyList() throws Exception {
+    public void testCSVEmptyList() throws Exception {
         List<Beer> beers = new ArrayList<Beer>();
 
-        try {
-            fExporter.export(beers);
-        } catch (Exception e) {
-            fail("Export should not throw exception for empty list: " + e.getMessage());
-        }
+        Intent intent = fExporter.makeExportIntent(beers);
+
+        String csv = intent.getStringExtra(Intent.EXTRA_TEXT);
+        assertNotNull("CSV should not be null for empty list", csv);
+        assertEquals("CSV should only have header for empty list", "Beer, Brewery, Style, Rating\n", csv);
     }
 
-    public void testExportBeerWithQuotesInName() throws Exception {
+    public void testCSVQuotesInBeerName() throws Exception {
         Beer beer = aBeer()
                 .called("The \"Quoted\" Beer")
                 .from(aBrewery().called("Test Brewery"))
@@ -105,16 +149,30 @@ public class BeerExporterTest extends AndroidTestCase {
                 .build();
         beer.setNumberOfStars(new StarRating(3));
 
-        List<Beer> beers = Arrays.asList(beer);
+        Intent intent = fExporter.makeExportIntent(Arrays.asList(beer));
 
-        try {
-            fExporter.export(beers);
-        } catch (Exception e) {
-            fail("Export should handle quotes in beer name: " + e.getMessage());
-        }
+        String csv = intent.getStringExtra(Intent.EXTRA_TEXT);
+        String[] lines = csv.split("\n");
+        // Note: Current implementation doesn't escape quotes, so we test actual behavior
+        assertTrue("CSV should contain beer name with quotes", lines[1].contains("The \"Quoted\" Beer"));
     }
 
-    public void testExportBeerWithCommasInName() throws Exception {
+    public void testCSVQuotesInBreweryName() throws Exception {
+        Beer beer = aBeer()
+                .called("Test Beer")
+                .from(aBrewery().called("The \"Quoted\" Brewery"))
+                .withStyle("IPA")
+                .build();
+        beer.setNumberOfStars(new StarRating(3));
+
+        Intent intent = fExporter.makeExportIntent(Arrays.asList(beer));
+
+        String csv = intent.getStringExtra(Intent.EXTRA_TEXT);
+        String[] lines = csv.split("\n");
+        assertTrue("CSV should contain brewery name with quotes", lines[1].contains("The \"Quoted\" Brewery"));
+    }
+
+    public void testCSVCommasInNames() throws Exception {
         Beer beer = aBeer()
                 .called("Beer, The Great")
                 .from(aBrewery().called("Brewery, Inc."))
@@ -122,16 +180,17 @@ public class BeerExporterTest extends AndroidTestCase {
                 .build();
         beer.setNumberOfStars(new StarRating(4));
 
-        List<Beer> beers = Arrays.asList(beer);
+        Intent intent = fExporter.makeExportIntent(Arrays.asList(beer));
 
-        try {
-            fExporter.export(beers);
-        } catch (Exception e) {
-            fail("Export should handle commas in names: " + e.getMessage());
-        }
+        String csv = intent.getStringExtra(Intent.EXTRA_TEXT);
+        assertNotNull("CSV should not be null", csv);
+        // CSV wraps fields in quotes, so commas are handled
+        assertTrue("CSV should contain beer name", csv.contains("Beer, The Great"));
+        assertTrue("CSV should contain brewery name", csv.contains("Brewery, Inc."));
+        assertTrue("CSV should contain style", csv.contains("IPA, Strong"));
     }
 
-    public void testExportBeerWithNewlinesInName() throws Exception {
+    public void testCSVNewlinesInNames() throws Exception {
         Beer beer = aBeer()
                 .called("Beer\nWith\nNewlines")
                 .from(aBrewery().called("Brewery\nName"))
@@ -139,16 +198,15 @@ public class BeerExporterTest extends AndroidTestCase {
                 .build();
         beer.setNumberOfStars(new StarRating(3));
 
-        List<Beer> beers = Arrays.asList(beer);
+        Intent intent = fExporter.makeExportIntent(Arrays.asList(beer));
 
-        try {
-            fExporter.export(beers);
-        } catch (Exception e) {
-            fail("Export should handle newlines in names: " + e.getMessage());
-        }
+        String csv = intent.getStringExtra(Intent.EXTRA_TEXT);
+        assertNotNull("CSV should not be null", csv);
+        // Note: Current implementation doesn't escape newlines specially
+        assertTrue("CSV should contain beer name", csv.contains("Beer\nWith\nNewlines"));
     }
 
-    public void testExportBeerWithSpecialCharacters() throws Exception {
+    public void testCSVSpecialCharacters() throws Exception {
         Beer beer = aBeer()
                 .called("Spëcîål Béér & Co.'s")
                 .from(aBrewery().called("Brëwéry™"))
@@ -156,16 +214,16 @@ public class BeerExporterTest extends AndroidTestCase {
                 .build();
         beer.setNumberOfStars(new StarRating(5));
 
-        List<Beer> beers = Arrays.asList(beer);
+        Intent intent = fExporter.makeExportIntent(Arrays.asList(beer));
 
-        try {
-            fExporter.export(beers);
-        } catch (Exception e) {
-            fail("Export should handle special characters: " + e.getMessage());
-        }
+        String csv = intent.getStringExtra(Intent.EXTRA_TEXT);
+        assertNotNull("CSV should not be null", csv);
+        assertTrue("CSV should contain special characters in beer name", csv.contains("Spëcîål Béér & Co.'s"));
+        assertTrue("CSV should contain special characters in brewery name", csv.contains("Brëwéry™"));
+        assertTrue("CSV should contain special characters in style", csv.contains("IPÄ"));
     }
 
-    public void testExportUnratedBeer() throws Exception {
+    public void testCSVUnratedBeer() throws Exception {
         Beer beer = aBeer()
                 .called("Unrated Beer")
                 .from(aBrewery().called("Test Brewery"))
@@ -173,19 +231,43 @@ public class BeerExporterTest extends AndroidTestCase {
                 .build();
         // Don't set rating, defaults to 0
 
-        List<Beer> beers = Arrays.asList(beer);
+        Intent intent = fExporter.makeExportIntent(Arrays.asList(beer));
 
-        try {
-            fExporter.export(beers);
-        } catch (Exception e) {
-            fail("Export should handle unrated beers: " + e.getMessage());
+        String csv = intent.getStringExtra(Intent.EXTRA_TEXT);
+        String[] lines = csv.split("\n");
+        assertEquals("\"Unrated Beer\", \"Test Brewery\", \"Lager\", 0", lines[1]);
+    }
+
+    public void testCSVAllRatingValues() throws Exception {
+        List<Beer> beers = new ArrayList<Beer>();
+
+        // Test all ratings from 0 to 5
+        for (int rating = 0; rating <= 5; rating++) {
+            Beer beer = aBeer()
+                    .called("Beer " + rating)
+                    .from(aBrewery().called("Brewery"))
+                    .withStyle("IPA")
+                    .build();
+            beer.setNumberOfStars(new StarRating(rating));
+            beers.add(beer);
+        }
+
+        Intent intent = fExporter.makeExportIntent(beers);
+
+        String csv = intent.getStringExtra(Intent.EXTRA_TEXT);
+        String[] lines = csv.split("\n");
+
+        assertEquals("CSV should have 7 lines (header + 6 beers)", 7, lines.length);
+        for (int rating = 0; rating <= 5; rating++) {
+            String expected = String.format("\"Beer %d\", \"Brewery\", \"IPA\", %d", rating, rating);
+            assertEquals("Line " + (rating + 1) + " should match expected format", expected, lines[rating + 1]);
         }
     }
 
-    public void testExportBeerWithVeryLongName() throws Exception {
+    public void testCSVVeryLongNames() throws Exception {
         StringBuilder longName = new StringBuilder();
         for (int i = 0; i < 100; i++) {
-            longName.append("VeryLongBeerName");
+            longName.append("VeryLongName");
         }
 
         Beer beer = aBeer()
@@ -195,16 +277,14 @@ public class BeerExporterTest extends AndroidTestCase {
                 .build();
         beer.setNumberOfStars(new StarRating(3));
 
-        List<Beer> beers = Arrays.asList(beer);
+        Intent intent = fExporter.makeExportIntent(Arrays.asList(beer));
 
-        try {
-            fExporter.export(beers);
-        } catch (Exception e) {
-            fail("Export should handle very long names: " + e.getMessage());
-        }
+        String csv = intent.getStringExtra(Intent.EXTRA_TEXT);
+        assertNotNull("CSV should not be null for very long names", csv);
+        assertTrue("CSV should contain long beer name", csv.contains(longName.toString()));
     }
 
-    public void testExportBeerWithEmptyStrings() throws Exception {
+    public void testCSVEmptyStrings() throws Exception {
         Beer beer = aBeer()
                 .called("")
                 .from(aBrewery().called(""))
@@ -212,16 +292,14 @@ public class BeerExporterTest extends AndroidTestCase {
                 .build();
         beer.setNumberOfStars(new StarRating(3));
 
-        List<Beer> beers = Arrays.asList(beer);
+        Intent intent = fExporter.makeExportIntent(Arrays.asList(beer));
 
-        try {
-            fExporter.export(beers);
-        } catch (Exception e) {
-            fail("Export should handle empty strings: " + e.getMessage());
-        }
+        String csv = intent.getStringExtra(Intent.EXTRA_TEXT);
+        String[] lines = csv.split("\n");
+        assertEquals("\"\", \"\", \"\", 3", lines[1]);
     }
 
-    public void testExportLargeNumberOfBeers() throws Exception {
+    public void testCSVLargeNumberOfBeers() throws Exception {
         List<Beer> beers = new ArrayList<Beer>();
         for (int i = 0; i < 1000; i++) {
             Beer beer = aBeer()
@@ -233,55 +311,71 @@ public class BeerExporterTest extends AndroidTestCase {
             beers.add(beer);
         }
 
-        try {
-            fExporter.export(beers);
-        } catch (Exception e) {
-            fail("Export should handle large number of beers: " + e.getMessage());
-        }
+        Intent intent = fExporter.makeExportIntent(beers);
+
+        String csv = intent.getStringExtra(Intent.EXTRA_TEXT);
+        assertNotNull("CSV should not be null for large list", csv);
+        String[] lines = csv.split("\n");
+        assertEquals("CSV should have 1001 lines (header + 1000 beers)", 1001, lines.length);
     }
 
-    public void testExportMixedRatings() throws Exception {
-        List<Beer> beers = new ArrayList<Beer>();
-
-        // Test all ratings from 0 to 5
-        for (int rating = 0; rating <= 5; rating++) {
-            Beer beer = aBeer()
-                    .called("Beer with rating " + rating)
-                    .from(aBrewery().called("Test Brewery"))
-                    .withStyle("IPA")
-                    .build();
-            beer.setNumberOfStars(new StarRating(rating));
-            beers.add(beer);
-        }
-
-        try {
-            fExporter.export(beers);
-        } catch (Exception e) {
-            fail("Export should handle all rating values: " + e.getMessage());
-        }
-    }
-
-    public void testExportWithVariousStyles() throws Exception {
+    public void testCSVVariousStyles() throws Exception {
         String[] styles = {
                 "Pale Ale", "IPA", "Stout", "Porter", "Lager",
                 "Pilsner", "Wheat Beer", "Belgian", "Sour", "Barley Wine"
         };
 
         List<Beer> beers = new ArrayList<Beer>();
-        for (String style : styles) {
+        for (int i = 0; i < styles.length; i++) {
             Beer beer = aBeer()
-                    .called("Test Beer")
-                    .from(aBrewery().called("Test Brewery"))
-                    .withStyle(style)
+                    .called("Beer " + i)
+                    .from(aBrewery().called("Brewery"))
+                    .withStyle(styles[i])
                     .build();
             beer.setNumberOfStars(new StarRating(3));
             beers.add(beer);
         }
 
-        try {
-            fExporter.export(beers);
-        } catch (Exception e) {
-            fail("Export should handle various beer styles: " + e.getMessage());
+        Intent intent = fExporter.makeExportIntent(beers);
+
+        String csv = intent.getStringExtra(Intent.EXTRA_TEXT);
+        assertNotNull("CSV should not be null", csv);
+
+        // Verify all styles are present
+        for (String style : styles) {
+            assertTrue("CSV should contain style: " + style, csv.contains(style));
         }
+    }
+
+    public void testCSVOrderPreserved() throws Exception {
+        Beer beer1 = aBeer()
+                .called("Alpha Beer")
+                .from(aBrewery().called("Alpha Brewery"))
+                .withStyle("IPA")
+                .build();
+        beer1.setNumberOfStars(new StarRating(5));
+
+        Beer beer2 = aBeer()
+                .called("Beta Beer")
+                .from(aBrewery().called("Beta Brewery"))
+                .withStyle("Stout")
+                .build();
+        beer2.setNumberOfStars(new StarRating(3));
+
+        Beer beer3 = aBeer()
+                .called("Gamma Beer")
+                .from(aBrewery().called("Gamma Brewery"))
+                .withStyle("Lager")
+                .build();
+        beer3.setNumberOfStars(new StarRating(4));
+
+        Intent intent = fExporter.makeExportIntent(Arrays.asList(beer1, beer2, beer3));
+
+        String csv = intent.getStringExtra(Intent.EXTRA_TEXT);
+        String[] lines = csv.split("\n");
+
+        assertTrue("First beer should be Alpha", lines[1].contains("Alpha Beer"));
+        assertTrue("Second beer should be Beta", lines[2].contains("Beta Beer"));
+        assertTrue("Third beer should be Gamma", lines[3].contains("Gamma Beer"));
     }
 }
