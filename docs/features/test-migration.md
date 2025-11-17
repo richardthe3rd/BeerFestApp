@@ -36,12 +36,12 @@ The BeerFestApp currently has **7 instrumented tests running**:
 | `CamBeerFestApplicationTest.java` | ? | ? | ✅ Running | AndroidTestCase |
 | ~~`actions/BeerSharerTest.java`~~ | 84 | 3 | ✅ **MIGRATED** | Moved to modern framework |
 | ~~`actions/BeerExporterTest.java`~~ | 382 | 20 | ✅ **MIGRATED** | Moved to modern framework |
-| `model/JsonBeerListTest.java` | 78 | 2 | ✅ Running | AndroidTestCase, JSON resources |
-| `model/BeerListTest.java` | ? | ? | ✅ Running | AndroidTestCase, EasyMock |
+| ~~`model/JsonBeerListTest.java`~~ | 78 | 2 | ✅ **MIGRATED** | Moved to modern framework + resources |
+| ~~`model/BeerListTest.java`~~ | 134 | 3 | ✅ **MIGRATED** | Moved to modern framework |
 | `model/dao/BeersImplTest.java` | ? | 2 | ✅ Running | AndroidTestCase, OrmLite |
 | `model/dao/BreweriesImplTest.java` | ? | 3 | ✅ Running | AndroidTestCase, OrmLite |
 
-**Total:** 5 test classes running (2 migrated, 1 deleted)
+**Total:** 3 test classes running (4 migrated, 1 deleted)
 
 ### Modern Tests (app/src/androidTest/)
 
@@ -50,8 +50,10 @@ The BeerFestApp currently has **7 instrumented tests running**:
 | `CamBeerFestApplicationInstrumentedTest.java` | 28 | 1 | AndroidJUnit4, Espresso |
 | `actions/BeerSharerTest.java` | 108 | 3 | AndroidJUnit4 |
 | `actions/BeerExporterTest.java` | 453 | 20 | AndroidJUnit4 |
+| `model/JsonBeerListTest.java` | 84 | 2 | AndroidJUnit4 |
+| `model/BeerListTest.java` | 144 | 3 | AndroidJUnit4, EasyMock |
 
-**Total:** 3 test classes
+**Total:** 5 test classes
 
 ---
 
@@ -131,9 +133,9 @@ The BeerFestApp currently has **7 instrumented tests running**:
 2. ❌ ~~`LifecycleTest.java`~~ (**DELETED** - see replacement strategy below)
 3. ✅ `BeerSharerTest.java` (Intent tests, medium complexity) **MIGRATED**
 4. ✅ `BeerExporterTest.java` (CSV export tests, medium complexity) **MIGRATED**
-5. `JsonBeerListTest.java` (requires resource migration) **← NEXT**
-6. `BeerListTest.java` (unknown complexity)
-7. `CamBeerFestApplicationTest.java` (may overlap with instrumented test)
+5. ✅ `JsonBeerListTest.java` (requires resource migration) **MIGRATED**
+6. ✅ `BeerListTest.java` (unknown complexity) **MIGRATED**
+7. `CamBeerFestApplicationTest.java` (may overlap with instrumented test) **← NEXT**
 8. `BeersImplTest.java` (DAO/database tests, complex)
 9. `BreweriesImplTest.java` (DAO/database tests, complex)
 
@@ -397,11 +399,11 @@ If migration causes issues:
 - [ ] Documentation updated
 
 **Current Progress:**
-- ✅ 3/9 tests already modern (`CamBeerFestApplicationInstrumentedTest`, `BeerSharerTest`, `BeerExporterTest`)
-- ⏳ 5/9 tests still in legacy framework
+- ✅ 5/9 tests already modern (`CamBeerFestApplicationInstrumentedTest`, `BeerSharerTest`, `BeerExporterTest`, `JsonBeerListTest`, `BeerListTest`)
+- ⏳ 3/9 tests still in legacy framework
 - ❌ 1/9 tests deleted (LifecycleTest - needs ActivityScenario replacement)
 
-**Progress: 33% complete (3/9 tests migrated)**
+**Progress: 56% complete (5/9 tests migrated)**
 
 ---
 
@@ -414,4 +416,4 @@ If migration causes issues:
 ---
 
 **Last Updated:** 2025-11-17
-**Status:** Phase 1 complete, Phase 2 in progress (3/9 tests migrated - 33%)
+**Status:** Phase 1 complete, Phase 2 in progress (5/9 tests migrated - 56%)

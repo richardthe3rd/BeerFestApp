@@ -1,0 +1,42 @@
+{
+    "producers": [
+        {
+            "id": "1",
+            "name": "BREWERY_ONE",
+            "notes": "BREWERY_ONE_NOTES",
+            "products": [
+                {
+                    "id": "1",
+                    "name": "BEER_ONE",
+                    "style": "STYLE1",
+                    "notes": "BEER_ONE_NOTES",
+                    "abv": 1.1,
+                    "status_text": "BEER_ONE_STATUS"
+                }
+            ]
+        },
+        {
+            "id": "2",
+            "name": "BREWERY_TWO",
+            "notes": "BREWERY_TWO_NOTES",
+            "products": [
+                {
+                    "id": "2",
+                    "name": "BEER_TWO",
+                    "style": "STYLE2",
+                    "notes": "BEER_TWO_NOTES",
+                    "abv": 2.2,
+                    "status_text": "BEER_TWO_STATUS"
+                },
+                {
+                    "id": "3",
+                    "name": "BEER_THREE",
+                    "style": "STYLE3",
+                    "notes": "BEER_THREE_NOTES",
+                    "abv": 3.3,
+                    "status_text": "BEER_THREE_STATUS"
+                }
+            ]
+        }
+    ]
+}

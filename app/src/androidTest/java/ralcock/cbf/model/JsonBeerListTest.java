@@ -1,12 +1,18 @@
 package ralcock.cbf.model;
 
-import android.test.AndroidTestCase;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.InputStream;
 import java.util.List;
 import java.util.Vector;
 
-public class JsonBeerListTest extends AndroidTestCase {
+import static org.junit.Assert.assertEquals;
+
+@RunWith(AndroidJUnit4.class)
+public class JsonBeerListTest {
 
     private final Brewery fBrewery1 = new Brewery("1", "BREWERY_ONE", "BREWERY_ONE_NOTES");
     private final Brewery fBrewery2 = new Brewery("2", "BREWERY_TWO", "BREWERY_TWO_NOTES");
@@ -49,7 +55,8 @@ public class JsonBeerListTest extends AndroidTestCase {
         }
     }
 
-    public void testLoadBeers() throws Exception {
+    @Test
+    public void testLoadBeers() {
         InputStream inputStream = JsonBeerListTest.class.getResourceAsStream("resources/one_beer.json");
         final Beer expectedBeer = fBrewery1Beer1;
         JsonBeerList jsonBeerList = new JsonBeerList(convertStreamToString(inputStream));
@@ -58,7 +65,8 @@ public class JsonBeerListTest extends AndroidTestCase {
         }
     }
 
-    public void testLoadBeers2() throws Exception {
+    @Test
+    public void testLoadBeers2() {
         InputStream inputStream = JsonBeerListTest.class.getResourceAsStream("resources/two_breweries_three_beers.json");
 
         List<Beer> expectedBeers = new Vector<Beer>(3);
