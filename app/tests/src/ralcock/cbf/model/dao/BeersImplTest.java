@@ -43,13 +43,13 @@ public class BeersImplTest extends AndroidTestCase {
         Brewery brewery2 = new Brewery("2", "Best Brewery", "");
         fBreweries.create(brewery2);
 
-        fBeer1 = new Beer("1", "A Mild", 1f, "description1", fStyle1, "status1", brewery);
+        fBeer1 = new Beer("1", "A Mild", 1f, "description1", fStyle1, "status1", "cask", brewery);
         fBeers.create(fBeer1);
 
-        fBeer2 = new Beer("2", "A Best Bitter", 2f, "description2", fStyle2, "status2", brewery);
+        fBeer2 = new Beer("2", "A Best Bitter", 2f, "description2", fStyle2, "status2", "cask", brewery);
         fBeers.create(fBeer2);
 
-        fBeer3 = new Beer("3", "A Stout", 3f, "description3", fStyle2, "status3", brewery2);
+        fBeer3 = new Beer("3", "A Stout", 3f, "description3", fStyle2, "status3", "cask", brewery2);
         fBeers.create(fBeer3);
 
         assertEquals(3, fBeers.getNumberOfBeers());
