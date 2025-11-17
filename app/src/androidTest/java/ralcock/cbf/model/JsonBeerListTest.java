@@ -57,7 +57,7 @@ public class JsonBeerListTest {
 
     @Test
     public void testLoadBeers() {
-        InputStream inputStream = JsonBeerListTest.class.getResourceAsStream("resources/one_beer.json");
+        InputStream inputStream = JsonBeerListTest.class.getResourceAsStream("/ralcock/cbf/model/one_beer.json");
         final Beer expectedBeer = fBrewery1Beer1;
         JsonBeerList jsonBeerList = new JsonBeerList(convertStreamToString(inputStream));
         for (Beer beer : jsonBeerList) {
@@ -67,7 +67,7 @@ public class JsonBeerListTest {
 
     @Test
     public void testLoadBeers2() {
-        InputStream inputStream = JsonBeerListTest.class.getResourceAsStream("resources/two_breweries_three_beers.json");
+        InputStream inputStream = JsonBeerListTest.class.getResourceAsStream("/ralcock/cbf/model/two_breweries_three_beers.json");
 
         List<Beer> expectedBeers = new Vector<Beer>(3);
         expectedBeers.add(fBrewery1Beer1);
