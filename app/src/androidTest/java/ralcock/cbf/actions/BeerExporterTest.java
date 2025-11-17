@@ -1,7 +1,15 @@
 package ralcock.cbf.actions;
 
+import android.content.Context;
 import android.content.Intent;
-import android.test.AndroidTestCase;
+
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.StarRating;
 
@@ -9,6 +17,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static ralcock.cbf.model.BeerBuilder.aBeer;
 import static ralcock.cbf.model.BreweryBuilder.aBrewery;
 
@@ -17,17 +28,20 @@ import static ralcock.cbf.model.BreweryBuilder.aBrewery;
  *
  * Tests verify CSV formatting, Intent contents, and edge case handling.
  */
-public class BeerExporterTest extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class BeerExporterTest {
 
     private BeerExporter fExporter;
+    private Context context;
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        fExporter = new BeerExporter(getContext());
+    @Before
+    public void setUp() {
+        context = ApplicationProvider.getApplicationContext();
+        fExporter = new BeerExporter(context);
     }
 
-    public void testIntentAction() throws Exception {
+    @Test
+    public void testIntentAction() {
         Beer beer = aBeer()
                 .called("Test Beer")
                 .from(aBrewery().called("Test Brewery"))
@@ -40,7 +54,8 @@ public class BeerExporterTest extends AndroidTestCase {
         assertEquals("Intent action should be ACTION_SEND", Intent.ACTION_SEND, intent.getAction());
     }
 
-    public void testIntentType() throws Exception {
+    @Test
+    public void testIntentType() {
         Beer beer = aBeer()
                 .called("Test Beer")
                 .from(aBrewery().called("Test Brewery"))
@@ -52,7 +67,8 @@ public class BeerExporterTest extends AndroidTestCase {
         assertEquals("Intent type should be text/plain", "text/plain", intent.getType());
     }
 
-    public void testIntentSubject() throws Exception {
+    @Test
+    public void testIntentSubject() {
         Beer beer = aBeer()
                 .called("Test Beer")
                 .from(aBrewery().called("Test Brewery"))
@@ -67,7 +83,8 @@ public class BeerExporterTest extends AndroidTestCase {
         assertTrue("Subject should contain festival name", subject.contains("Cambridge Beer Festival"));
     }
 
-    public void testCSVHeader() throws Exception {
+    @Test
+    public void testCSVHeader() {
         Beer beer = aBeer()
                 .called("Test Beer")
                 .from(aBrewery().called("Test Brewery"))
@@ -82,7 +99,8 @@ public class BeerExporterTest extends AndroidTestCase {
         assertTrue("CSV should contain header", csv.startsWith("Beer, Brewery, Style, Rating\n"));
     }
 
-    public void testCSVSingleBeerFormat() throws Exception {
+    @Test
+    public void testCSVSingleBeerFormat() {
         Beer beer = aBeer()
                 .called("Test Beer")
                 .from(aBrewery().called("Test Brewery"))
@@ -99,7 +117,8 @@ public class BeerExporterTest extends AndroidTestCase {
         assertEquals("\"Test Beer\", \"Test Brewery\", \"IPA\", 4", lines[1]);
     }
 
-    public void testCSVMultipleBeers() throws Exception {
+    @Test
+    public void testCSVMultipleBeers() {
         Beer beer1 = aBeer()
                 .called("First Beer")
                 .from(aBrewery().called("First Brewery"))
@@ -131,7 +150,8 @@ public class BeerExporterTest extends AndroidTestCase {
         assertEquals("\"Third Beer\", \"Third Brewery\", \"Lager\", 2", lines[3]);
     }
 
-    public void testCSVEmptyList() throws Exception {
+    @Test
+    public void testCSVEmptyList() {
         List<Beer> beers = new ArrayList<Beer>();
 
         Intent intent = fExporter.makeExportIntent(beers);
@@ -141,7 +161,8 @@ public class BeerExporterTest extends AndroidTestCase {
         assertEquals("CSV should only have header for empty list", "Beer, Brewery, Style, Rating\n", csv);
     }
 
-    public void testCSVQuotesInBeerName() throws Exception {
+    @Test
+    public void testCSVQuotesInBeerName() {
         Beer beer = aBeer()
                 .called("The \"Quoted\" Beer")
                 .from(aBrewery().called("Test Brewery"))
@@ -157,7 +178,8 @@ public class BeerExporterTest extends AndroidTestCase {
         assertTrue("CSV should contain beer name with quotes", lines[1].contains("The \"Quoted\" Beer"));
     }
 
-    public void testCSVQuotesInBreweryName() throws Exception {
+    @Test
+    public void testCSVQuotesInBreweryName() {
         Beer beer = aBeer()
                 .called("Test Beer")
                 .from(aBrewery().called("The \"Quoted\" Brewery"))
@@ -172,7 +194,8 @@ public class BeerExporterTest extends AndroidTestCase {
         assertTrue("CSV should contain brewery name with quotes", lines[1].contains("The \"Quoted\" Brewery"));
     }
 
-    public void testCSVCommasInNames() throws Exception {
+    @Test
+    public void testCSVCommasInNames() {
         Beer beer = aBeer()
                 .called("Beer, The Great")
                 .from(aBrewery().called("Brewery, Inc."))
@@ -190,7 +213,8 @@ public class BeerExporterTest extends AndroidTestCase {
         assertTrue("CSV should contain style", csv.contains("IPA, Strong"));
     }
 
-    public void testCSVNewlinesInNames() throws Exception {
+    @Test
+    public void testCSVNewlinesInNames() {
         Beer beer = aBeer()
                 .called("Beer\nWith\nNewlines")
                 .from(aBrewery().called("Brewery\nName"))
@@ -206,7 +230,8 @@ public class BeerExporterTest extends AndroidTestCase {
         assertTrue("CSV should contain beer name", csv.contains("Beer\nWith\nNewlines"));
     }
 
-    public void testCSVSpecialCharacters() throws Exception {
+    @Test
+    public void testCSVSpecialCharacters() {
         Beer beer = aBeer()
                 .called("Spëcîål Béér & Co.'s")
                 .from(aBrewery().called("Brëwéry™"))
@@ -223,7 +248,8 @@ public class BeerExporterTest extends AndroidTestCase {
         assertTrue("CSV should contain special characters in style", csv.contains("IPÄ"));
     }
 
-    public void testCSVUnratedBeer() throws Exception {
+    @Test
+    public void testCSVUnratedBeer() {
         Beer beer = aBeer()
                 .called("Unrated Beer")
                 .from(aBrewery().called("Test Brewery"))
@@ -238,7 +264,8 @@ public class BeerExporterTest extends AndroidTestCase {
         assertEquals("\"Unrated Beer\", \"Test Brewery\", \"Lager\", 0", lines[1]);
     }
 
-    public void testCSVAllRatingValues() throws Exception {
+    @Test
+    public void testCSVAllRatingValues() {
         List<Beer> beers = new ArrayList<Beer>();
 
         // Test all ratings from 0 to 5
@@ -264,7 +291,8 @@ public class BeerExporterTest extends AndroidTestCase {
         }
     }
 
-    public void testCSVVeryLongNames() throws Exception {
+    @Test
+    public void testCSVVeryLongNames() {
         StringBuilder longName = new StringBuilder();
         for (int i = 0; i < 100; i++) {
             longName.append("VeryLongName");
@@ -284,7 +312,8 @@ public class BeerExporterTest extends AndroidTestCase {
         assertTrue("CSV should contain long beer name", csv.contains(longName.toString()));
     }
 
-    public void testCSVEmptyStrings() throws Exception {
+    @Test
+    public void testCSVEmptyStrings() {
         Beer beer = aBeer()
                 .called("")
                 .from(aBrewery().called(""))
@@ -299,7 +328,8 @@ public class BeerExporterTest extends AndroidTestCase {
         assertEquals("\"\", \"\", \"\", 3", lines[1]);
     }
 
-    public void testCSVLargeNumberOfBeers() throws Exception {
+    @Test
+    public void testCSVLargeNumberOfBeers() {
         List<Beer> beers = new ArrayList<Beer>();
         for (int i = 0; i < 1000; i++) {
             Beer beer = aBeer()
@@ -319,7 +349,8 @@ public class BeerExporterTest extends AndroidTestCase {
         assertEquals("CSV should have 1001 lines (header + 1000 beers)", 1001, lines.length);
     }
 
-    public void testCSVVariousStyles() throws Exception {
+    @Test
+    public void testCSVVariousStyles() {
         String[] styles = {
                 "Pale Ale", "IPA", "Stout", "Porter", "Lager",
                 "Pilsner", "Wheat Beer", "Belgian", "Sour", "Barley Wine"
@@ -347,7 +378,8 @@ public class BeerExporterTest extends AndroidTestCase {
         }
     }
 
-    public void testCSVOrderPreserved() throws Exception {
+    @Test
+    public void testCSVOrderPreserved() {
         Beer beer1 = aBeer()
                 .called("Alpha Beer")
                 .from(aBrewery().called("Alpha Brewery"))
