@@ -6,18 +6,20 @@ This document provides comprehensive guidance for AI assistants working with the
 
 ## Table of Contents
 1. [Project Overview](#project-overview)
-2. [Architecture and Structure](#architecture-and-structure)
-3. [Tech Stack](#tech-stack)
-4. [Development Setup](#development-setup)
-5. [Build and Test](#build-and-test)
-6. [Annual Festival Update Workflow](#annual-festival-update-workflow)
-7. [Coding Conventions](#coding-conventions)
-8. [CI/CD Pipeline](#cicd-pipeline)
-9. [Key Files Reference](#key-files-reference)
-10. [Common Development Tasks](#common-development-tasks)
-11. [Database Schema](#database-schema)
-12. [Testing Strategy](#testing-strategy)
-13. [Release Process](#release-process)
+2. [Known Issues and Limitations](#known-issues-and-limitations)
+3. [Architecture and Structure](#architecture-and-structure)
+4. [Tech Stack](#tech-stack)
+5. [Development Setup](#development-setup)
+6. [Build and Test](#build-and-test)
+7. [Annual Festival Update Workflow](#annual-festival-update-workflow)
+8. [Coding Conventions](#coding-conventions)
+9. [CI/CD Pipeline](#cicd-pipeline)
+10. [Key Files Reference](#key-files-reference)
+11. [Common Development Tasks](#common-development-tasks)
+12. [Database Schema](#database-schema)
+13. [Testing Strategy](#testing-strategy)
+14. [Release Process](#release-process)
+15. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -44,6 +46,124 @@ This document provides comprehensive guidance for AI assistants working with the
 - **Maintenance Pattern:** Annual updates for each year's festival (cbf2024, cbf2025, etc.)
 - **Active Development:** Primarily maintenance-driven with periodic CI/CD improvements
 - **Code Size:** ~3,500 lines of production code
+
+---
+
+## Known Issues and Limitations
+
+### Critical Pain Points
+
+#### 1. Annual Update Complexity
+**Problem:** Updating the app each year requires manual changes to multiple files:
+- Version codes in `build.gradle`
+- Festival year in `festival.xml` (multiple locations)
+- Database version in `BeerDatabaseHelper.java`
+
+**Impact:**
+- Error-prone manual process
+- Easy to miss a file or forget to increment DB version
+- No automation to prevent mistakes
+
+**Improvement Opportunities:**
+- Create a script to automate annual updates (see [Common Development Tasks](#common-development-tasks))
+- Add pre-commit hooks to validate version consistency
+- Consider externalizing configuration to a single source of truth
+
+#### 2. Insufficient Testing
+**Problem:** Testing coverage is inadequate for production use:
+- Limited instrumented tests (only 1 basic test)
+- No UI automation tests for critical flows
+- No integration tests for data updates
+- Manual testing required for each release
+
+**Impact:**
+- Crashes in production
+- ANRs (Application Not Responding) reported by users
+- Stale beer lists not detected before release
+
+**User Reports:**
+- "App crashes when opening beer details"
+- "App becomes unresponsive during data download"
+- "Beer list shows old data from last year"
+
+**Improvement Opportunities:**
+- Add comprehensive Espresso tests for all UI flows
+- Add integration tests for UpdateService/UpdateTask
+- Test network timeout scenarios
+- Add automated tests for database migrations
+- Implement crash reporting (Firebase Crashlytics, Sentry)
+- Add proper loading states and error handling in UI
+
+#### 3. Stale Beer List Issue
+**Problem:** Users report seeing old festival data even after updates are released.
+
+**Root Causes:**
+- Database migration may fail silently
+- Update service may not run automatically
+- Network failures during download not handled properly
+- No user feedback when updates fail
+
+**Improvement Opportunities:**
+- Add explicit version checking in UpdateService
+- Show update status in UI (last updated timestamp)
+- Implement retry logic with exponential backoff
+- Add manual "Force Update" option in settings
+- Log update failures for debugging
+
+#### 4. Beverage Type Limitation
+**Problem:** App only displays ales/beers, but festival also features cider and mead.
+
+**User Feedback:**
+- "Where are the ciders?"
+- "Can't find mead section"
+- "Only showing beer, not other festival drinks"
+
+**Impact:**
+- Incomplete festival coverage
+- Reduced app utility for cider/mead enthusiasts
+- Negative user reviews
+
+**Technical Requirements for Fix:**
+- Update data model to support beverage type field
+- Modify UI to filter/group by beverage type (Beer, Cider, Mead)
+- Update JSON feed parsing to include type
+- Add navigation tabs or sections for each beverage type
+- Coordinate with festival data provider to include type in JSON
+
+**Files to Modify:**
+- `libraries/beers/src/main/java/ralcock/cbf/model/Beer.java` - Add beverage type field
+- `BeerDatabaseHelper.java` - Increment DB version for schema change
+- UI fragments to support filtering/grouping
+- JSON parser to handle new field
+
+#### 5. Crash and ANR Reports
+**Problem:** Users report crashes and "Application Not Responding" errors.
+
+**Likely Causes:**
+- Network operations on main thread
+- Large dataset processing blocking UI
+- Database operations on main thread
+- Memory leaks in long-running activities
+
+**Improvement Opportunities:**
+- Audit all network calls (ensure background threads)
+- Use WorkManager instead of deprecated AsyncTask
+- Implement pagination for large beer lists
+- Add proper cancellation for background tasks
+- Use RecyclerView optimizations (DiffUtil)
+- Implement ProGuard/R8 properly to catch issues early
+- Add StrictMode in debug builds to detect violations
+
+### Known Limitations
+
+| Limitation | Impact | Workaround |
+|------------|--------|------------|
+| No offline beer list included | First run requires network | Could bundle previous year's data |
+| No push notifications for updates | Users don't know when new data available | Add in-app update check on launch |
+| No search suggestions | Search less discoverable | Add autocomplete or popular searches |
+| No multi-language support | English only | Festival is UK-based, low priority |
+| Min SDK 14 (old) | Maintenance burden for old APIs | Consider raising to SDK 21+ |
+| No dark mode | User preference ignored | Add theme support |
 
 ---
 
@@ -469,6 +589,131 @@ Looking at recent commits, the update pattern follows:
 **Commit Message Convention:**
 - Short form: `cbfYYYY`
 - PR form: `Update app for Cambridge Beer Festival YYYY (#XX)`
+
+### Automation Suggestions
+
+**PROBLEM:** The manual update process is error-prone and time-consuming.
+
+**SOLUTION:** Create a script to automate the annual update process:
+
+**Option 1: Bash Script** (`scripts/update-festival-year.sh`)
+
+```bash
+#!/bin/bash
+# Usage: ./scripts/update-festival-year.sh 2026
+
+set -e
+
+YEAR=$1
+if [ -z "$YEAR" ]; then
+    echo "Usage: $0 <year>"
+    echo "Example: $0 2026"
+    exit 1
+fi
+
+echo "Updating BeerFestApp for CBF $YEAR..."
+
+# 1. Update build.gradle version
+BUILD_GRADLE="app/build.gradle"
+CURRENT_VERSION_CODE=$(grep "versionCode" $BUILD_GRADLE | sed 's/[^0-9]*//g')
+NEW_VERSION_CODE=$((CURRENT_VERSION_CODE + 1))
+
+sed -i "s/versionCode $CURRENT_VERSION_CODE/versionCode $NEW_VERSION_CODE/" $BUILD_GRADLE
+sed -i "s/versionName \"[0-9]\{4\}\.[0-9.]*\"/versionName \"$YEAR.0.0.1\"/" $BUILD_GRADLE
+
+echo "✓ Updated $BUILD_GRADLE"
+
+# 2. Update festival.xml
+FESTIVAL_XML="app/src/main/res/values/festival.xml"
+sed -i "s/Cambridge Beer Festival [0-9]\{4\}/Cambridge Beer Festival $YEAR/" $FESTIVAL_XML
+sed -i "s/cbf[0-9]\{4\}/cbf$YEAR/g" $FESTIVAL_XML
+
+echo "✓ Updated $FESTIVAL_XML"
+
+# 3. Update BeerDatabaseHelper.java
+DB_HELPER="app/src/main/java/ralcock/cbf/model/BeerDatabaseHelper.java"
+CURRENT_DB_VERSION=$(grep "DB_VERSION = " $DB_HELPER | sed 's/[^0-9]*//g' | head -1)
+NEW_DB_VERSION=$((CURRENT_DB_VERSION + 1))
+
+sed -i "s/DB_VERSION = $CURRENT_DB_VERSION; \/\/ cbf[0-9]\{4\}/DB_VERSION = $NEW_DB_VERSION; \/\/ cbf$YEAR/" $DB_HELPER
+
+echo "✓ Updated $DB_HELPER"
+
+echo ""
+echo "Summary of changes:"
+echo "  - Version code: $CURRENT_VERSION_CODE → $NEW_VERSION_CODE"
+echo "  - Version name: → $YEAR.0.0.1"
+echo "  - DB version: $CURRENT_DB_VERSION → $NEW_DB_VERSION"
+echo "  - Festival year: → $YEAR"
+echo ""
+echo "Next steps:"
+echo "  1. Review changes: git diff"
+echo "  2. Test: ./gradlew clean test"
+echo "  3. Commit: git commit -am 'cbf$YEAR'"
+```
+
+**Option 2: Gradle Task** (add to `app/build.gradle`)
+
+```gradle
+task updateFestivalYear {
+    doLast {
+        def year = project.findProperty('year')
+        if (!year) {
+            throw new GradleException("Usage: ./gradlew updateFestivalYear -Pyear=2026")
+        }
+
+        println "Updating for CBF ${year}..."
+
+        // Update festival.xml
+        def festivalXml = file('src/main/res/values/festival.xml')
+        def content = festivalXml.text
+        content = content.replaceAll(/Cambridge Beer Festival \d{4}/, "Cambridge Beer Festival ${year}")
+        content = content.replaceAll(/cbf\d{4}/, "cbf${year}")
+        festivalXml.text = content
+
+        println "✓ Updated festival.xml"
+        println "⚠ Remember to manually update:"
+        println "  - versionCode and versionName in build.gradle"
+        println "  - DB_VERSION in BeerDatabaseHelper.java"
+    }
+}
+```
+
+**Option 3: Pre-commit Hook** (`.git/hooks/pre-commit`)
+
+```bash
+#!/bin/bash
+# Validate version consistency before commit
+
+BUILD_GRADLE="app/build.gradle"
+FESTIVAL_XML="app/src/main/res/values/festival.xml"
+DB_HELPER="app/src/main/java/ralcock/cbf/model/BeerDatabaseHelper.java"
+
+# Extract years from different files
+VERSION_YEAR=$(grep "versionName" $BUILD_GRADLE | sed 's/.*"\([0-9]\{4\}\).*/\1/')
+FESTIVAL_YEAR=$(grep "festival_name" $FESTIVAL_XML | sed 's/.*Festival \([0-9]\{4\}\).*/\1/')
+HASHTAG_YEAR=$(grep "festival_hashtag" $FESTIVAL_XML | sed 's/.*cbf\([0-9]\{4\}\).*/\1/')
+URL_YEAR=$(grep "beer_list_url" $FESTIVAL_XML | sed 's/.*cbf\([0-9]\{4\}\).*/\1/')
+DB_YEAR=$(grep "DB_VERSION.*cbf" $DB_HELPER | sed 's/.*cbf\([0-9]\{4\}\).*/\1/')
+
+# Check consistency
+if [ "$VERSION_YEAR" != "$FESTIVAL_YEAR" ] || \
+   [ "$VERSION_YEAR" != "$HASHTAG_YEAR" ] || \
+   [ "$VERSION_YEAR" != "$URL_YEAR" ] || \
+   [ "$VERSION_YEAR" != "$DB_YEAR" ]; then
+    echo "ERROR: Year mismatch detected!"
+    echo "  build.gradle version:   $VERSION_YEAR"
+    echo "  festival.xml name:      $FESTIVAL_YEAR"
+    echo "  festival.xml hashtag:   $HASHTAG_YEAR"
+    echo "  festival.xml URL:       $URL_YEAR"
+    echo "  BeerDatabaseHelper:     $DB_YEAR"
+    echo ""
+    echo "All years must match. Please fix before committing."
+    exit 1
+fi
+
+echo "✓ Version consistency check passed (CBF $VERSION_YEAR)"
+```
 
 ---
 
@@ -1311,12 +1556,332 @@ A successful contribution:
 
 ---
 
+## Troubleshooting
+
+### User-Reported Issues
+
+This section documents common issues reported by users and how to diagnose/fix them.
+
+#### Issue 1: App Crashes on Launch or Beer Details
+
+**Symptoms:**
+- App crashes when opening
+- Crashes when tapping on a beer to view details
+- "Unfortunately, BeerFestApp has stopped"
+
+**Possible Causes:**
+1. **Null pointer exceptions** in data binding
+2. **Database corruption** or migration failure
+3. **Missing data** in Beer or Brewery objects
+4. **ProGuard stripping** required classes in release builds
+
+**Debugging Steps:**
+```bash
+# 1. Check logcat for stack traces
+adb logcat | grep -i "exception\|error\|crash"
+
+# 2. Run debug build to get full stack traces
+./gradlew installDebug
+
+# 3. Check database state
+adb shell
+run-as ralcock.cbf
+cd databases
+sqlite3 BEERS
+.schema
+SELECT COUNT(*) FROM beers;
+SELECT COUNT(*) FROM breweries;
+.quit
+```
+
+**Common Fixes:**
+1. **Add null checks** in UI code:
+   ```java
+   if (beer != null && beer.getBrewery() != null) {
+       breweryName.setText(beer.getBrewery().getName());
+   }
+   ```
+
+2. **Fix ProGuard rules** in `proguard.cfg`:
+   ```
+   # Keep OrmLite models
+   -keep class ralcock.cbf.model.** { *; }
+
+   # Keep Builder classes
+   -keep class **Builder { *; }
+   ```
+
+3. **Clear app data** if database corrupted:
+   ```bash
+   adb shell pm clear ralcock.cbf
+   ```
+
+#### Issue 2: ANR (Application Not Responding)
+
+**Symptoms:**
+- App freezes/hangs
+- "App is not responding" dialog
+- UI becomes unresponsive during beer list download
+
+**Root Causes:**
+- Network operations on main thread
+- Large dataset processing blocking UI
+- Database operations on main thread
+
+**Diagnosis:**
+```bash
+# Pull ANR traces from device
+adb pull /data/anr/traces.txt
+
+# Enable StrictMode in debug builds (add to CamBeerFestApplication.onCreate)
+if (BuildConfig.DEBUG) {
+    StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+        .detectAll()
+        .penaltyLog()
+        .build());
+    StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+        .detectAll()
+        .penaltyLog()
+        .build());
+}
+```
+
+**Files to Audit:**
+- `UpdateService.java:7010` - Check for main thread operations
+- `UpdateTask.java:6700` - Ensure proper AsyncTask usage
+- `BeerListFragment.java` - Check data loading
+- `BeerAccessor.java` - Database operations
+
+**Solutions:**
+1. **Move network to background:**
+   ```java
+   // BAD: Network on main thread
+   URL url = new URL(beerListUrl);
+   connection = url.openConnection();
+
+   // GOOD: Use AsyncTask or WorkManager
+   new UpdateTask().execute(beerListUrl);
+   ```
+
+2. **Use WorkManager** instead of deprecated AsyncTask:
+   ```gradle
+   // Add to app/build.gradle
+   implementation 'androidx.work:work-runtime:2.8.1'
+   ```
+
+3. **Paginate large lists:**
+   - Implement RecyclerView pagination
+   - Load beers in batches of 50-100
+
+#### Issue 3: Stale Beer List (Old Data Showing)
+
+**Symptoms:**
+- Beer list shows data from previous year
+- "Why am I seeing 2024 beers when it's 2025?"
+- Update button doesn't work
+
+**Diagnosis:**
+```bash
+# Check app preferences for last update time
+adb shell
+run-as ralcock.cbf
+cat shared_prefs/ralcock.cbf_preferences.xml
+
+# Check current database version
+adb shell
+run-as ralcock.cbf
+cd databases
+sqlite3 BEERS
+PRAGMA user_version;
+.quit
+```
+
+**Root Causes:**
+1. **Database version not incremented** - Migration didn't run
+2. **Update service not triggered** - Background service disabled
+3. **Network failure** - Download failed silently
+4. **URL not updated** - Still pointing to old year
+
+**Solutions:**
+1. **Verify database version was incremented:**
+   ```java
+   // In BeerDatabaseHelper.java
+   private static final int DB_VERSION = 33; // cbf2026 ← Must increment!
+   ```
+
+2. **Add explicit update check in UI:**
+   ```java
+   // Show last update time in settings
+   SharedPreferences prefs = getSharedPreferences("app", MODE_PRIVATE);
+   long lastUpdate = prefs.getLong("last_beer_update", 0);
+   if (lastUpdate > 0) {
+       String date = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date(lastUpdate));
+       lastUpdateText.setText("Last updated: " + date);
+   }
+   ```
+
+3. **Add manual "Force Update" button:**
+   ```java
+   forceUpdateButton.setOnClickListener(v -> {
+       // Clear database
+       BeerDatabaseHelper helper = getHelper();
+       helper.deleteAll();
+
+       // Trigger update
+       Intent intent = new Intent(this, UpdateService.class);
+       startService(intent);
+   });
+   ```
+
+4. **Verify festival.xml was updated:**
+   ```bash
+   grep beer_list_url app/src/main/res/values/festival.xml
+   # Should show: https://data.cambridgebeerfestival.com/cbf2026/beer.json
+   ```
+
+#### Issue 4: Missing Ciders and Mead
+
+**Symptoms:**
+- Users complain "Where are the ciders?"
+- Only beers showing up
+- Incomplete festival coverage
+
+**Current Status:**
+- **Known limitation** - App name is "BeerFestApp", data model only handles beer
+- Festival includes cider and mead but app doesn't display them
+- JSON feed may or may not include these beverage types
+
+**Temporary Workarounds:**
+1. **Check if JSON includes cider/mead:**
+   ```bash
+   curl https://data.cambridgebeerfestival.com/cbf2025/beer.json | jq '.beers[] | select(.style | contains("Cider"))'
+   ```
+
+2. **If data exists, it's displayed as "beer"** - no filtering by type
+
+**Long-term Solution:**
+See [Known Issues - Beverage Type Limitation](#4-beverage-type-limitation) for implementation plan.
+
+#### Issue 5: Share Function Not Working
+
+**Symptoms:**
+- Share button doesn't work
+- Wrong hashtag in shared posts
+- Share text incomplete
+
+**Diagnosis:**
+```bash
+# Check festival.xml configuration
+grep festival_hashtag app/src/main/res/values/festival.xml
+# Should output: <string name="festival_hashtag">cbf2025</string>
+```
+
+**Common Fixes:**
+1. **Update hashtag** in `festival.xml` for new year
+2. **Check BeerSharer.java** for null checks:
+   ```java
+   if (beer == null || beer.getName() == null) {
+       return; // Don't share incomplete data
+   }
+   ```
+
+#### Issue 6: Build Failures in CI/CD
+
+**Symptoms:**
+- GitHub Actions build fails
+- "Keystore not found" error
+- Tests timeout
+
+**Solutions:**
+1. **Keystore issues:**
+   ```yaml
+   # Verify secrets are set in GitHub repo settings:
+   # - KEYSTORE (base64 encoded)
+   # - SIGNING_KEY_ALIAS
+   # - SIGNING_KEY_PASSWORD
+   # - SIGNING_STORE_PASSWORD
+   ```
+
+2. **Test timeouts:**
+   ```yaml
+   # In .github/workflows/android.yml
+   # Increase AVD disk size if needed:
+   disk-size: 8000M  # Increase from 6000M
+   ```
+
+3. **Gradle build failures:**
+   ```bash
+   # Clear Gradle cache locally
+   rm -rf ~/.gradle/caches
+   ./gradlew clean build --refresh-dependencies
+   ```
+
+### Performance Optimization
+
+**Slow beer list loading:**
+1. Add RecyclerView.ViewHolder recycling
+2. Use DiffUtil for list updates
+3. Load images asynchronously (if added)
+4. Cache beer styles for filtering
+
+**High memory usage:**
+1. Avoid loading entire dataset at once
+2. Use cursor-based pagination
+3. Release database connections properly
+4. Clear bitmap caches
+
+**Slow search:**
+1. Add database indexes on search fields:
+   ```java
+   @DatabaseField(index = true)
+   private String name;
+   ```
+
+2. Use FTS (Full-Text Search) table for better search performance
+
+### Development Workflow Issues
+
+**Can't run instrumented tests:**
+```bash
+# Start emulator first
+emulator -avd Pixel_5_API_34 -no-snapshot-load
+
+# Or create AVD
+avdmanager create avd -n test_device -k "system-images;android-34;google_apis;x86_64"
+```
+
+**ProGuard breaks release build:**
+```bash
+# Test ProGuard locally
+./gradlew assembleRelease -PRELEASE
+
+# Check mapping file
+cat app/build/outputs/mapping/release/mapping.txt
+
+# Add keep rules for broken classes in proguard.cfg
+```
+
+**Gradle sync fails:**
+```bash
+# Update Gradle wrapper
+./gradlew wrapper --gradle-version 8.0.0
+
+# Or download dependencies manually
+./gradlew build --refresh-dependencies --offline
+```
+
+---
+
 ## Document Maintenance
 
 **Last Updated:** 2025-11-17
-**Document Version:** 1.0.0
+**Document Version:** 2.0.0
 **Codebase Version:** 2025.0.0.1 (versionCode 27)
 **Database Version:** 32 (cbf2025)
+
+**Changelog:**
+- **v2.0.0 (2025-11-17):** Added Known Issues section, Troubleshooting guide, and automation suggestions for annual updates
+- **v1.0.0 (2025-11-17):** Initial comprehensive documentation
 
 **Update this document when:**
 - Major architectural changes occur
