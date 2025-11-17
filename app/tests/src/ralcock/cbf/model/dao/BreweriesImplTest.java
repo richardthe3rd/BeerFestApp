@@ -3,7 +3,6 @@ package ralcock.cbf.model.dao;
 import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
 import ralcock.cbf.model.BeerDatabaseHelper;
-import ralcock.cbf.model.BeerListTest;
 import ralcock.cbf.model.Brewery;
 
 import java.sql.SQLException;
@@ -17,7 +16,7 @@ public class BreweriesImplTest extends AndroidTestCase {
     public void setUp() throws Exception {
         super.setUp();
         fContext = new RenamingDelegatingContext(getContext(),
-                BeerListTest.class.getSimpleName() + ".");
+                BreweriesImplTest.class.getSimpleName() + ".");
         fBeerDatabaseHelper = new BeerDatabaseHelper(fContext);
         fBreweries = fBeerDatabaseHelper.getBreweries();
     }

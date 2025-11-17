@@ -5,7 +5,6 @@ import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerDatabaseHelper;
-import ralcock.cbf.model.BeerListTest;
 import ralcock.cbf.model.Brewery;
 import ralcock.cbf.model.SortOrder;
 
@@ -32,7 +31,7 @@ public class BeersImplTest extends AndroidTestCase {
     public void setUp() throws Exception {
         super.setUp();
         fContext = new RenamingDelegatingContext(getContext(),
-                BeerListTest.class.getSimpleName() + ".");
+                BeersImplTest.class.getSimpleName() + ".");
         fBeerDatabaseHelper = new BeerDatabaseHelper(fContext);
         fBeers = fBeerDatabaseHelper.getBeers();
         fBreweries = fBeerDatabaseHelper.getBreweries();
