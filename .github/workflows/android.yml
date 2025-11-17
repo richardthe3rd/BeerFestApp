@@ -25,6 +25,8 @@ on:
 
 permissions:
   contents: read
+  checks: write
+  pull-requests: write
 
 jobs:
   build:
@@ -54,12 +56,42 @@ jobs:
       uses: gradle/actions/setup-gradle@v4
 
     - name: Build with Gradle
-      run: ./gradlew build -PRELEASE --scan
+      run: ./gradlew build jacocoTestReport -PRELEASE --scan
       env:
         SIGNING_KEYSTORE: ${{ steps.decode_keystore.outputs.filePath }}
         SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
         SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
         SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+
+    - name: Publish Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        files: |
+          **/build/test-results/**/*.xml
+        check_name: Unit Test Results
+        comment_mode: off
+
+    - name: Add coverage to PR
+      if: github.event_name == 'pull_request'
+      run: |
+        COVERAGE_REPORT="app/build/reports/jacoco/jacocoTestReport/html/index.html"
+        if [ -f "$COVERAGE_REPORT" ]; then
+          COVERAGE=$(grep -oP 'Total[^%]*\K\d+(?=%)' "$COVERAGE_REPORT" | head -1 || echo "N/A")
+          echo "### 📊 Test Coverage: ${COVERAGE}%" >> $GITHUB_STEP_SUMMARY
+          echo "Coverage report generated successfully" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "### ⚠️ Coverage report not found" >> $GITHUB_STEP_SUMMARY
+        fi
+
+    - name: Archive coverage reports
+      uses: actions/upload-artifact@v4
+      if: success() || failure()
+      with:
+        name: coverage-reports
+        path: |
+          app/build/reports/jacoco/
+        retention-days: 7
 
     - name: Archive build reports
       uses: actions/upload-artifact@v4
@@ -146,6 +178,15 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: ./gradlew connectedCheck --scan
+
+      - name: Publish Instrumented Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            **/build/outputs/androidTest-results/**/*.xml
+          check_name: Instrumented Test Results
+          comment_mode: off
 
       - name: Archive test reports
         uses: actions/upload-artifact@v4
