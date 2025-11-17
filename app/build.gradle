@@ -17,6 +17,7 @@ dependencies {
     implementation group: 'com.j256.ormlite',            name: 'ormlite-android',  version: '5.0'
     implementation group: 'com.google.android.material', name: 'material',         version: '1.8.0'
     implementation group: 'org.slf4j',                   name: 'slf4j-android',    version: '1.7.25'
+    implementation 'androidx.multidex:multidex:2.0.1'
 
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.3.0'
@@ -43,6 +44,7 @@ android {
            versionName "2025.0.0.1"
            minSdkVersion 14
            targetSdkVersion 34
+           multiDexEnabled true
 
            testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
        }
