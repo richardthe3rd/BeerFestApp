@@ -27,7 +27,7 @@ permissions:
   contents: read
 
 jobs:
-  build-and-test:
+  build:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -52,11 +52,9 @@ jobs:
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
-      with:
-        cache-read-only: false
 
-    - name: Build and run unit tests
-      run: ./gradlew assembleRelease assembleDebug test -PRELEASE --build-cache --parallel --scan
+    - name: Build with Gradle
+      run: ./gradlew build -PRELEASE --scan
       env:
         SIGNING_KEYSTORE: ${{ steps.decode_keystore.outputs.filePath }}
         SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
@@ -71,16 +69,6 @@ jobs:
         path: ./app/build/reports/
         retention-days: 7
 
-    - name: Archive test reports
-      uses: actions/upload-artifact@v4
-      if: success() || failure()
-      with:
-        name: unit-test-reports
-        path: |
-          ./app/build/reports/tests/
-          ./libraries/beers/build/reports/tests/
-        retention-days: 7
-
     - name: Archive build artifacts
       uses: actions/upload-artifact@v4
       with:
@@ -88,7 +76,7 @@ jobs:
         path: ./app/build/outputs/
         retention-days: 7
 
-  instrumented-test:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -97,13 +85,13 @@ jobs:
       - name: Delete unnecessary tools 🔧
         uses: jlumbroso/free-disk-space@v1.3.1
         with:
-          android: false # Don't remove Android tools
-          tool-cache: true # Remove image tool cache
-          dotnet: true # rm -rf /usr/share/dotnet
-          haskell: true # rm -rf /opt/ghc
-          swap-storage: true # rm -f /mnt/swapfile (4GiB)
-          docker-images: false # Takes 16s, skip for speed
-          large-packages: false # includes google-cloud-sdk and it's slow
+          android: false
+          tool-cache: true
+          dotnet: true
+          haskell: true
+          swap-storage: true
+          docker-images: false
+          large-packages: false
 
       - name: Enable KVM group perms
         run: |
@@ -124,8 +112,6 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-read-only: false
 
       - name: AVD cache
         uses: actions/cache@v4
@@ -134,7 +120,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ matrix.api-level }}-v2
+          key: avd-${{ matrix.api-level }}
 
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
@@ -144,11 +130,10 @@ jobs:
           force-avd-creation: false
           target: google_apis
           arch: x86_64
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -memory 4096
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          disk-size: 8000M
-          heap-size: 512M
-          ram-size: 4096M
+          disk-size: 6000M
+          heap-size: 600M
           script: echo "Generated AVD snapshot for caching."
 
       - name: Run instrumented tests
@@ -158,14 +143,14 @@ jobs:
           target: google_apis
           arch: x86_64
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -memory 4096
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew connectedCheck --build-cache --parallel --scan
+          script: ./gradlew connectedCheck --scan
 
-      - name: Archive instrumented test reports
+      - name: Archive test reports
         uses: actions/upload-artifact@v4
         if: success() || failure()
         with:
-          name: instrumented-test-reports
+          name: test-reports
           path: ./app/build/reports/androidTests/connected/
           retention-days: 7
