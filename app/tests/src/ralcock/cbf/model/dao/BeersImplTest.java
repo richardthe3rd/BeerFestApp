@@ -5,7 +5,6 @@ import android.test.AndroidTestCase;
 import android.test.RenamingDelegatingContext;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerDatabaseHelper;
-import ralcock.cbf.model.BeerListTest;
 import ralcock.cbf.model.Brewery;
 import ralcock.cbf.model.SortOrder;
 
@@ -32,10 +31,13 @@ public class BeersImplTest extends AndroidTestCase {
     public void setUp() throws Exception {
         super.setUp();
         fContext = new RenamingDelegatingContext(getContext(),
-                BeerListTest.class.getSimpleName() + ".");
+                BeersImplTest.class.getSimpleName() + ".");
         fBeerDatabaseHelper = new BeerDatabaseHelper(fContext);
         fBeers = fBeerDatabaseHelper.getBeers();
         fBreweries = fBeerDatabaseHelper.getBreweries();
+
+        // Clear any existing data to avoid unique constraint violations
+        fBeerDatabaseHelper.deleteAll();
 
         Brewery brewery = new Brewery("1", "First Brewery", "y");
         fBreweries.create(brewery);
@@ -43,13 +45,13 @@ public class BeersImplTest extends AndroidTestCase {
         Brewery brewery2 = new Brewery("2", "Best Brewery", "");
         fBreweries.create(brewery2);
 
-        fBeer1 = new Beer("1", "A Mild", 1f, "description1", fStyle1, "status1", brewery);
+        fBeer1 = new Beer("1", "A Mild", 1f, "description1", fStyle1, "status1", "cask", brewery);
         fBeers.create(fBeer1);
 
-        fBeer2 = new Beer("2", "A Best Bitter", 2f, "description2", fStyle2, "status2", brewery);
+        fBeer2 = new Beer("2", "A Best Bitter", 2f, "description2", fStyle2, "status2", "cask", brewery);
         fBeers.create(fBeer2);
 
-        fBeer3 = new Beer("3", "A Stout", 3f, "description3", fStyle2, "status3", brewery2);
+        fBeer3 = new Beer("3", "A Stout", 3f, "description3", fStyle2, "status3", "cask", brewery2);
         fBeers.create(fBeer3);
 
         assertEquals(3, fBeers.getNumberOfBeers());

@@ -175,7 +175,7 @@ public final class Beer implements Serializable {
         if (fName != null ? !fName.equals(beer.fName) : beer.fName != null) return false;
         if (fStatus != null ? !fStatus.equals(beer.fStatus) : beer.fStatus != null) return false;
         if (fStyle != null ? !fStyle.equals(beer.fStyle) : beer.fStyle != null) return false;
-        if (fDispense != null ? !fStyle.equals(beer.fDispense) : beer.fDispense != null) return false;
+        if (fDispense != null ? !fDispense.equals(beer.fDispense) : beer.fDispense != null) return false;
         if (fUserComments != null ? !fUserComments.equals(beer.fUserComments) : beer.fUserComments != null)
             return false;
 
