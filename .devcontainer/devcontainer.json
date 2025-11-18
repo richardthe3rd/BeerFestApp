@@ -41,9 +41,11 @@
 				"fnando.linter",
 				"hverlin.mise-vscode",
 				"ms-azuretools.vscode-docker",
+				"tamasfe.even-better-toml",
 				"Upstash.context7-mcp",
 				"vscjava.vscode-gradle",
 				"vscjava.vscode-java-pack"
+				
 			]
 		}
 	}

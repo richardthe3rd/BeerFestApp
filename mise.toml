@@ -1,3 +1,4 @@
 [tools]
+node = '24'
 gh = 'latest'
 claude = 'latest'
