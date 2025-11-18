@@ -37,4 +37,11 @@ jacocoTestReport {
         html.required = true
         csv.required = false
     }
+
+    // Configure source and class directories
+    sourceDirectories.setFrom(files(['src/main/java']))
+    classDirectories.setFrom(files(['build/classes/java/main']))
+
+    // Configure execution data location
+    executionData.setFrom(files(['build/jacoco/test.exec']))
 }
