@@ -9,12 +9,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import com.google.android.material.tabs.TabLayout;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -22,6 +16,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.viewpager.widget.ViewPager;
+import com.google.android.material.tabs.TabLayout;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import java.util.Date;
 import java.util.List;
@@ -55,13 +55,15 @@ public class CamBeerFestApplication extends AppCompatActivity {
 
     private BeerDatabaseHelper fDBHelper;
 
-    private final List<ListChangedListener> fListChangedListeners = new CopyOnWriteArrayList<ListChangedListener>();
+    private final List<ListChangedListener> fListChangedListeners =
+            new CopyOnWriteArrayList<ListChangedListener>();
 
     // TODO: Migrate from deprecated LocalBroadcastManager to LiveData or other alternatives
     // LocalBroadcastManager was deprecated in AndroidX 1.1.0
     // Recommended alternatives: LiveData, StateFlow, or direct callbacks
     @SuppressWarnings("deprecation")
     private LocalBroadcastManager fLocalBroadcastManager;
+
     private BroadcastReceiver fBroadcastReceiver;
 
     public CamBeerFestApplication() {
@@ -70,9 +72,7 @@ public class CamBeerFestApplication extends AppCompatActivity {
         fExceptionReporter = new ExceptionReporter(this);
     }
 
-    /**
-     * Called when the activity is first created.
-     */
+    /** Called when the activity is first created. */
     @Override
     @SuppressWarnings("deprecation")
     public void onCreate(Bundle savedInstanceState) {
@@ -91,8 +91,9 @@ public class CamBeerFestApplication extends AppCompatActivity {
         filterBy("");
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-        viewPager.setAdapter(new BeerListFragmentPagerAdapter(
-                getSupportFragmentManager(), CamBeerFestApplication.this));
+        viewPager.setAdapter(
+                new BeerListFragmentPagerAdapter(
+                        getSupportFragmentManager(), CamBeerFestApplication.this));
         TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
         tabLayout.setupWithViewPager(viewPager);
 
@@ -103,17 +104,19 @@ public class CamBeerFestApplication extends AppCompatActivity {
         }
 
         fLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
-        fBroadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(final Context context, final Intent intent) {
-                if (intent.getAction().equals(UpdateService.UPDATE_SERVICE_RESULT)) {
-                    Log.i(TAG, "Received " + UpdateService.UPDATE_SERVICE_RESULT);
-                    UpdateTask.Result result = (UpdateTask.Result) intent
-                            .getSerializableExtra(UpdateService.RESULT_EXTRA);
-                    doReceivedUpdateServiceResult(result);
-                }
-            }
-        };
+        fBroadcastReceiver =
+                new BroadcastReceiver() {
+                    @Override
+                    public void onReceive(final Context context, final Intent intent) {
+                        if (intent.getAction().equals(UpdateService.UPDATE_SERVICE_RESULT)) {
+                            Log.i(TAG, "Received " + UpdateService.UPDATE_SERVICE_RESULT);
+                            UpdateTask.Result result =
+                                    (UpdateTask.Result)
+                                            intent.getSerializableExtra(UpdateService.RESULT_EXTRA);
+                            doReceivedUpdateServiceResult(result);
+                        }
+                    }
+                };
     }
 
     private void doReceivedUpdateServiceResult(final UpdateTask.Result result) {
@@ -124,8 +127,7 @@ public class CamBeerFestApplication extends AppCompatActivity {
             notifyBeersChanged();
         } else {
             // Failed - notify of failure.
-            Toast.makeText(this,
-                    result.getThrowable().getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, result.getThrowable().getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -212,24 +214,28 @@ public class CamBeerFestApplication extends AppCompatActivity {
         inflater.inflate(R.menu.list_options_menu, menu);
 
         final SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-        searchView.setOnSearchClickListener(new View.OnClickListener() {
-            public void onClick(final View view) {
-                searchView.setQueryHint(getResources().getString(R.string.filter_hint));
-            }
-        });
+        searchView.setOnSearchClickListener(
+                new View.OnClickListener() {
+                    public void onClick(final View view) {
+                        searchView.setQueryHint(getResources().getString(R.string.filter_hint));
+                    }
+                });
 
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            public boolean onQueryTextSubmit(final String query) {
-                filterBy(query.toString());
-                searchView.clearFocus();
-                return true;
-            }
+        searchView.setOnQueryTextListener(
+                new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(final String query) {
+                        filterBy(query);
+                        searchView.clearFocus();
+                        return true;
+                    }
 
-            public boolean onQueryTextChange(final String newText) {
-                filterBy(newText.toString());
-                return true;
-            }
-        });
+                    @Override
+                    public boolean onQueryTextChange(final String newText) {
+                        filterBy(newText);
+                        return true;
+                    }
+                });
         return true;
     }
 
@@ -290,14 +296,16 @@ public class CamBeerFestApplication extends AppCompatActivity {
     // Copied from
     // http://developer.android.com/reference/android/app/DialogFragment.html
     private void showSortByDialog() {
-        DialogFragment newFragment = SortByDialogFragment.newInstance(fAppPreferences.getSortOrder());
+        DialogFragment newFragment =
+                SortByDialogFragment.newInstance(fAppPreferences.getSortOrder());
         newFragment.show(getFragmentManager(), "sortBy");
     }
 
     private void showFilterByStyleDialog() {
         final Set<String> allStyles = getBeerDao().getAvailableStyles();
         final Set<String> stylesToHide = fAppPreferences.getStylesToHide();
-        final DialogFragment newFragment = FilterByStyleDialogFragment.newInstance(stylesToHide, allStyles);
+        final DialogFragment newFragment =
+                FilterByStyleDialogFragment.newInstance(stylesToHide, allStyles);
         newFragment.show(getFragmentManager(), "filterByStyle");
     }
 

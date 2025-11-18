@@ -2,21 +2,21 @@ package ralcock.cbf.view;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MenuInflater;
-import androidx.appcompat.widget.ShareActionProvider;
-import androidx.core.view.MenuItemCompat;
+import android.view.MenuItem;
+import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.ShareActionProvider;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.MenuItemCompat;
 import ralcock.cbf.R;
 import ralcock.cbf.actions.BeerSharer;
 import ralcock.cbf.model.Beer;
-import ralcock.cbf.model.BeerChangedListener;
 import ralcock.cbf.model.BeerAccessor;
+import ralcock.cbf.model.BeerChangedListener;
 
-//OrmLiteBaseActivity<BeerDatabaseHelper>
+// OrmLiteBaseActivity<BeerDatabaseHelper>
 public final class BeerDetailsActivity extends AppCompatActivity {
 
     private static final String TAG = BeerDetailsActivity.class.getName();
@@ -56,15 +56,20 @@ public final class BeerDetailsActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.details_options_menu, menu);
 
-        fShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menu.findItem(R.id.shareBeer));
+        fShareActionProvider =
+                (ShareActionProvider)
+                        MenuItemCompat.getActionProvider(menu.findItem(R.id.shareBeer));
         fShareActionProvider.setShareIntent(fBeerSharer.makeShareIntent(getBeer()));
 
-        fBeerAccessor.getBeers().addBeerChangedListener(new BeerChangedListener() {
-            public void beerChanged(final Beer beer) {
-                fShareActionProvider.setShareIntent(
-                        fBeerSharer.makeShareIntent(beer));
-            }
-        });
+        fBeerAccessor
+                .getBeers()
+                .addBeerChangedListener(
+                        new BeerChangedListener() {
+                            public void beerChanged(final Beer beer) {
+                                fShareActionProvider.setShareIntent(
+                                        fBeerSharer.makeShareIntent(beer));
+                            }
+                        });
         return true;
     }
 

@@ -2,9 +2,8 @@ package ralcock.cbf.model;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import ralcock.cbf.model.dao.BeersImpl;
-
 import java.io.Serializable;
+import ralcock.cbf.model.dao.BeersImpl;
 
 @DatabaseTable(tableName = Beer.TABLE_NAME, daoClass = BeersImpl.class)
 public final class Beer implements Serializable {
@@ -61,18 +60,18 @@ public final class Beer implements Serializable {
     private String fUserComments;
 
     @SuppressWarnings("UnusedDeclaration")
-        // needed by ormlite
-    Beer() {
-    }
+    // needed by ormlite
+    Beer() {}
 
-    public Beer(final String festivalId,
-                final String name,
-                final float abv,
-                final String description,
-                final String style,
-                final String status,
-                final String dispense,
-                final Brewery brewery) {
+    public Beer(
+            final String festivalId,
+            final String name,
+            final float abv,
+            final String description,
+            final String style,
+            final String status,
+            final String dispense,
+            final Brewery brewery) {
         fFestivalID = festivalId;
         fBrewery = brewery;
         fName = name;
@@ -169,15 +168,21 @@ public final class Beer implements Serializable {
         if (Float.compare(beer.fAbv, fAbv) != 0) return false;
         if (fIsOnWishList != beer.fIsOnWishList) return false;
         if (fRating != beer.fRating) return false;
-        if (fBrewery != null ? !fBrewery.equals(beer.fBrewery) : beer.fBrewery != null) return false;
-        if (fDescription != null ? !fDescription.equals(beer.fDescription) : beer.fDescription != null) return false;
-        if (fFestivalID != null ? !fFestivalID.equals(beer.fFestivalID) : beer.fFestivalID != null) return false;
+        if (fBrewery != null ? !fBrewery.equals(beer.fBrewery) : beer.fBrewery != null)
+            return false;
+        if (fDescription != null
+                ? !fDescription.equals(beer.fDescription)
+                : beer.fDescription != null) return false;
+        if (fFestivalID != null ? !fFestivalID.equals(beer.fFestivalID) : beer.fFestivalID != null)
+            return false;
         if (fName != null ? !fName.equals(beer.fName) : beer.fName != null) return false;
         if (fStatus != null ? !fStatus.equals(beer.fStatus) : beer.fStatus != null) return false;
         if (fStyle != null ? !fStyle.equals(beer.fStyle) : beer.fStyle != null) return false;
-        if (fDispense != null ? !fDispense.equals(beer.fDispense) : beer.fDispense != null) return false;
-        if (fUserComments != null ? !fUserComments.equals(beer.fUserComments) : beer.fUserComments != null)
+        if (fDispense != null ? !fDispense.equals(beer.fDispense) : beer.fDispense != null)
             return false;
+        if (fUserComments != null
+                ? !fUserComments.equals(beer.fUserComments)
+                : beer.fUserComments != null) return false;
 
         return true;
     }

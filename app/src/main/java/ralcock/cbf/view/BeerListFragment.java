@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import androidx.fragment.app.ListFragment;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
+import java.util.Set;
 import ralcock.cbf.CamBeerFestApplication;
 import ralcock.cbf.R;
 import ralcock.cbf.actions.BeerSearcher;
@@ -21,8 +22,6 @@ import ralcock.cbf.model.BeerList;
 import ralcock.cbf.model.SortOrder;
 import ralcock.cbf.model.StatusToShow;
 import ralcock.cbf.model.dao.Beers;
-
-import java.util.Set;
 
 public abstract class BeerListFragment extends ListFragment implements ListChangedListener {
     private static final String TAG = BeerListFragment.class.getName();
@@ -36,11 +35,12 @@ public abstract class BeerListFragment extends ListFragment implements ListChang
     private BeerSharer fBeerSharer;
     private BeerSearcher fBeerSearcher;
 
-    protected BeerListFragment() {
-    }
+    protected BeerListFragment() {}
 
     @Override
-    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+    public View onCreateView(
+            final LayoutInflater inflater,
+            final ViewGroup container,
             final Bundle savedInstanceState) {
         return inflater.inflate(R.layout.beer_listview_fragment, container, false);
     }
@@ -63,31 +63,43 @@ public abstract class BeerListFragment extends ListFragment implements ListChang
         setListAdapter(fAdapter);
 
         // Add list click listener.
-        getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Log.i(TAG, "Starting BeerDetails Activity with ID " + id);
-                Intent intent = new Intent(getActivity(), BeerDetailsActivity.class);
-                intent.putExtra(BeerDetailsActivity.EXTRA_BEER_ID, id);
-                startActivityForResult(intent, SHOW_BEER_DETAILS_REQUEST_CODE);
-            }
-        });
+        getListView()
+                .setOnItemClickListener(
+                        new AdapterView.OnItemClickListener() {
+                            public void onItemClick(
+                                    AdapterView<?> adapterView, View view, int position, long id) {
+                                Log.i(TAG, "Starting BeerDetails Activity with ID " + id);
+                                Intent intent =
+                                        new Intent(getActivity(), BeerDetailsActivity.class);
+                                intent.putExtra(BeerDetailsActivity.EXTRA_BEER_ID, id);
+                                startActivityForResult(intent, SHOW_BEER_DETAILS_REQUEST_CODE);
+                            }
+                        });
 
-        getListView().setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
-            public void onCreateContextMenu(ContextMenu contextMenu, final View view,
-                    final ContextMenu.ContextMenuInfo contextMenuInfo) {
-                getActivity().getMenuInflater().inflate(R.menu.list_context_menu, contextMenu);
-                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) contextMenuInfo;
-                Beer beer = getBeer(info.id);
-                boolean isBookMarked = beer.isIsOnWishList();
-                contextMenu.findItem(R.id.unBookmarkBeer).setVisible(isBookMarked);
-                contextMenu.findItem(R.id.bookmarkBeer).setVisible(!isBookMarked);
-            }
-        });
+        getListView()
+                .setOnCreateContextMenuListener(
+                        new View.OnCreateContextMenuListener() {
+                            public void onCreateContextMenu(
+                                    ContextMenu contextMenu,
+                                    final View view,
+                                    final ContextMenu.ContextMenuInfo contextMenuInfo) {
+                                getActivity()
+                                        .getMenuInflater()
+                                        .inflate(R.menu.list_context_menu, contextMenu);
+                                AdapterView.AdapterContextMenuInfo info =
+                                        (AdapterView.AdapterContextMenuInfo) contextMenuInfo;
+                                Beer beer = getBeer(info.id);
+                                boolean isBookMarked = beer.isIsOnWishList();
+                                contextMenu.findItem(R.id.unBookmarkBeer).setVisible(isBookMarked);
+                                contextMenu.findItem(R.id.bookmarkBeer).setVisible(!isBookMarked);
+                            }
+                        });
     }
 
     @Override
     public boolean onContextItemSelected(final MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        AdapterView.AdapterContextMenuInfo info =
+                (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         Beer beer = getBeer(info.id);
         int itemId = item.getItemId();
         if (itemId == R.id.bookmarkBeer) {

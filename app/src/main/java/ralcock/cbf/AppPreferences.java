@@ -3,15 +3,14 @@ package ralcock.cbf;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONException;
 import ralcock.cbf.model.BeerList;
 import ralcock.cbf.model.SortOrder;
 import ralcock.cbf.model.StatusToShow;
-
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 public final class AppPreferences {
 
@@ -159,9 +158,6 @@ public final class AppPreferences {
 
     public BeerList.Config getBeerListConfig() {
         return new BeerList.Config(
-                getSortOrder(),
-                getFilterText(),
-                getStylesToHide(),
-                getStatusToShow());
+                getSortOrder(), getFilterText(), getStylesToHide(), getStatusToShow());
     }
 }

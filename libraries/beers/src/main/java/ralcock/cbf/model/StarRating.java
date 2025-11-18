@@ -38,7 +38,6 @@ public final class StarRating implements Serializable, Comparable<StarRating> {
         return stars.toString();
     }
 
-
     public int compareTo(final StarRating starRating) {
         if (fRating > starRating.fRating) return 1;
         if (fRating == starRating.fRating) return 0;

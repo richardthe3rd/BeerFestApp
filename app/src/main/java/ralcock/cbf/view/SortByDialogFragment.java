@@ -2,9 +2,9 @@ package ralcock.cbf.view;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.app.DialogFragment;
 import ralcock.cbf.CamBeerFestApplication;
 import ralcock.cbf.R;
 import ralcock.cbf.model.SortOrder;
@@ -37,14 +37,16 @@ public class SortByDialogFragment extends DialogFragment {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.sort_dialog_title);
-        builder.setSingleChoiceItems(items, checkedItem, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-                CamBeerFestApplication app = (CamBeerFestApplication) getActivity();
-                app.doDismissSortDialog(sortOrders[i]);
-            }
-        });
+        builder.setSingleChoiceItems(
+                items,
+                checkedItem,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                        CamBeerFestApplication app = (CamBeerFestApplication) getActivity();
+                        app.doDismissSortDialog(sortOrders[i]);
+                    }
+                });
         return builder.create();
     }
-
 }

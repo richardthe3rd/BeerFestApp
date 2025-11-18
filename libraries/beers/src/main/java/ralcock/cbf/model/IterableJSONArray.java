@@ -1,10 +1,9 @@
 package ralcock.cbf.model;
 
+import java.util.Iterator;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.Iterator;
 
 final class IterableJSONArray implements Iterable<JSONObject> {
     private final JSONArray fJsonArray;

@@ -14,5 +14,4 @@ public class BookmarkedBeerListFragment extends BeerListFragment {
         AppPreferences preferences = new AppPreferences(this.getActivity());
         return BeerList.bookmarkedBeers(beers, preferences.getBeerListConfig());
     }
-
 }

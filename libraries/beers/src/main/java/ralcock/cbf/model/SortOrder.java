@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 @SuppressWarnings({"UnusedDeclaration"})
 public enum SortOrder implements Serializable {
-
     BREWERY_NAME_ASC(Beer.BREWERY_FIELD, true, "Brewery (A-Z)"),
     BREWERY_NAME_DESC(Beer.BREWERY_FIELD, false, "Brewery (Z-A)"),
 
@@ -15,7 +14,8 @@ public enum SortOrder implements Serializable {
     BEER_ABV_DESC(Beer.ABV_FIELD, false, "ABV (high to low)"),
 
     BEER_RATING_ASC(Beer.RATING_FIELD, true, "Rating (low to high)"),
-    BEER_RATING_DESC(Beer.RATING_FIELD, false, "Rating (high to low)"),;
+    BEER_RATING_DESC(Beer.RATING_FIELD, false, "Rating (high to low)"),
+    ;
 
     private final String fColumnName;
     private final boolean fAscending;

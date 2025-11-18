@@ -9,9 +9,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.ImageView;
 import ralcock.cbf.R;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerList;
@@ -24,9 +24,8 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
     private final BeerFilter fFilter;
     private final BeerListFragment fBeerListFragment;
 
-    public BeerListAdapter(final Context context,
-            final BeerList beerList,
-            final BeerListFragment fragment) {
+    public BeerListAdapter(
+            final Context context, final BeerList beerList, final BeerListFragment fragment) {
         fContext = context;
         fBeerList = beerList;
         fFilter = new BeerFilter(this, fBeerList);
@@ -50,7 +49,8 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
         BeerListItemView beerListItemView = (BeerListItemView) view.getTag();
 
         Brewery brewery = beer.getBrewery();
-        beerListItemView.BreweryName.setText(brewery == null ? "<NULL_BREWERY>" : brewery.getName());
+        beerListItemView.BreweryName.setText(
+                brewery == null ? "<NULL_BREWERY>" : brewery.getName());
 
         beerListItemView.BeerRatingBar.setRating(beer.getRating());
 
@@ -63,21 +63,23 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
 
         if (beer.isIsOnWishList()) {
             beerListItemView.BookmarkImage.setImageResource(R.drawable.ic_bookmark_black_48dp);
-            beerListItemView.BeerName.setTypeface(beerListItemView.BeerName.getTypeface(),
-                    Typeface.BOLD_ITALIC);
+            beerListItemView.BeerName.setTypeface(
+                    beerListItemView.BeerName.getTypeface(), Typeface.BOLD_ITALIC);
         } else {
-            beerListItemView.BookmarkImage.setImageResource(R.drawable.ic_bookmark_border_black_48dp);
-            beerListItemView.BeerName.setTypeface(beerListItemView.BeerName.getTypeface(),
-                    Typeface.BOLD);
+            beerListItemView.BookmarkImage.setImageResource(
+                    R.drawable.ic_bookmark_border_black_48dp);
+            beerListItemView.BeerName.setTypeface(
+                    beerListItemView.BeerName.getTypeface(), Typeface.BOLD);
         }
 
         beerListItemView.BookmarkImage.setClickable(true);
-        beerListItemView.BookmarkImage.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fBeerListFragment.toggleBookmark(beer);
-            }
-        });
+        beerListItemView.BookmarkImage.setOnClickListener(
+                new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        fBeerListFragment.toggleBookmark(beer);
+                    }
+                });
     }
 
     public int getCount() {

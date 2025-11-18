@@ -32,12 +32,13 @@ Your first stop! Learn how to:
 - [Testing Guide](annual-updates/testing-guide.md) _(coming soon)_
 - [Checklist](annual-updates/checklist.md) - Printable checklist
 
-#### [Development](development/) _(coming soon)_
+#### [Development](development/)
 Development workflows and best practices:
-- Setup - Environment configuration
-- Build and Test - Commands and procedures
-- Coding Conventions - Java style guide
-- Git Workflow - Branching and commits
+- [Code Quality & Formatting](development/code-quality.md) - Spotless, Lint, pre-commit hooks
+- Setup - Environment configuration _(coming soon)_
+- Build and Test - Commands and procedures _(coming soon)_
+- Coding Conventions - Java style guide _(coming soon)_
+- Git Workflow - Branching and commits _(coming soon)_
 
 ### For Troubleshooting
 
@@ -104,6 +105,9 @@ Data models and interfaces:
 **...modernize the UI**
 → [UI Modernization](features/README.md#ui-modernization)
 
+**...set up code formatting/linting**
+→ [Code Quality & Formatting](development/code-quality.md)
+
 ---
 
 ## 📊 Documentation Status
@@ -112,12 +116,12 @@ Data models and interfaces:
 |---------|--------|------------|
 | Getting Started | ✅ Complete | 100% |
 | Annual Updates | ✅ Complete | 100% |
+| Development | 🟡 Partial | 20% |
 | Troubleshooting | 🟡 Partial | 60% |
 | Features | 🟡 Partial | 40% |
 | Architecture | ⏳ Planned | 0% |
-| Development | ⏳ Planned | 0% |
 | CI/CD | ⏳ Planned | 0% |
-| API Reference | ⏳ Planned | 0% |
+| API Reference | 🟡 Partial | 30% |
 
 **Legend:**
 - ✅ Complete - Fully documented
@@ -134,7 +138,8 @@ Data models and interfaces:
 - **Crashes and bugs:** [Troubleshooting](troubleshooting/)
 - **Future features:** [Feature Proposals](features/)
 - **Getting started:** [Getting Started](getting-started.md)
-- **Build and test:** [Development](#) _(coming soon)_
+- **Code quality:** [Code Quality & Formatting](development/code-quality.md)
+- **Build and test:** [Development](development/) _(more guides coming soon)_
 
 ### By File Type
 
@@ -190,7 +195,7 @@ When creating new documentation:
 
 ---
 
-**Last Updated:** 2025-11-17
-**Documentation Version:** 3.0.0
+**Last Updated:** 2025-11-18
+**Documentation Version:** 3.1.0
 
 **Back to:** [Main Documentation](../CLAUDE.md)

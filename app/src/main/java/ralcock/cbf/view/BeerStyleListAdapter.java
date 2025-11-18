@@ -8,18 +8,18 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckedTextView;
 import android.widget.TextView;
-import ralcock.cbf.R;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
+import ralcock.cbf.R;
 
 public class BeerStyleListAdapter extends BaseAdapter {
     private final Vector<String> fStyleList;
     private final Context fContext;
     private final Set<String> fStylesToHide;
 
-    public BeerStyleListAdapter(final Context context, final Set<String> allStyles, final Set<String> stylesToHide) {
+    public BeerStyleListAdapter(
+            final Context context, final Set<String> allStyles, final Set<String> stylesToHide) {
         super();
         fContext = context;
         fStylesToHide = new HashSet<String>(stylesToHide);
@@ -47,7 +47,9 @@ public class BeerStyleListAdapter extends BaseAdapter {
         ItemView itemView;
         if (view == null) {
             LayoutInflater layoutInflater = LayoutInflater.from(fContext);
-            view = layoutInflater.inflate(android.R.layout.select_dialog_multichoice, viewGroup, false);
+            view =
+                    layoutInflater.inflate(
+                            android.R.layout.select_dialog_multichoice, viewGroup, false);
             itemView = new ItemView(view);
             view.setTag(itemView);
         } else {
@@ -58,21 +60,23 @@ public class BeerStyleListAdapter extends BaseAdapter {
             itemView.StyleTextView.setText(R.string.filter_style_dialog_show_all);
             itemView.StyleTextView.setTypeface(Typeface.DEFAULT_BOLD);
             itemView.ShowStyleCheck.setChecked(fStylesToHide.isEmpty());
-            itemView.ShowStyleCheck.setOnClickListener(new View.OnClickListener() {
-                public void onClick(final View view) {
-                    toggleShowAllStyles();
-                }
-            });
+            itemView.ShowStyleCheck.setOnClickListener(
+                    new View.OnClickListener() {
+                        public void onClick(final View view) {
+                            toggleShowAllStyles();
+                        }
+                    });
         } else {
             String style = fStyleList.get(i - 1);
             itemView.StyleTextView.setText(style);
             itemView.StyleTextView.setTypeface(Typeface.DEFAULT);
             itemView.ShowStyleCheck.setChecked(!fStylesToHide.contains(style));
-            itemView.ShowStyleCheck.setOnClickListener(new View.OnClickListener() {
-                public void onClick(final View view) {
-                    toggleShowStyle(i - 1);
-                }
-            });
+            itemView.ShowStyleCheck.setOnClickListener(
+                    new View.OnClickListener() {
+                        public void onClick(final View view) {
+                            toggleShowStyle(i - 1);
+                        }
+                    });
         }
         return view;
     }
@@ -109,5 +113,4 @@ public class BeerStyleListAdapter extends BaseAdapter {
             ShowStyleCheck = (CheckedTextView) view;
         }
     }
-
 }

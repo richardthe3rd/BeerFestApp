@@ -3,12 +3,6 @@ package ralcock.cbf.service;
 import android.os.AsyncTask;
 import android.util.Log;
 import com.j256.ormlite.misc.TransactionManager;
-import org.json.JSONException;
-import ralcock.cbf.model.Beer;
-import ralcock.cbf.model.BeerDatabaseHelper;
-import ralcock.cbf.model.JsonBeerList;
-import ralcock.cbf.model.dao.Beers;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -20,6 +14,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.concurrent.Callable;
+import org.json.JSONException;
+import ralcock.cbf.model.Beer;
+import ralcock.cbf.model.BeerDatabaseHelper;
+import ralcock.cbf.model.JsonBeerList;
+import ralcock.cbf.model.dao.Beers;
 
 // TODO: Migrate from deprecated AsyncTask to WorkManager or Kotlin Coroutines
 // AsyncTask was deprecated in API 30 (Android 11)
@@ -28,7 +27,8 @@ import java.util.concurrent.Callable;
 //   - Kotlin Coroutines for asynchronous operations
 //   - ExecutorService with Handler for simple background tasks
 @SuppressWarnings("deprecation")
-public class UpdateTask extends AsyncTask<UpdateTask.Params, UpdateTask.Progress, UpdateTask.Result> {
+public class UpdateTask
+        extends AsyncTask<UpdateTask.Params, UpdateTask.Progress, UpdateTask.Result> {
 
     private static final String TAG = UpdateTask.class.getName();
 
@@ -61,15 +61,17 @@ public class UpdateTask extends AsyncTask<UpdateTask.Params, UpdateTask.Progress
             try {
                 final JsonBeerList beerList = new JsonBeerList(jsonString);
                 final BeerDatabaseHelper helper = param0.getDatabaseHelper();
-                int count = TransactionManager.callInTransaction(helper.getConnectionSource(),
-                        new Callable<Integer>() {
-                            public Integer call() throws Exception {
-                                if (param0.cleanUpdate()) {
-                                    helper.deleteAll();
-                                }
-                                return initializeDatabase(beerList, helper.getBeers());
-                            }
-                        });
+                int count =
+                        TransactionManager.callInTransaction(
+                                helper.getConnectionSource(),
+                                new Callable<Integer>() {
+                                    public Integer call() throws Exception {
+                                        if (param0.cleanUpdate()) {
+                                            helper.deleteAll();
+                                        }
+                                        return initializeDatabase(beerList, helper.getBeers());
+                                    }
+                                });
                 Log.d(TAG, "Updated " + count + " beers.");
                 return new UpdateResult(count, toMD5String(digest));
             } catch (JSONException e) {
@@ -126,7 +128,7 @@ public class UpdateTask extends AsyncTask<UpdateTask.Params, UpdateTask.Progress
         return count;
     }
 
-    public static abstract class Params {
+    public abstract static class Params {
         abstract MessageDigest getDigest() throws NoSuchAlgorithmException;
 
         abstract InputStream openStream() throws IOException;
@@ -140,7 +142,7 @@ public class UpdateTask extends AsyncTask<UpdateTask.Params, UpdateTask.Progress
         abstract boolean updateDue();
     }
 
-    public final static class Progress implements Serializable {
+    public static final class Progress implements Serializable {
         private static final long serialVersionUID = 1L;
         private final int fCount;
         private final int fSize;
@@ -221,6 +223,5 @@ public class UpdateTask extends AsyncTask<UpdateTask.Params, UpdateTask.Progress
         public boolean success() {
             return false;
         }
-
     }
 }

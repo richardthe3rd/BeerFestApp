@@ -55,7 +55,8 @@ public class BeerBuilder {
     }
 
     public Beer build() {
-        return new Beer(fFestivalId, fName, fAbv, fDescription, fStyle, fStatus, fDispense, fBrewery);
+        return new Beer(
+                fFestivalId, fName, fAbv, fDescription, fStyle, fStatus, fDispense, fBrewery);
     }
 
     public BeerBuilder from(final BreweryBuilder breweryBuilder) {

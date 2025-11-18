@@ -28,8 +28,8 @@ public final class BeerSharer {
         final Resources resources = fContext.getResources();
 
         String festivalName = resources.getString(R.string.festival_name);
-        String extraSubject = resources.getString(R.string.share_intent_subject,
-                "beer", festivalName);
+        String extraSubject =
+                resources.getString(R.string.share_intent_subject, "beer", festivalName);
         intent.putExtra(Intent.EXTRA_SUBJECT, extraSubject);
 
         String extraText = makeExtraText(resources, beer);
@@ -40,8 +40,9 @@ public final class BeerSharer {
 
     private String makeExtraText(final Resources resources, final Beer beer) {
         String stars = beer.getNumberOfStars().toFancyString();
-        String extraText = resources.getString(R.string.share_intent_text,
-                beer.getBrewery().getName(), beer.getName());
+        String extraText =
+                resources.getString(
+                        R.string.share_intent_text, beer.getBrewery().getName(), beer.getName());
         String hashTag = resources.getString(R.string.festival_hashtag);
         return String.format("%s %s #%s", extraText, stars, hashTag);
     }

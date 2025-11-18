@@ -8,8 +8,7 @@ final class BeerFilter extends Filter {
     private final BeerListAdapter fBeerListAdapter;
     private final BeerList fBeerList;
 
-    public BeerFilter(final BeerListAdapter adapter,
-            final BeerList beerList) {
+    public BeerFilter(final BeerListAdapter adapter, final BeerList beerList) {
         fBeerListAdapter = adapter;
         fBeerList = beerList;
     }
@@ -18,11 +17,11 @@ final class BeerFilter extends Filter {
     protected FilterResults performFiltering(final CharSequence charSequence) {
         fBeerList.filterBy(charSequence);
         return new FilterResults();
-
     }
 
     @Override
-    protected void publishResults(final CharSequence charSequence, final FilterResults filterResults) {
+    protected void publishResults(
+            final CharSequence charSequence, final FilterResults filterResults) {
         fBeerListAdapter.notifyDataSetChanged();
     }
 }

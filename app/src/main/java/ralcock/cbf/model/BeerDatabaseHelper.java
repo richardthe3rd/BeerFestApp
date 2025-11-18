@@ -6,12 +6,11 @@ import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
+import java.sql.SQLException;
+import ralcock.cbf.R;
 import ralcock.cbf.model.dao.Beers;
 import ralcock.cbf.model.dao.BeersImpl;
 import ralcock.cbf.model.dao.Breweries;
-import ralcock.cbf.R;
-
-import java.sql.SQLException;
 
 public final class BeerDatabaseHelper extends OrmLiteSqliteOpenHelper {
     public static final String DATABASE_NAME = "BEERS";
@@ -22,12 +21,12 @@ public final class BeerDatabaseHelper extends OrmLiteSqliteOpenHelper {
     private Beers fBeers;
 
     public BeerDatabaseHelper(final Context context) {
-        super(context, DATABASE_NAME, null, DB_VERSION,  R.raw.ormlite_config);
+        super(context, DATABASE_NAME, null, DB_VERSION, R.raw.ormlite_config);
     }
 
     @Override
-    public void onCreate(final SQLiteDatabase sqLiteDatabase,
-                         final ConnectionSource connectionSource) {
+    public void onCreate(
+            final SQLiteDatabase sqLiteDatabase, final ConnectionSource connectionSource) {
         try {
             TableUtils.createTable(connectionSource, Beer.class);
             TableUtils.createTable(connectionSource, Brewery.class);
@@ -37,9 +36,11 @@ public final class BeerDatabaseHelper extends OrmLiteSqliteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(final SQLiteDatabase sqLiteDatabase,
-                          final ConnectionSource connectionSource,
-                          int old_version, int new_version) {
+    public void onUpgrade(
+            final SQLiteDatabase sqLiteDatabase,
+            final ConnectionSource connectionSource,
+            int old_version,
+            int new_version) {
         try {
             TableUtils.dropTable(connectionSource, Beer.class, true);
             TableUtils.dropTable(connectionSource, Brewery.class, true);
