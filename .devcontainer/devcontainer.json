@@ -45,7 +45,7 @@
 				"tamasfe.even-better-toml",
 				"Upstash.context7-mcp",
 				"vscjava.vscode-gradle",
-				"vscjava.vscode-java-pack"				
+				"vscjava.vscode-java-pack"
 			]
 		}
 	}
