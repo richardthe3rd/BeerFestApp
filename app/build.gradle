@@ -9,6 +9,7 @@ buildscript {
 }
 
 apply plugin: 'com.android.application'
+apply plugin: 'jacoco'
 
 dependencies {
     implementation project(':libraries:beers')
@@ -16,6 +17,7 @@ dependencies {
     implementation group: 'com.j256.ormlite',            name: 'ormlite-android',  version: '5.0'
     implementation group: 'com.google.android.material', name: 'material',         version: '1.8.0'
     implementation group: 'org.slf4j',                   name: 'slf4j-android',    version: '1.7.25'
+    implementation 'androidx.multidex:multidex:2.0.1'
 
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.3.0'
@@ -42,6 +44,7 @@ android {
            versionName "2025.0.0.1"
            minSdkVersion 14
            targetSdkVersion 34
+           multiDexEnabled true
 
            testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
        }
@@ -58,6 +61,12 @@ android {
         abortOnError false
     }
 
+    buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
+    }
+
     // See https://www.timroes.de/2013/09/22/handling-signing-configs-with-gradle/
     if(project.hasProperty("RELEASE") && new File("app/release.gradle").exists()){
         logger.quiet("Building release")
@@ -70,4 +79,38 @@ android {
 tasks.withType(JavaCompile) {
     options.compilerArgs << '-Xlint:unchecked'
     options.deprecation = true
+}
+
+// JaCoCo configuration for test coverage
+jacoco {
+    toolVersion = "0.8.8"
+}
+
+tasks.register('jacocoTestReport', JacocoReport) {
+    dependsOn 'testDebugUnitTest'
+
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+
+    def fileFilter = [
+        '**/R.class',
+        '**/R$*.class',
+        '**/BuildConfig.*',
+        '**/Manifest*.*',
+        '**/*Test*.*',
+        'android/**/*.*'
+    ]
+
+    def debugTree = fileTree(dir: "${buildDir}/intermediates/javac/debug", excludes: fileFilter)
+    def mainSrc = "${project.projectDir}/src/main/java"
+
+    sourceDirectories.setFrom(files([mainSrc]))
+    classDirectories.setFrom(files([debugTree]))
+    executionData.setFrom(fileTree(dir: buildDir, includes: [
+        'outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec',
+        'jacoco/testDebugUnitTest.exec'
+    ]))
 }
