@@ -219,142 +219,16 @@ jobs:
           name: app-coverage-reports
           path: app-coverage/
 
-      - name: Debug - List downloaded files
-        run: |
-          echo "=== Library Coverage Files ==="
-          ls -la library-coverage/ || echo "library-coverage/ directory not found"
-          find library-coverage/ -type f 2>/dev/null || echo "No files in library-coverage/"
-
-          echo ""
-          echo "=== App Coverage Files ==="
-          ls -la app-coverage/ || echo "app-coverage/ directory not found"
-          find app-coverage/ -type f 2>/dev/null || echo "No files in app-coverage/"
-
-      - name: Parse coverage reports
-        id: coverage
-        run: |
-          # Parse coverage from XML reports
-          APP_XML="app-coverage/jacocoTestReport/jacocoTestReport.xml"
-          LIB_XML="library-coverage/test/jacocoTestReport.xml"
-
-          # Function to extract coverage from XML
-          get_coverage() {
-            local xml_file=$1
-            echo "Checking: $xml_file" >&2
-            if [ -f "$xml_file" ]; then
-              echo "File exists, parsing..." >&2
-              # Extract line coverage percentage from XML using Python one-liner
-              python3 -c "
-          import xml.etree.ElementTree as ET
-          import sys
-          try:
-              tree = ET.parse('$xml_file')
-              root = tree.getroot()
-              # Get the report-level LINE counter (direct child), not method-level counters
-              counter = root.find(\"counter[@type='LINE']\")
-              if counter is not None:
-                  covered = float(counter.get('covered', 0))
-                  missed = float(counter.get('missed', 0))
-                  total = covered + missed
-                  sys.stderr.write(f'Found: covered={covered}, missed={missed}, total={total}\n')
-                  print(f'{(covered / total * 100):.1f}' if total > 0 else '0.0')
-              else:
-                  sys.stderr.write('No LINE counter found in XML\n')
-                  print('0.0')
-          except Exception as e:
-              sys.stderr.write(f'Error parsing XML: {e}\n')
-              print('0.0')
-          " || echo "0.0"
-            else
-              echo "File not found: $xml_file" >&2
-              echo "0.0"
-            fi
-          }
-
-          APP_COV=$(get_coverage "$APP_XML")
-          LIB_COV=$(get_coverage "$LIB_XML")
-
-          echo "app_coverage=$APP_COV" >> $GITHUB_OUTPUT
-          echo "lib_coverage=$LIB_COV" >> $GITHUB_OUTPUT
-
-          # Create summary
-          {
-            echo "### 📊 Combined Test Coverage Report"
-            echo ""
-            echo "| Module | Test Type | Coverage |"
-            echo "|--------|-----------|----------|"
-
-            if [ -f "$APP_XML" ]; then
-              echo "| App | Instrumented Tests | ${APP_COV}% |"
-            else
-              echo "| App | Instrumented Tests | ❌ No report |"
-            fi
-
-            if [ -f "$LIB_XML" ]; then
-              echo "| Libraries | Unit Tests | ${LIB_COV}% |"
-            else
-              echo "| Libraries | Unit Tests | ❌ No report |"
-            fi
-
-            echo ""
-            if [ -f "$APP_XML" ] || [ -f "$LIB_XML" ]; then
-              echo "✅ Coverage reports generated successfully"
-              echo ""
-              echo "Download the \`app-coverage-reports\` and \`library-coverage-reports\` artifacts to view detailed HTML reports."
-            else
-              echo "⚠️ No coverage reports were generated"
-              echo ""
-              echo "This may be because:"
-              echo "- Tests failed to run"
-              echo "- No test execution data was found"
-              echo "- JaCoCo configuration needs review"
-            fi
-          } >> $GITHUB_STEP_SUMMARY
-
-      - name: Comment coverage on PR
-        if: github.event_name == 'pull_request' && (steps.coverage.outputs.app_coverage != '0.0' || steps.coverage.outputs.lib_coverage != '0.0')
-        uses: actions/github-script@v7
+      - name: Add coverage report to PR
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.7.2
+        if: github.event_name == 'pull_request'
         with:
-          script: |
-            const appCov = '${{ steps.coverage.outputs.app_coverage }}';
-            const libCov = '${{ steps.coverage.outputs.lib_coverage }}';
-
-            const body = `### 📊 Test Coverage Report
-
-            | Module | Test Type | Coverage |
-            |--------|-----------|----------|
-            | App | Instrumented Tests | ${appCov}% |
-            | Libraries | Unit Tests | ${libCov}% |
-
-            Download the workflow artifacts to view detailed HTML reports:
-            - \`app-coverage-reports\` - App instrumented test coverage
-            - \`library-coverage-reports\` - Library unit test coverage`;
-
-            // Find existing coverage comment
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            });
-
-            const coverageComment = comments.find(comment =>
-              comment.user.type === 'Bot' && comment.body.includes('📊 Test Coverage Report')
-            );
-
-            if (coverageComment) {
-              // Update existing comment
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: coverageComment.id,
-                body: body
-              });
-            } else {
-              // Create new comment
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: body
-              });
-            }
+          paths: |
+            ${{ github.workspace }}/library-coverage/test/jacocoTestReport.xml,
+            ${{ github.workspace }}/app-coverage/jacocoTestReport/jacocoTestReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 15
+          min-coverage-changed-files: 50
+          title: '📊 JaCoCo Code Coverage'
+          update-comment: true
