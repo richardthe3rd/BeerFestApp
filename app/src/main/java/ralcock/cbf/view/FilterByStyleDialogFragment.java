@@ -50,6 +50,7 @@ public class FilterByStyleDialogFragment extends DialogFragment {
         builder.setAdapter(
                 listAdapter,
                 new DialogInterface.OnClickListener() {
+                    @Override
                     public void onClick(final DialogInterface dialogInterface, final int i) {
                         // NOTHING TO DO HERE
                     }
