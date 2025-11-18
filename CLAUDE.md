@@ -304,4 +304,4 @@ try {
 ---
 
 **📖 For detailed information, explore the [docs/](docs/) directory or see [full documentation](CLAUDE-full.md.backup).**
-- use conventional commits. With one commit per logical change
+- Use conventional commits with one commit per logical change.
