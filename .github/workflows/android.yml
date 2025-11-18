@@ -219,6 +219,17 @@ jobs:
           name: app-coverage-reports
           path: app-coverage/
 
+      - name: Debug - List downloaded files
+        run: |
+          echo "=== Library Coverage Files ==="
+          ls -la library-coverage/ || echo "library-coverage/ directory not found"
+          find library-coverage/ -type f 2>/dev/null || echo "No files in library-coverage/"
+
+          echo ""
+          echo "=== App Coverage Files ==="
+          ls -la app-coverage/ || echo "app-coverage/ directory not found"
+          find app-coverage/ -type f 2>/dev/null || echo "No files in app-coverage/"
+
       - name: Parse coverage reports
         id: coverage
         run: |
@@ -229,22 +240,32 @@ jobs:
           # Function to extract coverage from XML
           get_coverage() {
             local xml_file=$1
+            echo "Checking: $xml_file" >&2
             if [ -f "$xml_file" ]; then
+              echo "File exists, parsing..." >&2
               # Extract line coverage percentage from XML using Python one-liner
               python3 -c "
           import xml.etree.ElementTree as ET
-          tree = ET.parse('$xml_file')
-          root = tree.getroot()
-          counter = root.find(\".//counter[@type='LINE']\")
-          if counter is not None:
-              covered = float(counter.get('covered', 0))
-              missed = float(counter.get('missed', 0))
-              total = covered + missed
-              print(f'{(covered / total * 100):.1f}' if total > 0 else '0.0')
-          else:
+          import sys
+          try:
+              tree = ET.parse('$xml_file')
+              root = tree.getroot()
+              counter = root.find(\".//counter[@type='LINE']\")
+              if counter is not None:
+                  covered = float(counter.get('covered', 0))
+                  missed = float(counter.get('missed', 0))
+                  total = covered + missed
+                  sys.stderr.write(f'Found: covered={covered}, missed={missed}, total={total}\n')
+                  print(f'{(covered / total * 100):.1f}' if total > 0 else '0.0')
+              else:
+                  sys.stderr.write('No LINE counter found in XML\n')
+                  print('0.0')
+          except Exception as e:
+              sys.stderr.write(f'Error parsing XML: {e}\n')
               print('0.0')
-          " 2>/dev/null || echo "0.0"
+          " || echo "0.0"
             else
+              echo "File not found: $xml_file" >&2
               echo "0.0"
             fi
           }
