@@ -23,3 +23,44 @@ dependencies {
     testImplementation "com.j256.ormlite:ormlite-jdbc:5.0"
     testImplementation "com.h2database:h2:1.4.194"
 }
+
+// JaCoCo configuration
+jacoco {
+    toolVersion = "0.8.8"
+}
+
+// Ensure test task has JaCoCo enabled
+test {
+    jacoco {
+        enabled = true
+        destinationFile = file("${buildDir}/jacoco/test.exec")
+        includeNoLocationClasses = true
+        excludes = ['jdk.internal.*']
+    }
+}
+
+jacocoTestReport {
+    dependsOn test
+
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+
+    // Use Gradle's source sets to automatically find the right paths
+    sourceDirectories.setFrom(sourceSets.main.allSource.srcDirs)
+    classDirectories.setFrom(sourceSets.main.output)
+    executionData.setFrom(test.jacoco.destinationFile)
+
+    doFirst {
+        logger.lifecycle("JaCoCo Report Configuration:")
+        logger.lifecycle("  Source dirs: ${sourceDirectories.files}")
+        logger.lifecycle("  Class dirs: ${classDirectories.files}")
+        logger.lifecycle("  Execution data: ${executionData.files}")
+        logger.lifecycle("  Execution data exists: ${test.jacoco.destinationFile.exists()}")
+        if (test.jacoco.destinationFile.exists()) {
+            logger.lifecycle("  Execution data size: ${test.jacoco.destinationFile.length()} bytes")
+        }
+    }
+}

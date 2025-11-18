@@ -56,14 +56,17 @@ jobs:
       uses: gradle/actions/setup-gradle@v4
 
     - name: Build with Gradle
-      run: ./gradlew build jacocoTestReport -PRELEASE --scan
+      run: ./gradlew build -PRELEASE --scan
       env:
         SIGNING_KEYSTORE: ${{ steps.decode_keystore.outputs.filePath }}
         SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
         SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
         SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
 
-    - name: Publish Test Results
+    - name: Run library unit tests with coverage
+      run: ./gradlew :libraries:beers:test :libraries:beers:jacocoTestReport --scan
+
+    - name: Publish Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
       with:
@@ -72,25 +75,13 @@ jobs:
         check_name: Unit Test Results
         comment_mode: off
 
-    - name: Add coverage to PR
-      if: github.event_name == 'pull_request'
-      run: |
-        COVERAGE_REPORT="app/build/reports/jacoco/jacocoTestReport/html/index.html"
-        if [ -f "$COVERAGE_REPORT" ]; then
-          COVERAGE=$(grep -oP 'Total[^%]*\K\d+(?=%)' "$COVERAGE_REPORT" | head -1 || echo "N/A")
-          echo "### 📊 Test Coverage: ${COVERAGE}%" >> $GITHUB_STEP_SUMMARY
-          echo "Coverage report generated successfully" >> $GITHUB_STEP_SUMMARY
-        else
-          echo "### ⚠️ Coverage report not found" >> $GITHUB_STEP_SUMMARY
-        fi
-
-    - name: Archive coverage reports
+    - name: Archive library coverage reports
       uses: actions/upload-artifact@v4
       if: success() || failure()
       with:
-        name: coverage-reports
+        name: library-coverage-reports
         path: |
-          app/build/reports/jacoco/
+          libraries/beers/build/reports/jacoco/
         retention-days: 7
 
     - name: Archive build reports
@@ -179,6 +170,10 @@ jobs:
           disable-animations: true
           script: ./gradlew connectedCheck --scan
 
+      - name: Generate coverage report
+        if: always()
+        run: ./gradlew jacocoTestReport --scan
+
       - name: Publish Instrumented Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
@@ -188,6 +183,15 @@ jobs:
           check_name: Instrumented Test Results
           comment_mode: off
 
+      - name: Archive app coverage reports
+        uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: app-coverage-reports
+          path: |
+            app/build/reports/jacoco/
+          retention-days: 7
+
       - name: Archive test reports
         uses: actions/upload-artifact@v4
         if: success() || failure()
@@ -195,3 +199,36 @@ jobs:
           name: test-reports
           path: ./app/build/reports/androidTests/connected/
           retention-days: 7
+
+  coverage:
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Download library coverage reports
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: library-coverage-reports
+          path: library-coverage/
+
+      - name: Download app coverage reports
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: app-coverage-reports
+          path: app-coverage/
+
+      - name: Add coverage report to PR
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.7.2
+        if: github.event_name == 'pull_request'
+        with:
+          paths: |
+            ${{ github.workspace }}/library-coverage/test/jacocoTestReport.xml,
+            ${{ github.workspace }}/app-coverage/jacocoTestReport/jacocoTestReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 15
+          min-coverage-changed-files: 50
+          title: '📊 JaCoCo Code Coverage'
+          update-comment: true
