@@ -100,7 +100,6 @@ jobs:
         retention-days: 7
 
   test:
-    needs: build
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -136,13 +135,6 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-
-      - name: Download library coverage reports
-        uses: actions/download-artifact@v4
-        continue-on-error: true
-        with:
-          name: library-coverage-reports
-          path: libraries/beers/build/reports/jacoco/
 
       - name: AVD cache
         uses: actions/cache@v4
@@ -191,37 +183,67 @@ jobs:
           check_name: Instrumented Test Results
           comment_mode: off
 
+      - name: Archive app coverage reports
+        uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: app-coverage-reports
+          path: |
+            app/build/reports/jacoco/
+          retention-days: 7
+
+      - name: Archive test reports
+        uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: test-reports
+          path: ./app/build/reports/androidTests/connected/
+          retention-days: 7
+
+  coverage:
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Download library coverage reports
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: library-coverage-reports
+          path: library-coverage/
+
+      - name: Download app coverage reports
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: app-coverage-reports
+          path: app-coverage/
+
       - name: Parse coverage reports
         id: coverage
-        if: always()
         run: |
           # Parse coverage from XML reports
-          APP_XML="app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
-          LIB_XML="libraries/beers/build/reports/jacoco/test/jacocoTestReport.xml"
+          APP_XML="app-coverage/jacocoTestReport/jacocoTestReport.xml"
+          LIB_XML="library-coverage/test/jacocoTestReport.xml"
 
           # Function to extract coverage from XML
           get_coverage() {
             local xml_file=$1
             if [ -f "$xml_file" ]; then
-              # Extract line coverage percentage from XML
-              python3 << EOF
+              # Extract line coverage percentage from XML using Python one-liner
+              python3 -c "
           import xml.etree.ElementTree as ET
-          try:
-              tree = ET.parse('$xml_file')
-              root = tree.getroot()
-              for counter in root.findall(".//counter[@type='LINE']"):
-                  covered = float(counter.get('covered', 0))
-                  missed = float(counter.get('missed', 0))
-                  total = covered + missed
-                  if total > 0:
-                      percentage = (covered / total) * 100
-                      print(f"{percentage:.1f}")
-                      break
-              else:
-                  print("0.0")
-          except Exception as e:
-              print("0.0")
-          EOF
+          tree = ET.parse('$xml_file')
+          root = tree.getroot()
+          counter = root.find(\".//counter[@type='LINE']\")
+          if counter is not None:
+              covered = float(counter.get('covered', 0))
+              missed = float(counter.get('missed', 0))
+              total = covered + missed
+              print(f'{(covered / total * 100):.1f}' if total > 0 else '0.0')
+          else:
+              print('0.0')
+          " 2>/dev/null || echo "0.0"
             else
               echo "0.0"
             fi
@@ -314,20 +336,3 @@ jobs:
                 body: body
               });
             }
-
-      - name: Archive app coverage reports
-        uses: actions/upload-artifact@v4
-        if: success() || failure()
-        with:
-          name: app-coverage-reports
-          path: |
-            app/build/reports/jacoco/
-          retention-days: 7
-
-      - name: Archive test reports
-        uses: actions/upload-artifact@v4
-        if: success() || failure()
-        with:
-          name: test-reports
-          path: ./app/build/reports/androidTests/connected/
-          retention-days: 7
