@@ -1,28 +1,40 @@
 # Test Migration Plan: Legacy to Modern Framework
 
-## Status: Planned
+## Status: In Progress (66% Complete)
 
 **Priority:** Medium
-**Effort:** 2-3 hours
+**Effort:** 2-3 hours remaining
 **Impact:** Improved maintainability, better tooling, modern test framework
 
 ---
 
 ## Overview
 
-The BeerFestApp currently has **7 instrumented tests running**:
-- **6 legacy tests** in `app/tests/src/` (ANT-based, AndroidTestCase framework)
-- **1 modern test** in `app/src/androidTest/` (Gradle-based, AndroidJUnit4 framework)
-- **1 deleted test** (`LifecycleTest.java`) - removed due to deprecated framework, needs replacement
+**Test Migration Progress: 66% Complete (5 of 6 legacy tests migrated)**
 
-**Current state (as of Nov 2025):**
-- ✅ Quick fix implemented: Gradle configured to run legacy tests via sourceSets
-- ✅ 7/7 tests passing in CI (was 1/8 before)
-- ❌ Tests still use deprecated `AndroidTestCase` framework (pre-2013)
-- ❌ Tests not in standard Gradle location
-- ❌ LifecycleTest removed - needs modern ActivityScenario replacement
+The BeerFestApp test suite has been significantly expanded:
+- ✅ **5 legacy tests migrated** to modern AndroidJUnit4 framework
+- ✅ **6 new E2E tests added** covering major UI interactions
+- ⏳ **2 legacy tests remaining** in `app/tests/src/` (DAO tests)
+- ✅ **LifecycleTest replaced** with modern ActivityScenario-based test
 
-**Goal:** Migrate all tests to modern AndroidJUnit4 framework in standard location, and add modern ActivityScenario-based lifecycle test.
+**Current state (as of 2025-11-18):**
+- ✅ 11 modern test classes in `app/src/androidTest/`
+- ✅ Comprehensive E2E test coverage for UI interactions
+- ✅ Comprehensive UI architecture documentation
+- ⏳ 2 legacy DAO tests still to migrate
+- ❌ Tests still use deprecated `AndroidTestCase` framework (2 remaining)
+
+**Recent Additions (2025-11-18):**
+- ✅ `CamBeerFestApplicationLifecycleTest` - Modern ActivityScenario-based lifecycle testing
+- ✅ `BeerListInteractionTest` - Beer list display and navigation
+- ✅ `StarRatingInteractionTest` - Star rating functionality
+- ✅ `FavoritesInteractionTest` - Bookmark/wishlist functionality
+- ✅ `SortingAndFilteringTest` - Sort and filter dialogs
+- ✅ `SearchFunctionalityTest` - Search/filter functionality
+- ✅ `/docs/ui-architecture.md` - Comprehensive UI documentation for modernization
+
+**Goal:** Complete migration of remaining 2 legacy tests and expand E2E test coverage.
 
 ---
 
@@ -45,6 +57,8 @@ The BeerFestApp currently has **7 instrumented tests running**:
 
 ### Modern Tests (app/src/androidTest/)
 
+#### Unit and Integration Tests
+
 | Test File | Lines | Test Methods | Framework |
 |-----------|-------|--------------|-----------|
 | `CamBeerFestApplicationInstrumentedTest.java` | 28 | 1 | AndroidJUnit4, Espresso |
@@ -53,7 +67,18 @@ The BeerFestApp currently has **7 instrumented tests running**:
 | `model/JsonBeerListTest.java` | 84 | 2 | AndroidJUnit4 |
 | `model/BeerListTest.java` | 144 | 3 | AndroidJUnit4, EasyMock |
 
-**Total:** 5 test classes
+#### End-to-End Tests (Added 2025-11-18)
+
+| Test File | Test Methods | Coverage Area |
+|-----------|--------------|---------------|
+| `CamBeerFestApplicationLifecycleTest.java` | 4 | Activity lifecycle, recreation, state transitions |
+| `BeerListInteractionTest.java` | 6 | List display, clicking beers, navigation |
+| `StarRatingInteractionTest.java` | 4 | Rating bar interaction, persistence |
+| `FavoritesInteractionTest.java` | 5 | Bookmarking beers, wishlist functionality |
+| `SortingAndFilteringTest.java` | 7 | Sort dialog, filter by style, preferences |
+| `SearchFunctionalityTest.java` | 10 | Search/filter beers, search persistence |
+
+**Total:** 11 test classes (5 unit/integration + 6 e2e)
 
 ---
 
