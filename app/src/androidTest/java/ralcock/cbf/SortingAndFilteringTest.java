@@ -137,8 +137,6 @@ public class SortingAndFilteringTest {
     public void testSortButtonIsDisplayed() {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
-
-            }
             // Verify sort menu item exists
             // Note: Menu items may not be immediately visible
             // Would need to use openActionBarOverflowOrOptionsMenu() for hidden items
@@ -161,8 +159,6 @@ public class SortingAndFilteringTest {
     public void testClickingSortOpensDialog() {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
-
-            }
             // Click sort menu item
             // Note: This requires Espresso's menu interaction
             // onView(withId(R.id.sort)).perform(click());
@@ -180,8 +176,6 @@ public class SortingAndFilteringTest {
     public void testFilterByStyleButtonIsDisplayed() {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
-
-            }
             // Verify filter menu item exists
             // onView(withId(R.id.showOnlyStyle)).check(matches(isDisplayed()));
         }
@@ -202,8 +196,6 @@ public class SortingAndFilteringTest {
     public void testClickingFilterOpensDialog() {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
-
-            }
             // Click filter menu item
             // onView(withId(R.id.showOnlyStyle)).perform(click());
 
