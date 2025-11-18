@@ -1,17 +1,16 @@
 package ralcock.cbf.model.dao;
 
-import ralcock.cbf.model.Beer;
-import ralcock.cbf.model.Brewery;
+import static org.junit.Assert.*;
 
 import com.j256.ormlite.dao.DaoManager;
-import com.j256.ormlite.table.TableUtils;
-import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
-
+import com.j256.ormlite.support.ConnectionSource;
+import com.j256.ormlite.table.TableUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
+import ralcock.cbf.model.Beer;
+import ralcock.cbf.model.Brewery;
 
 public class BeersImplTest {
 
@@ -24,8 +23,8 @@ public class BeersImplTest {
     }
 
     private static Beer aBeer() {
-        return new  Beer("festivalId", "name", 4.2f,
-                         "description", "style", "status", "cask", aBrewery());
+        return new Beer(
+                "festivalId", "name", 4.2f, "description", "style", "status", "cask", aBrewery());
     }
 
     @Before

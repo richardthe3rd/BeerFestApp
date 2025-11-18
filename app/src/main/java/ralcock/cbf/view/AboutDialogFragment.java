@@ -2,11 +2,11 @@ package ralcock.cbf.view;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.DialogFragment;
 import android.text.Spannable;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
@@ -38,28 +38,34 @@ public class AboutDialogFragment extends DialogFragment {
         TextView festival = (TextView) layout.findViewById(R.id.festivalLink);
         festival.setText(R.string.festival_name, TextView.BufferType.SPANNABLE);
 
-        ClickableSpan clickableSpan = new ClickableSpan() {
-            @Override
-            public void onClick(final View view) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-                        Uri.parse(getResources().getString(R.string.festival_website_url)));
-                startActivity(browserIntent);
-            }
-        };
+        ClickableSpan clickableSpan =
+                new ClickableSpan() {
+                    @Override
+                    public void onClick(final View view) {
+                        Intent browserIntent =
+                                new Intent(
+                                        Intent.ACTION_VIEW,
+                                        Uri.parse(
+                                                getResources()
+                                                        .getString(R.string.festival_website_url)));
+                        startActivity(browserIntent);
+                    }
+                };
         Spannable span = (Spannable) festival.getText();
-        span.setSpan(clickableSpan,
-                0, span.length(),
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        span.setSpan(clickableSpan, 0, span.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         festival.setMovementMethod(LinkMovementMethod.getInstance());
 
         return new AlertDialog.Builder(getActivity())
                 .setTitle(appName)
                 .setView(layout)
-                .setNeutralButton("Close", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialogInterface, final int i) {
-                        dialogInterface.dismiss();
-                    }
-                })
+                .setNeutralButton(
+                        "Close",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(
+                                    final DialogInterface dialogInterface, final int i) {
+                                dialogInterface.dismiss();
+                            }
+                        })
                 .create();
     }
 }

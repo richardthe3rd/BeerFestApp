@@ -2,9 +2,8 @@ package ralcock.cbf.model;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import ralcock.cbf.model.dao.BreweriesImpl;
-
 import java.io.Serializable;
+import ralcock.cbf.model.dao.BreweriesImpl;
 
 @DatabaseTable(tableName = Brewery.TABLE_NAME, daoClass = BreweriesImpl.class)
 public final class Brewery implements Serializable {
@@ -28,9 +27,8 @@ public final class Brewery implements Serializable {
     private String fDescription;
 
     @SuppressWarnings("UnusedDeclaration")
-        // needed by ormlite
-    Brewery() {
-    }
+    // needed by ormlite
+    Brewery() {}
 
     public Brewery(final String festivalId, final String name, final String description) {
         fFestivalID = festivalId;
@@ -65,9 +63,12 @@ public final class Brewery implements Serializable {
 
         final Brewery brewery = (Brewery) o;
 
-        if (fDescription != null ? !fDescription.equals(brewery.fDescription) : brewery.fDescription != null)
-            return false;
-        if (fFestivalID != null ? !fFestivalID.equals(brewery.fFestivalID) : brewery.fFestivalID != null) return false;
+        if (fDescription != null
+                ? !fDescription.equals(brewery.fDescription)
+                : brewery.fDescription != null) return false;
+        if (fFestivalID != null
+                ? !fFestivalID.equals(brewery.fFestivalID)
+                : brewery.fFestivalID != null) return false;
         if (fName != null ? !fName.equals(brewery.fName) : brewery.fName != null) return false;
 
         return true;
@@ -92,5 +93,4 @@ public final class Brewery implements Serializable {
         sb.append('}');
         return sb.toString();
     }
-
 }

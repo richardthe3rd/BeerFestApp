@@ -7,12 +7,10 @@ import com.j256.ormlite.stmt.SelectArg;
 import com.j256.ormlite.stmt.UpdateBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.DatabaseTableConfig;
-import ralcock.cbf.model.Brewery;
-
+import java.sql.SQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.SQLException;
+import ralcock.cbf.model.Brewery;
 
 public class BreweriesImpl extends BaseDaoImpl<Brewery, Long> implements Breweries {
 
@@ -24,12 +22,14 @@ public class BreweriesImpl extends BaseDaoImpl<Brewery, Long> implements Breweri
     }
 
     @SuppressWarnings("UnusedDeclaration")
-    public BreweriesImpl(final ConnectionSource connectionSource, DatabaseTableConfig<Brewery> config) throws SQLException {
+    public BreweriesImpl(
+            final ConnectionSource connectionSource, DatabaseTableConfig<Brewery> config)
+            throws SQLException {
         super(connectionSource, config);
     }
 
     public QueryBuilder<Brewery, Long> buildFilteredBreweryQuery(final CharSequence filterText) {
-        SelectArg filterTextArg = new SelectArg("%"+filterText+"%");
+        SelectArg filterTextArg = new SelectArg("%" + filterText + "%");
         QueryBuilder<Brewery, Long> qb = queryBuilder();
         qb.selectColumns(Brewery.ID_FIELD);
         try {
@@ -70,5 +70,4 @@ public class BreweriesImpl extends BaseDaoImpl<Brewery, Long> implements Breweri
             create(brewery);
         }
     }
-
 }

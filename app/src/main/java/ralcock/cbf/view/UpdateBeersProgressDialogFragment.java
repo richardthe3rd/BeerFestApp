@@ -1,9 +1,9 @@
 package ralcock.cbf.view;
 
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.app.DialogFragment;
 import ralcock.cbf.R;
 
 // TODO: Migrate from deprecated android.app.DialogFragment to androidx.fragment.app.DialogFragment

@@ -1,26 +1,22 @@
 package ralcock.cbf.model.dao;
 
-import android.content.Context;
+import static org.junit.Assert.assertEquals;
 
+import android.content.Context;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.runner.AndroidJUnit4;
-
+import java.sql.SQLException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import ralcock.cbf.model.BeerDatabaseHelper;
 import ralcock.cbf.model.Brewery;
-
-import java.sql.SQLException;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Modern AndroidJUnit4 tests for Breweries DAO.
  *
- * Tests database operations including brewery creation, updates, and special character handling.
+ * <p>Tests database operations including brewery creation, updates, and special character handling.
  * Migrated from legacy AndroidTestCase framework (2025-11-18).
  */
 @RunWith(AndroidJUnit4.class)
@@ -66,7 +62,6 @@ public class BreweriesImplTest {
 
         fBreweries.refresh(brewery);
         assertEquals(brewery.getName(), "NAME2");
-
     }
 
     @Test

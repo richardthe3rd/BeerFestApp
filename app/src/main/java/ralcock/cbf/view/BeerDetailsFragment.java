@@ -1,24 +1,24 @@
 package ralcock.cbf.view;
 
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
 import android.text.Spannable;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.ImageView;
-import android.view.View.OnClickListener;
+import androidx.fragment.app.Fragment;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
+import java.util.Locale;
 import ralcock.cbf.R;
 import ralcock.cbf.actions.BeerSearcher;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerDatabaseHelper;
 import ralcock.cbf.model.StarRating;
-import java.util.Locale;
 
 public class BeerDetailsFragment extends Fragment {
     private BeerDetailsView fBeerDetailsView;
@@ -26,14 +26,15 @@ public class BeerDetailsFragment extends Fragment {
 
     private BeerDatabaseHelper getHelper() {
         if (fDBHelper == null) {
-            fDBHelper = OpenHelperManager.getHelper(getActivity(),
-                    BeerDatabaseHelper.class);
+            fDBHelper = OpenHelperManager.getHelper(getActivity(), BeerDatabaseHelper.class);
         }
         return fDBHelper;
     }
 
     @Override
-    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+    public View onCreateView(
+            final LayoutInflater inflater,
+            final ViewGroup container,
             final Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.beer_details_fragment, container, false);
         fBeerDetailsView = new BeerDetailsView(view);
@@ -48,7 +49,8 @@ public class BeerDetailsFragment extends Fragment {
     }
 
     public void displayBeer(final Beer beer) {
-        fBeerDetailsView.BeerNameAndAbv.setText(String.format(Locale.US, "%s (%.1f%%)", beer.getName(), beer.getAbv()));
+        fBeerDetailsView.BeerNameAndAbv.setText(
+                String.format(Locale.US, "%s (%.1f%%)", beer.getName(), beer.getAbv()));
         fBeerDetailsView.BeerDescription.setText(beer.getDescription());
         fBeerDetailsView.BeerStyle.setText(beer.getStyle());
 
@@ -62,37 +64,39 @@ public class BeerDetailsFragment extends Fragment {
 
         fBeerDetailsView.BeerRatingBar.setRating(beer.getRating());
 
-        fBeerDetailsView.BeerRatingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
-            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                if (fromUser)
-                    rateBeer(beer, new StarRating(rating));
-            }
-        });
+        fBeerDetailsView.BeerRatingBar.setOnRatingBarChangeListener(
+                new RatingBar.OnRatingBarChangeListener() {
+                    public void onRatingChanged(
+                            RatingBar ratingBar, float rating, boolean fromUser) {
+                        if (fromUser) rateBeer(beer, new StarRating(rating));
+                    }
+                });
 
         if (beer.isIsOnWishList()) {
             fBeerDetailsView.BookmarkImage.setImageResource(R.drawable.ic_bookmark_black_48dp);
         } else {
-            fBeerDetailsView.BookmarkImage.setImageResource(R.drawable.ic_bookmark_border_black_48dp);
+            fBeerDetailsView.BookmarkImage.setImageResource(
+                    R.drawable.ic_bookmark_border_black_48dp);
         }
 
-        fBeerDetailsView.BookmarkImage.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleBookmark(beer);
-            }
-        });
+        fBeerDetailsView.BookmarkImage.setOnClickListener(
+                new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        toggleBookmark(beer);
+                    }
+                });
 
-        ClickableSpan clickableSpan = new ClickableSpan() {
-            @Override
-            public void onClick(final View view) {
-                BeerSearcher beerSearcher = new BeerSearcher(getActivity());
-                beerSearcher.searchBeer(beer);
-            }
-        };
+        ClickableSpan clickableSpan =
+                new ClickableSpan() {
+                    @Override
+                    public void onClick(final View view) {
+                        BeerSearcher beerSearcher = new BeerSearcher(getActivity());
+                        beerSearcher.searchBeer(beer);
+                    }
+                };
         Spannable span = (Spannable) fBeerDetailsView.SearchOnline.getText();
-        span.setSpan(clickableSpan,
-                0, span.length(),
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        span.setSpan(clickableSpan, 0, span.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
     private void rateBeer(Beer beer, StarRating rating) {

@@ -1,11 +1,10 @@
 package ralcock.cbf.model;
 
-import ralcock.cbf.model.dao.Beers;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import ralcock.cbf.model.dao.Beers;
 
 public class BeerList {
 
@@ -15,14 +14,13 @@ public class BeerList {
     }
 
     public static class Config {
-        public Config() {
+        public Config() {}
 
-        }
-
-        public Config(final SortOrder sortOrder,
-                      final CharSequence searchText,
-                      final Set<String> stylesToHide,
-                      final StatusToShow statusToShow) {
+        public Config(
+                final SortOrder sortOrder,
+                final CharSequence searchText,
+                final Set<String> stylesToHide,
+                final StatusToShow statusToShow) {
             SortOrder = sortOrder;
             SearchText = searchText;
             StylesToHide = stylesToHide;
@@ -50,7 +48,6 @@ public class BeerList {
         }
     }
 
-
     private final Beers fBeers;
 
     private final Type fType;
@@ -63,6 +60,7 @@ public class BeerList {
     private Set<String> fStatusToHide;
 
     private static final Set<String> UNAVAILABLE_STATUS_SET;
+
     static {
         Set<String> set = new HashSet<>();
         set.add("Ordered");
@@ -71,9 +69,7 @@ public class BeerList {
         UNAVAILABLE_STATUS_SET = Collections.unmodifiableSet(set);
     }
 
-    public BeerList(final Beers beers,
-                    final Type type,
-                    final Config config) {
+    public BeerList(final Beers beers, final Type type, final Config config) {
         fBeers = beers;
         fType = type;
         fSortOrder = config.SortOrder;
@@ -124,10 +120,11 @@ public class BeerList {
         return fBeerList.get(i);
     }
 
-    private List<Beer> buildList(final SortOrder sortOrder,
-                                 final CharSequence filterText,
-                                 final Set<String> stylesToHide,
-                                 final Set<String> statusToHide) {
+    private List<Beer> buildList(
+            final SortOrder sortOrder,
+            final CharSequence filterText,
+            final Set<String> stylesToHide,
+            final Set<String> statusToHide) {
         if (fType == Type.ALL)
             return fBeers.allBeersList(sortOrder, filterText, stylesToHide, statusToHide);
         else {
@@ -135,14 +132,11 @@ public class BeerList {
         }
     }
 
-    public static BeerList allBeers(final Beers beers,
-                                    final Config config) {
+    public static BeerList allBeers(final Beers beers, final Config config) {
         return new BeerList(beers, Type.ALL, config);
     }
 
-    public static BeerList bookmarkedBeers(final Beers beers,
-                                           final Config config) {
+    public static BeerList bookmarkedBeers(final Beers beers, final Config config) {
         return new BeerList(beers, Type.BOOKMARKS, config);
     }
-
 }

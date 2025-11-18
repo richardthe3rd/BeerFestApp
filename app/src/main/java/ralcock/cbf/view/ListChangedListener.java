@@ -1,9 +1,8 @@
 package ralcock.cbf.view;
 
+import java.util.Set;
 import ralcock.cbf.model.SortOrder;
 import ralcock.cbf.model.StatusToShow;
-
-import java.util.Set;
 
 public interface ListChangedListener {
     void filterTextChanged(String filterText);

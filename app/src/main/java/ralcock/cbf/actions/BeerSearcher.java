@@ -9,7 +9,7 @@ public class BeerSearcher {
     private final Context fContext;
 
     public BeerSearcher(final Context context) {
-        //To change body of created methods use File | Settings | File Templates.
+        // To change body of created methods use File | Settings | File Templates.
         fContext = context;
     }
 

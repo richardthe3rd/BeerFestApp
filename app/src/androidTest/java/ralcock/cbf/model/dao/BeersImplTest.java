@@ -1,33 +1,29 @@
 package ralcock.cbf.model.dao;
 
-import android.content.Context;
+import static org.junit.Assert.assertEquals;
 
+import android.content.Context;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.runner.AndroidJUnit4;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import ralcock.cbf.model.Beer;
-import ralcock.cbf.model.BeerDatabaseHelper;
-import ralcock.cbf.model.Brewery;
-import ralcock.cbf.model.SortOrder;
-
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import ralcock.cbf.model.Beer;
+import ralcock.cbf.model.BeerDatabaseHelper;
+import ralcock.cbf.model.Brewery;
+import ralcock.cbf.model.SortOrder;
 
 /**
  * Modern AndroidJUnit4 tests for Beers DAO.
  *
- * Tests database operations including filtering and style queries.
- * Migrated from legacy AndroidTestCase framework (2025-11-18).
+ * <p>Tests database operations including filtering and style queries. Migrated from legacy
+ * AndroidTestCase framework (2025-11-18).
  */
 @RunWith(AndroidJUnit4.class)
 public class BeersImplTest {
@@ -62,7 +58,16 @@ public class BeersImplTest {
         fBeer1 = new Beer("1", "A Mild", 1f, "description1", fStyle1, "status1", "cask", brewery);
         fBeers.create(fBeer1);
 
-        fBeer2 = new Beer("2", "A Best Bitter", 2f, "description2", fStyle2, "status2", "cask", brewery);
+        fBeer2 =
+                new Beer(
+                        "2",
+                        "A Best Bitter",
+                        2f,
+                        "description2",
+                        fStyle2,
+                        "status2",
+                        "cask",
+                        brewery);
         fBeers.create(fBeer2);
 
         fBeer3 = new Beer("3", "A Stout", 3f, "description3", fStyle2, "status3", "cask", brewery2);
@@ -81,7 +86,9 @@ public class BeersImplTest {
         }
     }
 
-    private List<Beer> doQuery(SortOrder sortOrder, CharSequence filterText, Set<String> stylesToHide) throws SQLException {
+    private List<Beer> doQuery(
+            SortOrder sortOrder, CharSequence filterText, Set<String> stylesToHide)
+            throws SQLException {
         return fBeers.allBeersList(sortOrder, filterText, stylesToHide, stylesToHide);
     }
 
@@ -108,5 +115,4 @@ public class BeersImplTest {
         styles.add("style2");
         assertEquals(styles, fBeers.getAvailableStyles());
     }
-
 }

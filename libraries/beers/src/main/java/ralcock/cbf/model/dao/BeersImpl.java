@@ -9,20 +9,18 @@ import com.j256.ormlite.stmt.UpdateBuilder;
 import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.DatabaseTableConfig;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.CopyOnWriteArrayList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerChangedListener;
 import ralcock.cbf.model.Brewery;
 import ralcock.cbf.model.SortOrder;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
 
@@ -30,10 +28,11 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
 
     private Breweries fBreweries;
 
-    private final CopyOnWriteArrayList<BeerChangedListener> fListeners
-        = new CopyOnWriteArrayList<BeerChangedListener>();
+    private final CopyOnWriteArrayList<BeerChangedListener> fListeners =
+            new CopyOnWriteArrayList<BeerChangedListener>();
 
-    private static BeerAccessException newBeerAccessException(final String msg, final Throwable cause) {
+    private static BeerAccessException newBeerAccessException(
+            final String msg, final Throwable cause) {
         LoggerFactory.getLogger(BeersImpl.class).error(msg, cause);
         return new BeerAccessException(msg, cause);
     }
@@ -44,7 +43,8 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
     }
 
     @SuppressWarnings("UnusedDeclaration")
-    public BeersImpl(final ConnectionSource connectionSource, DatabaseTableConfig<Beer> config) throws SQLException {
+    public BeersImpl(final ConnectionSource connectionSource, DatabaseTableConfig<Beer> config)
+            throws SQLException {
         super(connectionSource, config);
     }
 
@@ -126,16 +126,18 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
     }
 
     private void fireBeerChanged(final Beer beer) {
-        for(BeerChangedListener l : fListeners) {
+        for (BeerChangedListener l : fListeners) {
             l.beerChanged(beer);
         }
     }
 
-    public List<Beer> allBeersList(final SortOrder sortOrder,
-                                   final CharSequence filterText,
-                                   final Set<String> stylesToHide,
-                                   final Set<String> statusToHide) {
-        QueryBuilder<Beer, Long> query = buildSortedFilteredBeerQuery(sortOrder, filterText, stylesToHide, statusToHide);
+    public List<Beer> allBeersList(
+            final SortOrder sortOrder,
+            final CharSequence filterText,
+            final Set<String> stylesToHide,
+            final Set<String> statusToHide) {
+        QueryBuilder<Beer, Long> query =
+                buildSortedFilteredBeerQuery(sortOrder, filterText, stylesToHide, statusToHide);
         try {
             return query.query();
         } catch (SQLException e) {
@@ -143,11 +145,13 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
         }
     }
 
-    public List<Beer> bookmarkedBeersList(final SortOrder sortOrder,
-                                          final CharSequence filterText,
-                                          final Set<String> stylesToHide,
-                                          final Set<String> statusToHide) {
-        QueryBuilder<Beer, Long> query = buildBookmarkQuery(sortOrder, filterText, stylesToHide, statusToHide);
+    public List<Beer> bookmarkedBeersList(
+            final SortOrder sortOrder,
+            final CharSequence filterText,
+            final Set<String> stylesToHide,
+            final Set<String> statusToHide) {
+        QueryBuilder<Beer, Long> query =
+                buildBookmarkQuery(sortOrder, filterText, stylesToHide, statusToHide);
         try {
             return query.query();
         } catch (SQLException e) {
@@ -155,10 +159,11 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
         }
     }
 
-    private QueryBuilder<Beer, Long> buildBookmarkQuery(final SortOrder sortOrder,
-                                                        final CharSequence filterText,
-                                                        final Set<String> stylesToHide,
-                                                        final Set<String> statusToHide) {
+    private QueryBuilder<Beer, Long> buildBookmarkQuery(
+            final SortOrder sortOrder,
+            final CharSequence filterText,
+            final Set<String> stylesToHide,
+            final Set<String> statusToHide) {
         QueryBuilder<Beer, Long> qb = queryBuilder();
         Where where = qb.where();
         try {
@@ -171,10 +176,11 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
         }
     }
 
-    private QueryBuilder<Beer, Long> buildSortedFilteredBeerQuery(final SortOrder sortOrder,
-                                                                  final CharSequence filterText,
-                                                                  final Set<String> stylesToHide,
-                                                                  final Set<String> statusToHide) {
+    private QueryBuilder<Beer, Long> buildSortedFilteredBeerQuery(
+            final SortOrder sortOrder,
+            final CharSequence filterText,
+            final Set<String> stylesToHide,
+            final Set<String> statusToHide) {
         QueryBuilder<Beer, Long> qb = queryBuilder();
         Where where = qb.where();
         try {
@@ -186,15 +192,17 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
         }
     }
 
-    private static void doWhere(final Where where,
-                                final Breweries breweries,
-                                final CharSequence filterText,
-                                final Set<String> stylesToHide,
-                                final Set<String> statusToHide) throws SQLException {
+    private static void doWhere(
+            final Where where,
+            final Breweries breweries,
+            final CharSequence filterText,
+            final Set<String> stylesToHide,
+            final Set<String> statusToHide)
+            throws SQLException {
         //noinspection unchecked
-        SelectArg nameFilter = new SelectArg("%"+filterText+"%");
-        SelectArg styleFilter = new SelectArg("%"+filterText+"%");
-        SelectArg descFilter = new SelectArg("%"+filterText+"%");
+        SelectArg nameFilter = new SelectArg("%" + filterText + "%");
+        SelectArg styleFilter = new SelectArg("%" + filterText + "%");
+        SelectArg descFilter = new SelectArg("%" + filterText + "%");
         where.and(
                 where.not().in(Beer.STATUS_FIELD, statusToHide),
                 where.not().in(Beer.STYLE_FIELD, stylesToHide),
@@ -202,11 +210,10 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
                         where.or(
                                 where.like(Beer.NAME_FIELD, nameFilter),
                                 where.like(Beer.STYLE_FIELD, styleFilter),
-                                where.like(Beer.DESCRIPTION_FIELD, descFilter)
-                        ),
-                        where.in(Beer.BREWERY_FIELD, breweries.buildFilteredBreweryQuery(filterText))
-                )
-        );
+                                where.like(Beer.DESCRIPTION_FIELD, descFilter)),
+                        where.in(
+                                Beer.BREWERY_FIELD,
+                                breweries.buildFilteredBreweryQuery(filterText))));
     }
 
     public void updateFromFestivalOrCreate(final Beer festivalBeerDescription) {
@@ -219,7 +226,11 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
             try {
                 doUpdateOrCreate(festivalBeerDescription);
             } catch (SQLException e) {
-                throw newBeerAccessException("Failed to update beer " + festivalBeerDescription + " from festival description", e);
+                throw newBeerAccessException(
+                        "Failed to update beer "
+                                + festivalBeerDescription
+                                + " from festival description",
+                        e);
             }
         }
     }

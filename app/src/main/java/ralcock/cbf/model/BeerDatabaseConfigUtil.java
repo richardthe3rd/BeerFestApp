@@ -1,7 +1,6 @@
 package ralcock.cbf.model;
 
 import com.j256.ormlite.android.apptools.OrmLiteConfigUtil;
-
 import java.io.IOException;
 import java.sql.SQLException;
 

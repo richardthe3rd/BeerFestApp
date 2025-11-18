@@ -2,22 +2,17 @@ package ralcock.cbf.model;
 
 import android.content.Context;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
-import ralcock.cbf.model.BeerDatabaseHelper;
-import ralcock.cbf.model.dao.Beers;
-import ralcock.cbf.model.Beer;
-
 import java.util.Set;
+import ralcock.cbf.model.dao.Beers;
 
-public class BeerAccessor
-{
+public class BeerAccessor {
     private final Context fContext;
     private BeerDatabaseHelper fDBHelper;
 
-    public BeerAccessor(Context context)
-    {
+    public BeerAccessor(Context context) {
         fContext = context;
-
     }
+
     private BeerDatabaseHelper getHelper() {
         if (fDBHelper == null) {
             fDBHelper = OpenHelperManager.getHelper(fContext, BeerDatabaseHelper.class);
@@ -28,6 +23,7 @@ public class BeerAccessor
     public Set<String> getAvailableStyles() {
         return getBeers().getAvailableStyles();
     }
+
     public Beers getBeers() {
         return getHelper().getBeers();
     }
@@ -40,11 +36,9 @@ public class BeerAccessor
         getBeers().updateBeer(beer);
     }
 
-    public void release(){
+    public void release() {
         if (fDBHelper != null) {
             OpenHelperManager.releaseHelper();
         }
     }
-
-
 }
