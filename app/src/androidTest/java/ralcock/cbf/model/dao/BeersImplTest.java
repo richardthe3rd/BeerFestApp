@@ -1,8 +1,15 @@
 package ralcock.cbf.model.dao;
 
+import android.content.Context;
 
-import android.test.AndroidTestCase;
-import android.test.RenamingDelegatingContext;
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.runner.AndroidJUnit4;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerDatabaseHelper;
 import ralcock.cbf.model.Brewery;
@@ -14,10 +21,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class BeersImplTest extends AndroidTestCase {
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Modern AndroidJUnit4 tests for Beers DAO.
+ *
+ * Tests database operations including filtering and style queries.
+ * Migrated from legacy AndroidTestCase framework (2025-11-18).
+ */
+@RunWith(AndroidJUnit4.class)
+public class BeersImplTest {
     private BeerDatabaseHelper fBeerDatabaseHelper;
     private Beers fBeers;
-    private RenamingDelegatingContext fContext;
+    private Context fContext;
 
     private Beer fBeer1;
     private Beer fBeer2;
@@ -27,11 +43,9 @@ public class BeersImplTest extends AndroidTestCase {
     private String fStyle2 = "style2";
     private Breweries fBreweries;
 
-    @Override
+    @Before
     public void setUp() throws Exception {
-        super.setUp();
-        fContext = new RenamingDelegatingContext(getContext(),
-                BeersImplTest.class.getSimpleName() + ".");
+        fContext = ApplicationProvider.getApplicationContext();
         fBeerDatabaseHelper = new BeerDatabaseHelper(fContext);
         fBeers = fBeerDatabaseHelper.getBeers();
         fBreweries = fBeerDatabaseHelper.getBreweries();
@@ -57,17 +71,21 @@ public class BeersImplTest extends AndroidTestCase {
         assertEquals(3, fBeers.getNumberOfBeers());
     }
 
-    @Override
+    @After
     public void tearDown() throws Exception {
-        super.tearDown();
-        fBeerDatabaseHelper.close();
-        fContext.deleteDatabase(BeerDatabaseHelper.DATABASE_NAME);
+        if (fBeerDatabaseHelper != null) {
+            fBeerDatabaseHelper.close();
+        }
+        if (fContext != null) {
+            fContext.deleteDatabase(BeerDatabaseHelper.DATABASE_NAME);
+        }
     }
 
     private List<Beer> doQuery(SortOrder sortOrder, CharSequence filterText, Set<String> stylesToHide) throws SQLException {
         return fBeers.allBeersList(sortOrder, filterText, stylesToHide, stylesToHide);
     }
 
+    @Test
     public void testFiltering() throws Exception {
         Set<String> showAllStyles = Collections.emptySet();
         {
@@ -83,6 +101,7 @@ public class BeersImplTest extends AndroidTestCase {
         }
     }
 
+    @Test
     public void testGetAvailableStyles() throws Exception {
         Set<String> styles = new HashSet<String>();
         styles.add("style1");

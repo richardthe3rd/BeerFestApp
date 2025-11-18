@@ -1,22 +1,37 @@
 package ralcock.cbf.model.dao;
 
-import android.test.AndroidTestCase;
-import android.test.RenamingDelegatingContext;
+import android.content.Context;
+
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.runner.AndroidJUnit4;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import ralcock.cbf.model.BeerDatabaseHelper;
 import ralcock.cbf.model.Brewery;
 
 import java.sql.SQLException;
 
-public class BreweriesImplTest extends AndroidTestCase {
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Modern AndroidJUnit4 tests for Breweries DAO.
+ *
+ * Tests database operations including brewery creation, updates, and special character handling.
+ * Migrated from legacy AndroidTestCase framework (2025-11-18).
+ */
+@RunWith(AndroidJUnit4.class)
+public class BreweriesImplTest {
     private BeerDatabaseHelper fBeerDatabaseHelper;
     private Breweries fBreweries;
-    private RenamingDelegatingContext fContext;
+    private Context fContext;
 
-    @Override
+    @Before
     public void setUp() throws Exception {
-        super.setUp();
-        fContext = new RenamingDelegatingContext(getContext(),
-                BreweriesImplTest.class.getSimpleName() + ".");
+        fContext = ApplicationProvider.getApplicationContext();
         fBeerDatabaseHelper = new BeerDatabaseHelper(fContext);
         fBreweries = fBeerDatabaseHelper.getBreweries();
 
@@ -24,18 +39,23 @@ public class BreweriesImplTest extends AndroidTestCase {
         fBeerDatabaseHelper.deleteAll();
     }
 
-    @Override
+    @After
     public void tearDown() throws Exception {
-        super.tearDown();
-        fBeerDatabaseHelper.close();
-        fContext.deleteDatabase(BeerDatabaseHelper.DATABASE_NAME);
+        if (fBeerDatabaseHelper != null) {
+            fBeerDatabaseHelper.close();
+        }
+        if (fContext != null) {
+            fContext.deleteDatabase(BeerDatabaseHelper.DATABASE_NAME);
+        }
     }
 
+    @Test
     public void testWithQuote() throws Exception {
         Brewery brewery = new Brewery("ID1", "Quote's Brewery", "NOTES");
         fBreweries.create(brewery);
     }
 
+    @Test
     public void testUpdateFromFestival() throws Exception {
         // Create Brewery in DB
         Brewery brewery = new Brewery("ID1", "NAME", "DESCRIPTION");
@@ -49,6 +69,7 @@ public class BreweriesImplTest extends AndroidTestCase {
 
     }
 
+    @Test
     public void testUpdateFromFestivalNew() throws SQLException {
         Brewery brewery = new Brewery("ID", "NAME", "DESCRIPTION");
         fBreweries.updateFromFestivalOrCreate(brewery);
