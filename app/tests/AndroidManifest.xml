@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Legacy test manifest for app/tests/ directory
-     Namespace is defined in app/build.gradle, not here (Gradle 8.0+ requirement)
-     Test instrumentation runner is configured in build.gradle defaultConfig
--->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Minimal manifest for legacy tests - configuration is in build.gradle -->
-</manifest>

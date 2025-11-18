@@ -26,7 +26,7 @@ dependencies {
     androidTestImplementation 'androidx.test:core:1.4.0'
     androidTestImplementation 'junit:junit:4.13.2'
 
-    // Legacy test dependencies for app/tests/ directory
+    // Additional test dependencies
     androidTestImplementation 'androidx.legacy:legacy-support-v4:1.0.0'
     androidTestImplementation 'android.arch.core:core-testing:1.1.1'
     androidTestImplementation 'org.easymock:easymock:3.6'
@@ -35,11 +35,6 @@ dependencies {
 android {
     compileSdkVersion 33
     namespace 'ralcock.cbf'
-
-    // Include deprecated android.test.* classes for legacy tests
-    useLibrary 'android.test.runner'
-    useLibrary 'android.test.base'
-    useLibrary 'android.test.mock'
 
     defaultConfig {
            versionCode 27
@@ -50,14 +45,6 @@ android {
 
            testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
        }
-
-    sourceSets {
-        androidTest {
-            java.srcDirs += ['tests/src']
-            resources.srcDirs += ['tests/src']
-            manifest.srcFile 'tests/AndroidManifest.xml'
-        }
-    }
 
     lint {
         abortOnError false
