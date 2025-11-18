@@ -102,20 +102,14 @@ tasks.register('jacocoTestReport', JacocoReport) {
 
     def mainSrc = "${project.projectDir}/src/main/java"
 
-    // Collect class files from multiple possible locations
-    def classPaths = [
-        "${buildDir}/intermediates/javac/debug/classes",
-        "${buildDir}/intermediates/javac/debug",
-        "${buildDir}/tmp/kotlin-classes/debug"
-    ].collect { path ->
-        fileTree(dir: path, excludes: fileFilter) {
-            // Only include if directory exists
-            it.include '**/*.class'
-        }
-    }
+    // Define the primary location for compiled classes
+    def javaClasses = fileTree(
+        dir: "${buildDir}/intermediates/javac/debug/classes",
+        excludes: fileFilter
+    )
 
     sourceDirectories.setFrom(files([mainSrc]))
-    classDirectories.setFrom(files(classPaths))
+    classDirectories.setFrom(files([javaClasses]))
 
     // Collect execution data from instrumented tests (.ec files)
     executionData.setFrom(fileTree(dir: buildDir, includes: [
