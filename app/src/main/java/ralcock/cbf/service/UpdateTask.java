@@ -21,6 +21,13 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.concurrent.Callable;
 
+// TODO: Migrate from deprecated AsyncTask to WorkManager or Kotlin Coroutines
+// AsyncTask was deprecated in API 30 (Android 11)
+// Recommended alternatives:
+//   - WorkManager for deferrable background work
+//   - Kotlin Coroutines for asynchronous operations
+//   - ExecutorService with Handler for simple background tasks
+@SuppressWarnings("deprecation")
 public class UpdateTask extends AsyncTask<UpdateTask.Params, UpdateTask.Progress, UpdateTask.Result> {
 
     private static final String TAG = UpdateTask.class.getName();

@@ -53,6 +53,10 @@ public class CamBeerFestApplication extends AppCompatActivity {
 
     private final List<ListChangedListener> fListChangedListeners = new CopyOnWriteArrayList<ListChangedListener>();
 
+    // TODO: Migrate from deprecated LocalBroadcastManager to LiveData or other alternatives
+    // LocalBroadcastManager was deprecated in AndroidX 1.1.0
+    // Recommended alternatives: LiveData, StateFlow, or direct callbacks
+    @SuppressWarnings("deprecation")
     private LocalBroadcastManager fLocalBroadcastManager;
     private BroadcastReceiver fBroadcastReceiver;
 
@@ -66,6 +70,7 @@ public class CamBeerFestApplication extends AppCompatActivity {
      * Called when the activity is first created.
      */
     @Override
+    @SuppressWarnings("deprecation")
     public void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "In onCreate");
 
@@ -134,6 +139,7 @@ public class CamBeerFestApplication extends AppCompatActivity {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     protected void onResume() {
         Log.d(TAG, "In onResume");
         super.onResume();
@@ -147,6 +153,7 @@ public class CamBeerFestApplication extends AppCompatActivity {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     protected void onPause() {
         Log.d(TAG, "In onPause");
         fLocalBroadcastManager.unregisterReceiver(fBroadcastReceiver);

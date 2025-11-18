@@ -62,11 +62,14 @@ public class BeerList {
     private Set<String> fFilterStyles;
     private Set<String> fStatusToHide;
 
-    private static final Set<String> UNAVAILABLE_STATUS_SET = new HashSet<String>() {{
-        add("Ordered");
-        add("Arrived");
-        add("Sold Out");
-    }};
+    private static final Set<String> UNAVAILABLE_STATUS_SET;
+    static {
+        Set<String> set = new HashSet<>();
+        set.add("Ordered");
+        set.add("Arrived");
+        set.add("Sold Out");
+        UNAVAILABLE_STATUS_SET = Collections.unmodifiableSet(set);
+    }
 
     public BeerList(final Beers beers,
                     final Type type,
