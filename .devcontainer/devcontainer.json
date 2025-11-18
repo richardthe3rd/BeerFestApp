@@ -38,7 +38,8 @@
 				"arahata.linter-actionlint",
 				"fnando.linter",
 				"ms-azuretools.vscode-docker",
-				"vscjava.vscode-gradle"
+				"vscjava.vscode-gradle",
+				"github.vscode-github-actions"
 			]
 		}
 	}
