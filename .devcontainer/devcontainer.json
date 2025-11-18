@@ -6,6 +6,8 @@
 	"build": {"dockerfile": "Dockerfile"},
 
 	"features": {
+	   "ghcr.io/atty303/devcontainer-features/mise:1": {
+	    },
 		"ghcr.io/devcontainers/features/java:1": {
 			"installGradle": true,
 			"version": "17",
@@ -34,12 +36,16 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"vscjava.vscode-java-pack",
+				"anthropic.claude-code",
 				"arahata.linter-actionlint",
 				"fnando.linter",
+				"github.vscode-github-actions",
+				"hverlin.mise-vscode",
 				"ms-azuretools.vscode-docker",
+				"tamasfe.even-better-toml",
+				"Upstash.context7-mcp",
 				"vscjava.vscode-gradle",
-				"github.vscode-github-actions"
+				"vscjava.vscode-java-pack"				
 			]
 		}
 	}
