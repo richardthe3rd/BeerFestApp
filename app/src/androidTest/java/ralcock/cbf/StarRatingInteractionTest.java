@@ -180,49 +180,4 @@ public class StarRatingInteractionTest {
             // or reset a beer's rating before checking
         }
     }
-
-    /**
-     * Documentation test - verifies understanding of rating system.
-     * Not a real test, but documents the rating implementation.
-     */
-    @Test
-    public void documentRatingSystemImplementation() {
-        /*
-         * RATING SYSTEM IMPLEMENTATION DETAILS:
-         *
-         * 1. Data Model:
-         *    - Beer.java has fields: fNumberOfStars (int)
-         *    - StarRating.java wraps the int value with validation (0-5)
-         *    - Database: OrmLite persists to SQLite 'beers' table
-         *
-         * 2. UI Components:
-         *    - beer_listitem.xml: Small RatingBar (read-only indicator)
-         *    - beer_details_fragment.xml: Large RatingBar (interactive)
-         *
-         * 3. Event Flow:
-         *    a. User drags/taps rating bar in details view
-         *    b. OnRatingBarChangeListener.onRatingChanged() called
-         *    c. if (fromUser) check prevents programmatic updates from triggering saves
-         *    d. rateBeer(beer, new StarRating(rating)) called
-         *    e. beer.setNumberOfStars(rating) updates model
-         *    f. getHelper().getBeers().updateBeer(beer) persists to DB
-         *    g. displayBeer(beer) refreshes UI
-         *
-         * 4. Database Operations:
-         *    - Update: BeersImpl.updateBeer(Beer beer)
-         *    - Uses OrmLite's Dao.update() method
-         *    - Triggers BeerChangedListener callbacks
-         *
-         * 5. Synchronization:
-         *    - BeerChangedListener pattern notifies other components
-         *    - Share intent updates when rating changes
-         *    - List view refreshed via ListChangedListener callbacks
-         *
-         * Related files:
-         * - app/src/main/java/ralcock/cbf/view/BeerDetailsFragment.java:63-101
-         * - app/src/main/java/ralcock/cbf/model/Beer.java
-         * - app/src/main/java/ralcock/cbf/model/StarRating.java
-         * - libraries/beers/src/main/java/ralcock/cbf/model/dao/BeersImpl.java
-         */
-    }
 }
