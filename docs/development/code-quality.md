@@ -106,9 +106,15 @@ Run checks manually anytime:
 
 ### What It Does
 
-Located at `.git/hooks/pre-commit`, it runs:
+Located at `.git/hooks/pre-commit`, it intelligently runs checks based on what's being committed:
+
+**Smart Detection:**
+- Only runs if `.java` files are in the commit
+- Skips instantly for documentation, config, or other non-Java changes
+
+**When Java files are detected:**
 1. **Spotless formatting check** (~5 seconds)
-2. **Android Lint** (~10-15 seconds)
+2. **Android Lint** (~10-15 seconds, optional with `SKIP_LINT=1`)
 
 If either fails, the commit is blocked with helpful error messages.
 
@@ -122,12 +128,20 @@ cat > .git/hooks/pre-commit << 'EOF'
 #!/bin/bash
 set -e
 
-echo "🔍 Running pre-commit checks..."
+# Check if any Java files are being committed
+JAVA_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.java$' || true)
+
+if [ -z "$JAVA_FILES" ]; then
+    echo "⚡ No Java files in commit - skipping code quality checks"
+    exit 0
+fi
+
+echo "🔍 Running pre-commit checks for Java files..."
 echo ""
 
 # Fast formatter check (< 5 seconds)
 echo "→ Checking code formatting with Spotless..."
-if ./gradlew spotlessCheck --quiet; then
+if ./gradlew spotlessCheck --quiet --console=plain --no-daemon 2>&1 | grep -v "Configuration.*was resolved"; then
     echo "✓ Code formatting passed"
 else
     echo ""
@@ -139,20 +153,27 @@ fi
 
 echo ""
 
-# Android Lint (fast checks only)
-echo "→ Running Android Lint..."
-if ./gradlew lintDebug --quiet; then
-    echo "✓ Android Lint passed"
+# Android Lint (can be slow - skip with SKIP_LINT=1)
+if [ "${SKIP_LINT}" != "1" ]; then
+    echo "→ Running Android Lint (set SKIP_LINT=1 to skip)..."
+    if ./gradlew lintDebug --quiet --console=plain --no-daemon 2>&1 | grep -v "Configuration.*was resolved"; then
+        echo "✓ Android Lint passed"
+    else
+        echo ""
+        echo "❌ Android Lint failed!"
+        echo ""
+        echo "Fix lint issues before committing."
+        exit 1
+    fi
 else
-    echo ""
-    echo "❌ Android Lint failed!"
-    echo ""
-    echo "Fix lint issues before committing."
-    exit 1
+    echo "⚠️  Skipping Android Lint (SKIP_LINT=1)"
+    echo "   (Lint will still run in CI)"
 fi
 
 echo ""
-echo "✅ All pre-commit checks passed!"
+echo "✅ Pre-commit checks passed!"
+echo ""
+echo "💡 Tip: For faster commits, use 'SKIP_LINT=1 git commit'"
 echo ""
 EOF
 
@@ -160,15 +181,38 @@ EOF
 chmod +x .git/hooks/pre-commit
 ```
 
-### Bypassing (Not Recommended)
+### Performance Options
 
-If you absolutely need to commit without checks:
+The hook has multiple levels for different speed needs:
 
+**Instant (~0s) - Non-Java commits:**
 ```bash
+# Commits with only docs, configs, etc.
+git commit -m "docs: update README"
+# Output: ⚡ No Java files in commit - skipping code quality checks
+```
+
+**Fast (~5-10s) - Skip lint:**
+```bash
+# When you need quick commits for Java changes
+SKIP_LINT=1 git commit -m "feat: add new feature"
+# Runs: Spotless check only
+```
+
+**Full (~15-20s) - All checks:**
+```bash
+# Normal commit with all validation
+git commit -m "feat: add new feature"
+# Runs: Spotless check + Android Lint
+```
+
+**Bypass (not recommended):**
+```bash
+# Skip all checks (CI will still run them)
 git commit --no-verify -m "Your message"
 ```
 
-**Warning:** The CI will still fail if checks don't pass!
+**Warning:** Bypassing checks means CI will catch issues later!
 
 ---
 
@@ -374,20 +418,25 @@ git commit -m "feat: your feature"
 
 ### Timing Benchmarks
 
-| Task | Duration | Frequency |
-|------|----------|-----------|
-| `spotlessCheck` | 4-5s | Every commit |
-| `spotlessApply` | 5s | On-demand |
-| `lintDebug` | 10-15s | Every commit |
-| `precommit` (both) | 15-20s | Every commit |
-| CI `code-quality` job | 20-30s | Every push |
+| Task | Duration | Frequency | Notes |
+|------|----------|-----------|-------|
+| Pre-commit (non-Java) | ~0s | Docs/config commits | Instant skip |
+| Pre-commit (Java, skip lint) | 5-10s | With `SKIP_LINT=1` | Format only |
+| Pre-commit (Java, full) | 15-20s | Normal Java commits | Format + lint |
+| `spotlessCheck` | 4-5s | On-demand | Manual check |
+| `spotlessApply` | 5s | On-demand | Auto-fix |
+| `lintDebug` | 10-15s | On-demand | Manual check |
+| `precommit` task | 15-20s | On-demand | Both checks |
+| CI `code-quality` job | 20-30s | Every push | Full validation |
 
 ### Optimization Tips
 
-1. **Use Gradle daemon:** Already enabled by default
-2. **Cache dependencies:** Already configured in CI
-3. **Run incrementally:** Spotless only checks changed files
-4. **Parallel builds:** Add `org.gradle.parallel=true` to `gradle.properties`
+1. **Smart detection:** Hook only runs for Java file changes (instant for docs)
+2. **Skip lint:** Use `SKIP_LINT=1` for faster Java commits (5-10s vs 15-20s)
+3. **Gradle optimizations:** `--no-daemon` and `--console=plain` reduce overhead
+4. **Use Gradle daemon for manual runs:** Already enabled by default
+5. **Cache dependencies:** Already configured in CI
+6. **Run incrementally:** Spotless only checks changed files
 
 ---
 
