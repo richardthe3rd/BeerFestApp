@@ -2,6 +2,7 @@ package ralcock.cbf.model;
 
 import androidx.test.runner.AndroidJUnit4;
 
+import org.json.JSONException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -56,7 +57,7 @@ public class JsonBeerListTest {
     }
 
     @Test
-    public void testLoadBeers() {
+    public void testLoadBeers() throws JSONException {
         InputStream inputStream = JsonBeerListTest.class.getResourceAsStream("/ralcock/cbf/model/one_beer.json");
         final Beer expectedBeer = fBrewery1Beer1;
         JsonBeerList jsonBeerList = new JsonBeerList(convertStreamToString(inputStream));
@@ -66,7 +67,7 @@ public class JsonBeerListTest {
     }
 
     @Test
-    public void testLoadBeers2() {
+    public void testLoadBeers2() throws JSONException {
         InputStream inputStream = JsonBeerListTest.class.getResourceAsStream("/ralcock/cbf/model/two_breweries_three_beers.json");
 
         List<Beer> expectedBeers = new Vector<Beer>(3);
