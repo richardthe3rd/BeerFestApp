@@ -100,6 +100,7 @@ jobs:
         retention-days: 7
 
   test:
+    needs: build
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -138,6 +139,7 @@ jobs:
 
       - name: Download library coverage reports
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           name: library-coverage-reports
           path: libraries/beers/build/reports/jacoco/
