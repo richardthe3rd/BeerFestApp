@@ -38,10 +38,15 @@ jacocoTestReport {
         csv.required = false
     }
 
-    // Configure source and class directories
-    sourceDirectories.setFrom(files(['src/main/java']))
-    classDirectories.setFrom(files(['build/classes/java/main']))
+    // Use Gradle's source sets to automatically find the right paths
+    sourceDirectories.setFrom(sourceSets.main.allSource.srcDirs)
+    classDirectories.setFrom(sourceSets.main.output)
+    executionData.setFrom(test.jacoco.destinationFile)
 
-    // Configure execution data location
-    executionData.setFrom(files(['build/jacoco/test.exec']))
+    doFirst {
+        logger.lifecycle("JaCoCo Report Configuration:")
+        logger.lifecycle("  Source dirs: ${sourceDirectories.files}")
+        logger.lifecycle("  Class dirs: ${classDirectories.files}")
+        logger.lifecycle("  Execution data: ${executionData.files}")
+    }
 }
