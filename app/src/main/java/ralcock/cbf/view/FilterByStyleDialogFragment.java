@@ -59,6 +59,7 @@ public class FilterByStyleDialogFragment extends DialogFragment {
         builder.setPositiveButton(
                 R.string.OK,
                 new DialogInterface.OnClickListener() {
+                    @Override
                     public void onClick(final DialogInterface dialogInterface, final int i) {
                         AlertDialog alertDialog = (AlertDialog) dialogInterface;
                         BeerStyleListAdapter listAdapter =
