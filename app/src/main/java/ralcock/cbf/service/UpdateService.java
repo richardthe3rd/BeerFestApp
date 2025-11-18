@@ -36,6 +36,9 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
 
     private final AppPreferences fAppPreferences;
 
+    // TODO: Migrate from deprecated LocalBroadcastManager to LiveData or other alternatives
+    // LocalBroadcastManager was deprecated in AndroidX 1.1.0
+    @SuppressWarnings("deprecation")
     private LocalBroadcastManager fLocalBroadcastManager;
 
     private NotificationManager fNotifyManager;
@@ -76,6 +79,7 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
         return START_NOT_STICKY;
     }
 
+    @SuppressWarnings("deprecation")
     private void doUpdate(final boolean cleanUpdate) {
         Log.d(TAG, "doUpdate: cleanUpdate=" + cleanUpdate);
         UpdateTask task = new UpdateTask() {
@@ -176,6 +180,7 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void onCreate() {
         Log.d(TAG, "onCreate");
         super.onCreate();

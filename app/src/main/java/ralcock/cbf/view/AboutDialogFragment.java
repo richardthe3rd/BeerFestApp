@@ -15,6 +15,8 @@ import android.view.View;
 import android.widget.TextView;
 import ralcock.cbf.R;
 
+// TODO: Migrate from deprecated android.app.DialogFragment to androidx.fragment.app.DialogFragment
+@SuppressWarnings("deprecation")
 public class AboutDialogFragment extends DialogFragment {
     public static DialogFragment newInstance(String appName, String versionName) {
         DialogFragment fragment = new AboutDialogFragment();
