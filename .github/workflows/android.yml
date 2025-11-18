@@ -56,14 +56,17 @@ jobs:
       uses: gradle/actions/setup-gradle@v4
 
     - name: Build with Gradle
-      run: ./gradlew build jacocoTestReport -PRELEASE --scan
+      run: ./gradlew build -PRELEASE --scan
       env:
         SIGNING_KEYSTORE: ${{ steps.decode_keystore.outputs.filePath }}
         SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
         SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
         SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
 
-    - name: Publish Test Results
+    - name: Run library unit tests with coverage
+      run: ./gradlew :libraries:beers:test :libraries:beers:jacocoTestReport --scan
+
+    - name: Publish Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
       with:
@@ -72,25 +75,13 @@ jobs:
         check_name: Unit Test Results
         comment_mode: off
 
-    - name: Add coverage to PR
-      if: github.event_name == 'pull_request'
-      run: |
-        COVERAGE_REPORT="app/build/reports/jacoco/jacocoTestReport/html/index.html"
-        if [ -f "$COVERAGE_REPORT" ]; then
-          COVERAGE=$(grep -oP 'Total[^%]*\K\d+(?=%)' "$COVERAGE_REPORT" | head -1 || echo "N/A")
-          echo "### 📊 Test Coverage: ${COVERAGE}%" >> $GITHUB_STEP_SUMMARY
-          echo "Coverage report generated successfully" >> $GITHUB_STEP_SUMMARY
-        else
-          echo "### ⚠️ Coverage report not found" >> $GITHUB_STEP_SUMMARY
-        fi
-
-    - name: Archive coverage reports
+    - name: Archive library coverage reports
       uses: actions/upload-artifact@v4
       if: success() || failure()
       with:
-        name: coverage-reports
+        name: library-coverage-reports
         path: |
-          app/build/reports/jacoco/
+          libraries/beers/build/reports/jacoco/
         retention-days: 7
 
     - name: Archive build reports
@@ -145,6 +136,12 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Download library coverage reports
+        uses: actions/download-artifact@v4
+        with:
+          name: library-coverage-reports
+          path: libraries/beers/build/reports/jacoco/
+
       - name: AVD cache
         uses: actions/cache@v4
         id: avd-cache
@@ -179,6 +176,10 @@ jobs:
           disable-animations: true
           script: ./gradlew connectedCheck --scan
 
+      - name: Generate coverage report
+        if: always()
+        run: ./gradlew jacocoTestReport --scan
+
       - name: Publish Instrumented Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
@@ -187,6 +188,139 @@ jobs:
             **/build/outputs/androidTest-results/**/*.xml
           check_name: Instrumented Test Results
           comment_mode: off
+
+      - name: Parse coverage reports
+        id: coverage
+        if: always()
+        run: |
+          # Parse coverage from XML reports
+          APP_XML="app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+          LIB_XML="libraries/beers/build/reports/jacoco/test/jacocoTestReport.xml"
+
+          # Function to extract coverage from XML
+          get_coverage() {
+            local xml_file=$1
+            if [ -f "$xml_file" ]; then
+              # Extract line coverage percentage from XML
+              python3 << EOF
+          import xml.etree.ElementTree as ET
+          try:
+              tree = ET.parse('$xml_file')
+              root = tree.getroot()
+              for counter in root.findall(".//counter[@type='LINE']"):
+                  covered = float(counter.get('covered', 0))
+                  missed = float(counter.get('missed', 0))
+                  total = covered + missed
+                  if total > 0:
+                      percentage = (covered / total) * 100
+                      print(f"{percentage:.1f}")
+                      break
+              else:
+                  print("0.0")
+          except Exception as e:
+              print("0.0")
+          EOF
+            else
+              echo "0.0"
+            fi
+          }
+
+          APP_COV=$(get_coverage "$APP_XML")
+          LIB_COV=$(get_coverage "$LIB_XML")
+
+          echo "app_coverage=$APP_COV" >> $GITHUB_OUTPUT
+          echo "lib_coverage=$LIB_COV" >> $GITHUB_OUTPUT
+
+          # Create summary
+          {
+            echo "### 📊 Combined Test Coverage Report"
+            echo ""
+            echo "| Module | Test Type | Coverage |"
+            echo "|--------|-----------|----------|"
+
+            if [ -f "$APP_XML" ]; then
+              echo "| App | Instrumented Tests | ${APP_COV}% |"
+            else
+              echo "| App | Instrumented Tests | ❌ No report |"
+            fi
+
+            if [ -f "$LIB_XML" ]; then
+              echo "| Libraries | Unit Tests | ${LIB_COV}% |"
+            else
+              echo "| Libraries | Unit Tests | ❌ No report |"
+            fi
+
+            echo ""
+            if [ -f "$APP_XML" ] || [ -f "$LIB_XML" ]; then
+              echo "✅ Coverage reports generated successfully"
+              echo ""
+              echo "Download the \`app-coverage-reports\` and \`library-coverage-reports\` artifacts to view detailed HTML reports."
+            else
+              echo "⚠️ No coverage reports were generated"
+              echo ""
+              echo "This may be because:"
+              echo "- Tests failed to run"
+              echo "- No test execution data was found"
+              echo "- JaCoCo configuration needs review"
+            fi
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: Comment coverage on PR
+        if: github.event_name == 'pull_request' && (steps.coverage.outputs.app_coverage != '0.0' || steps.coverage.outputs.lib_coverage != '0.0')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const appCov = '${{ steps.coverage.outputs.app_coverage }}';
+            const libCov = '${{ steps.coverage.outputs.lib_coverage }}';
+
+            const body = `### 📊 Test Coverage Report
+
+            | Module | Test Type | Coverage |
+            |--------|-----------|----------|
+            | App | Instrumented Tests | ${appCov}% |
+            | Libraries | Unit Tests | ${libCov}% |
+
+            Download the workflow artifacts to view detailed HTML reports:
+            - \`app-coverage-reports\` - App instrumented test coverage
+            - \`library-coverage-reports\` - Library unit test coverage`;
+
+            // Find existing coverage comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const coverageComment = comments.find(comment =>
+              comment.user.type === 'Bot' && comment.body.includes('📊 Test Coverage Report')
+            );
+
+            if (coverageComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: coverageComment.id,
+                body: body
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
+
+      - name: Archive app coverage reports
+        uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: app-coverage-reports
+          path: |
+            app/build/reports/jacoco/
+          retention-days: 7
 
       - name: Archive test reports
         uses: actions/upload-artifact@v4

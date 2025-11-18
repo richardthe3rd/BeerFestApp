@@ -23,3 +23,18 @@ dependencies {
     testImplementation "com.j256.ormlite:ormlite-jdbc:5.0"
     testImplementation "com.h2database:h2:1.4.194"
 }
+
+// JaCoCo configuration
+jacoco {
+    toolVersion = "0.8.8"
+}
+
+jacocoTestReport {
+    dependsOn test
+
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+}
