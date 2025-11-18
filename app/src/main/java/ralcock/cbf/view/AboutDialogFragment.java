@@ -61,6 +61,7 @@ public class AboutDialogFragment extends DialogFragment {
                 .setNeutralButton(
                         "Close",
                         new DialogInterface.OnClickListener() {
+                            @Override
                             public void onClick(
                                     final DialogInterface dialogInterface, final int i) {
                                 dialogInterface.dismiss();
