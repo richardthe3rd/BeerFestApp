@@ -7,6 +7,9 @@
  * user guide available at http://gradle.org/docs/1.11/userguide/tutorial_java_projects.html
  */
 
+plugins {
+    id 'com.diffplug.spotless' version '6.25.0'
+}
 
 // Apply the java plugin to add support for Java
 apply plugin: 'java'
@@ -62,5 +65,17 @@ jacocoTestReport {
         if (test.jacoco.destinationFile.exists()) {
             logger.lifecycle("  Execution data size: ${test.jacoco.destinationFile.length()} bytes")
         }
+    }
+}
+
+// Spotless configuration for code formatting
+spotless {
+    java {
+        target 'src/**/*.java'
+        googleJavaFormat('1.19.2').aosp() // AOSP style (4-space indent)
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+        importOrder() // Standard import order
     }
 }

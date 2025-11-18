@@ -8,6 +8,10 @@ buildscript {
     }
 }
 
+plugins {
+    id 'com.diffplug.spotless' version '6.25.0'
+}
+
 apply plugin: 'com.android.application'
 apply plugin: 'jacoco'
 
@@ -47,7 +51,17 @@ android {
        }
 
     lint {
-        abortOnError false
+        abortOnError true
+        warningsAsErrors = false
+        checkReleaseBuilds = true
+
+        // Fast pre-commit checks
+        checkOnly 'NewApi', 'InlinedApi', 'UnusedResources',
+                  'SimpleDateFormat', 'DefaultLocale', 'SetTextI18n',
+                  'HardcodedText', 'UnusedIds', 'ContentDescription'
+
+        // Disable checks that are too noisy or not applicable
+        disable 'IconMissingDensityFolder', 'GoogleAppIndexingWarning'
     }
 
     buildTypes {
@@ -126,4 +140,23 @@ tasks.register('jacocoTestReport', JacocoReport) {
             logger.warn("No test execution data found. Run 'connectedCheck' or 'createDebugCoverageReport' first.")
         }
     }
+}
+
+// Spotless configuration for code formatting
+spotless {
+    java {
+        target 'src/**/*.java'
+        googleJavaFormat('1.19.2').aosp() // AOSP style (4-space indent)
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+        importOrder() // Standard import order
+    }
+}
+
+// Fast pre-commit task
+tasks.register('precommit') {
+    dependsOn 'spotlessCheck', 'lintDebug'
+    description = 'Fast pre-commit checks (formatting and lint)'
+    group = 'verification'
 }
