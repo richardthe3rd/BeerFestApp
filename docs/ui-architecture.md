@@ -729,7 +729,7 @@ fBroadcastReceiver = new BroadcastReceiver() {
 | Component | Current | Issue | Recommended Replacement |
 |-----------|---------|-------|------------------------|
 | DialogFragment | `android.app.DialogFragment` | Deprecated in API 28 | `androidx.fragment.app.DialogFragment` |
-| LocalBroadcastManager | `androidx.localbroadcastmanager.content` | Deprecated in AndroidX 1.1.0 | LiveData, StateFlow, or callbacks |
+| LocalBroadcastManager | `androidx.localbroadcastmanager.content.LocalBroadcastManager` | Class deprecated in AndroidX 1.1.0 | LiveData, StateFlow, or callbacks |
 | ViewPager | `androidx.viewpager.widget.ViewPager` | Old API | `androidx.viewpager2.widget.ViewPager2` |
 | Listener pattern | Manual `ListChangedListener` | Boilerplate, not lifecycle-aware | LiveData with ViewModel |
 | Database | OrmLite | No compile-time verification | Room Database |
