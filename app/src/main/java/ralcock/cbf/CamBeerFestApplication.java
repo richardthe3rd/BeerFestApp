@@ -223,12 +223,14 @@ public class CamBeerFestApplication extends AppCompatActivity {
 
         searchView.setOnQueryTextListener(
                 new SearchView.OnQueryTextListener() {
+                    @Override
                     public boolean onQueryTextSubmit(final String query) {
                         filterBy(query);
                         searchView.clearFocus();
                         return true;
                     }
 
+                    @Override
                     public boolean onQueryTextChange(final String newText) {
                         filterBy(newText.toString());
                         return true;
