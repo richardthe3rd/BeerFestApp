@@ -104,7 +104,7 @@ public class FavoritesInteractionTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-                        // Click first beer to open details
+            // Click first beer to open details
             onView(withId(R.id.mainListView))
                 .perform(click());
 
@@ -133,7 +133,7 @@ public class FavoritesInteractionTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-                        // Click first beer to open details
+            // Click first beer to open details
             onView(withId(R.id.mainListView))
                 .perform(click());
 
@@ -212,7 +212,7 @@ public class FavoritesInteractionTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-                        // Verify list is displayed
+            // Verify list is displayed
             onView(withId(R.id.mainListView))
                 .check(matches(isDisplayed()));
 

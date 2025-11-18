@@ -75,7 +75,7 @@ public class StarRatingInteractionTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-                        // Click first beer to open details
+            // Click first beer to open details
             onView(withId(R.id.mainListView))
                 .perform(click());
 
@@ -101,7 +101,7 @@ public class StarRatingInteractionTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-                        // Verify that beer list items contain rating bars
+            // Verify that beer list items contain rating bars
             // Note: We can't easily check individual list items without data
             // This test verifies the list view itself is present
             onView(withId(R.id.mainListView))

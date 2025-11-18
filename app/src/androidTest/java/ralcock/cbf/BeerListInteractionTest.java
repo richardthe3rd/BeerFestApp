@@ -124,7 +124,7 @@ public class BeerListInteractionTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-                        // Click on the first beer in the list
+            // Click on the first beer in the list
             // Note: This uses mainListView which might be a ListView or RecyclerView
             // We try clicking on the list view itself
             onView(withId(R.id.mainListView))
@@ -145,7 +145,7 @@ public class BeerListInteractionTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-                        // Click first beer
+            // Click first beer
             onView(withId(R.id.mainListView))
                 .perform(click());
 
@@ -171,7 +171,7 @@ public class BeerListInteractionTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-                        // Click first beer
+            // Click first beer
             onView(withId(R.id.mainListView))
                 .perform(click());
 
@@ -190,7 +190,7 @@ public class BeerListInteractionTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-                        // Click first beer to open details
+            // Click first beer to open details
             onView(withId(R.id.mainListView))
                 .perform(click());
 

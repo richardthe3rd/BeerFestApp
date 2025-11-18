@@ -48,7 +48,7 @@ public class SearchFunctionalityTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-                        // Verify search menu item exists
+            // Verify search menu item exists
             // Note: SearchView is in the toolbar menu (id: R.id.search)
             // Clicking it expands the SearchView widget
         }
@@ -70,7 +70,7 @@ public class SearchFunctionalityTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-                        // Click search icon to expand
+            // Click search icon to expand
             // onView(withId(R.id.search)).perform(click());
 
             // TODO: Verify SearchView is expanded
@@ -95,7 +95,7 @@ public class SearchFunctionalityTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-                        // TODO: Get initial beer count
+            // TODO: Get initial beer count
 
             // Click search icon to expand SearchView
             // onView(withId(R.id.search)).perform(click());
@@ -104,7 +104,7 @@ public class SearchFunctionalityTest {
             // onView(isAssignableFrom(EditText.class))
             //     .perform(typeText("IPA"), closeSoftKeyboard());
 
-                        // TODO: Verify beer count decreased
+            // TODO: Verify beer count decreased
             // TODO: Verify only matching beers are shown
         }
     }
