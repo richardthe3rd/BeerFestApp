@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.app.DialogFragment;
 import ralcock.cbf.R;
 
+// TODO: Migrate from deprecated android.app.DialogFragment to androidx.fragment.app.DialogFragment
+@SuppressWarnings("deprecation")
 public class UpdateBeersProgressDialogFragment extends DialogFragment {
 
     private ProgressDialog fProgressDialog;

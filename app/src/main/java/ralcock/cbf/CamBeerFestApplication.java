@@ -40,6 +40,10 @@ import ralcock.cbf.view.FilterByStyleDialogFragment;
 import ralcock.cbf.view.ListChangedListener;
 import ralcock.cbf.view.SortByDialogFragment;
 
+// TODO: Migrate from deprecated android.app.DialogFragment to androidx.fragment.app.DialogFragment
+// android.app.DialogFragment was deprecated in API 28 (Android 9.0)
+// This affects: AboutDialogFragment, SortByDialogFragment, FilterByStyleDialogFragment
+@SuppressWarnings("deprecation")
 public class CamBeerFestApplication extends AppCompatActivity {
     private static final String TAG = CamBeerFestApplication.class.getName();
 

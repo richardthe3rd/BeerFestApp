@@ -9,6 +9,8 @@ import ralcock.cbf.CamBeerFestApplication;
 import ralcock.cbf.R;
 import ralcock.cbf.model.SortOrder;
 
+// TODO: Migrate from deprecated android.app.DialogFragment to androidx.fragment.app.DialogFragment
+@SuppressWarnings("deprecation")
 public class SortByDialogFragment extends DialogFragment {
 
     public static DialogFragment newInstance(SortOrder currentSortOrder) {

@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+// TODO: Migrate from deprecated android.app.DialogFragment to androidx.fragment.app.DialogFragment
+@SuppressWarnings("deprecation")
 public class FilterByStyleDialogFragment extends DialogFragment {
 
     public static DialogFragment newInstance(final Set<String> stylesToHide,
