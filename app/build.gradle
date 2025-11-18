@@ -80,7 +80,8 @@ android {
 
 tasks.withType(JavaCompile) {
     options.compilerArgs << '-Xlint:unchecked'
-    options.deprecation = true
+    // Suppress deprecation warnings - deprecated APIs are documented with @SuppressWarnings and TODO comments
+    options.deprecation = false
 }
 
 // JaCoCo configuration for test coverage
