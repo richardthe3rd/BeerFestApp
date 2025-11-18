@@ -1,7 +1,12 @@
 package ralcock.cbf.model;
 
-import junit.framework.TestCase;
+import androidx.test.runner.AndroidJUnit4;
+
 import org.easymock.EasyMock;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import ralcock.cbf.model.dao.Beers;
 import ralcock.cbf.model.dao.Breweries;
 
@@ -14,21 +19,24 @@ import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
 
-public class BeerListTest extends TestCase {
+@RunWith(AndroidJUnit4.class)
+public class BeerListTest {
 
     private static final Set<String> EMPTY_SET = Collections.emptySet();
 
     private Beers fBeers;
     private Breweries fBreweries;
 
-    @Override
-    public void setUp() throws Exception {
+    @Before
+    public void setUp() {
         fBeers = EasyMock.createMock(Beers.class);
         fBreweries = EasyMock.createMock(Breweries.class);
     }
 
-    public void testFiltering() throws Exception {
+    @Test
+    public void testFiltering() {
         final SortOrder sortOrder = SortOrder.BEER_NAME_ASC;
 
         final String mild = "mild";
@@ -68,7 +76,8 @@ public class BeerListTest extends TestCase {
         verify(fBeers, fBreweries);
     }
 
-    public void testSorting() throws Exception {
+    @Test
+    public void testSorting() {
         final SortOrder sortOrder1 = SortOrder.BEER_ABV_ASC;
         final String filterText = "";
 
@@ -109,7 +118,8 @@ public class BeerListTest extends TestCase {
         }
     }
 
-    public void testFilterByStyle() throws Exception {
+    @Test
+    public void testFilterByStyle() {
         Set<String> stylesToHide = new HashSet<String>();
         stylesToHide.add("style2");
 

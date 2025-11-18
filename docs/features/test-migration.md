@@ -33,22 +33,27 @@ The BeerFestApp currently has **7 instrumented tests running**:
 | Test File | Lines | Test Methods | Status | Dependencies |
 |-----------|-------|--------------|--------|--------------|
 | ~~`LifecycleTest.java`~~ | 45 | 1 | ❌ **DELETED** | ActivityUnitTestCase (removed - see below) |
-| `CamBeerFestApplicationTest.java` | ? | ? | ✅ Running | AndroidTestCase |
-| `actions/BeerSharerTest.java` | 84 | 3 | ✅ Running | AndroidTestCase, Resources |
-| `model/JsonBeerListTest.java` | 78 | 2 | ✅ Running | AndroidTestCase, JSON resources |
-| `model/BeerListTest.java` | ? | ? | ✅ Running | AndroidTestCase, EasyMock |
+| ~~`CamBeerFestApplicationTest.java`~~ | 9 | 0 | ❌ **DELETED** | Empty test, deprecated framework |
+| ~~`actions/BeerSharerTest.java`~~ | 84 | 3 | ✅ **MIGRATED** | Moved to modern framework |
+| ~~`actions/BeerExporterTest.java`~~ | 382 | 20 | ✅ **MIGRATED** | Moved to modern framework |
+| ~~`model/JsonBeerListTest.java`~~ | 78 | 2 | ✅ **MIGRATED** | Moved to modern framework + resources |
+| ~~`model/BeerListTest.java`~~ | 134 | 3 | ✅ **MIGRATED** | Moved to modern framework |
 | `model/dao/BeersImplTest.java` | ? | 2 | ✅ Running | AndroidTestCase, OrmLite |
 | `model/dao/BreweriesImplTest.java` | ? | 3 | ✅ Running | AndroidTestCase, OrmLite |
 
-**Total:** 6 test classes running (1 deleted)
+**Total:** 2 test classes running (4 migrated, 2 deleted)
 
 ### Modern Tests (app/src/androidTest/)
 
 | Test File | Lines | Test Methods | Framework |
 |-----------|-------|--------------|-----------|
 | `CamBeerFestApplicationInstrumentedTest.java` | 28 | 1 | AndroidJUnit4, Espresso |
+| `actions/BeerSharerTest.java` | 108 | 3 | AndroidJUnit4 |
+| `actions/BeerExporterTest.java` | 453 | 20 | AndroidJUnit4 |
+| `model/JsonBeerListTest.java` | 84 | 2 | AndroidJUnit4 |
+| `model/BeerListTest.java` | 144 | 3 | AndroidJUnit4, EasyMock |
 
-**Total:** 1 test class
+**Total:** 5 test classes
 
 ---
 
@@ -126,12 +131,13 @@ The BeerFestApp currently has **7 instrumented tests running**:
 
 1. ✅ `CamBeerFestApplicationInstrumentedTest.java` (already migrated)
 2. ❌ ~~`LifecycleTest.java`~~ (**DELETED** - see replacement strategy below)
-3. `BeerSharerTest.java` (Intent tests, medium complexity)
-4. `JsonBeerListTest.java` (requires resource migration)
-5. `BeerListTest.java` (unknown complexity)
-6. `CamBeerFestApplicationTest.java` (may overlap with instrumented test)
-7. `BeersImplTest.java` (DAO/database tests, complex)
-8. `BreweriesImplTest.java` (DAO/database tests, complex)
+3. ✅ `BeerSharerTest.java` (Intent tests, medium complexity) **MIGRATED**
+4. ✅ `BeerExporterTest.java` (CSV export tests, medium complexity) **MIGRATED**
+5. ✅ `JsonBeerListTest.java` (requires resource migration) **MIGRATED**
+6. ✅ `BeerListTest.java` (unknown complexity) **MIGRATED**
+7. ❌ ~~`CamBeerFestApplicationTest.java`~~ (**DELETED** - empty test, deprecated framework)
+8. `BeersImplTest.java` (DAO/database tests, complex) **← NEXT**
+9. `BreweriesImplTest.java` (DAO/database tests, complex)
 
 ---
 
@@ -384,18 +390,20 @@ If migration causes issues:
 
 ## Success Criteria
 
-- [ ] 6 legacy tests migrated to `app/src/androidTest/`
+- [ ] 7 legacy tests migrated to `app/src/androidTest/`
 - [ ] New ActivityScenario-based lifecycle test created
-- [ ] All 8 tests use modern frameworks (AndroidJUnit4, Espresso, ActivityScenario)
+- [ ] All 9 tests use modern frameworks (AndroidJUnit4, Espresso, ActivityScenario)
 - [ ] All tests pass in CI (`./gradlew connectedCheck`)
 - [ ] `app/tests/` directory deleted
 - [ ] `sourceSets` configuration removed from `app/build.gradle`
 - [ ] Documentation updated
 
 **Current Progress:**
-- ✅ 1/8 tests already modern (`CamBeerFestApplicationInstrumentedTest`)
-- ✅ 6/8 tests running via legacy framework
-- ❌ 1/8 tests deleted (LifecycleTest - needs ActivityScenario replacement)
+- ✅ 5/9 tests already modern (`CamBeerFestApplicationInstrumentedTest`, `BeerSharerTest`, `BeerExporterTest`, `JsonBeerListTest`, `BeerListTest`)
+- ⏳ 3/9 tests still in legacy framework
+- ❌ 1/9 tests deleted (LifecycleTest - needs ActivityScenario replacement)
+
+**Progress: 56% complete (5/9 tests migrated)**
 
 ---
 
@@ -408,4 +416,4 @@ If migration causes issues:
 ---
 
 **Last Updated:** 2025-11-17
-**Status:** Phase 1 complete, Phase 2 pending
+**Status:** Phase 1 complete, Phase 2 in progress (5/9 tests migrated - 56%)
