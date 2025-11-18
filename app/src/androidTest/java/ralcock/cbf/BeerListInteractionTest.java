@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import ralcock.cbf.view.BeerDetailsActivity;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.Espresso.pressBack;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -194,14 +195,15 @@ public class BeerListInteractionTest {
             onView(withId(R.id.mainListView))
                 .perform(click());
 
-            // Press back button (simulated by finishing activity)
-            scenario.onActivity(activity -> {
-                // The back button functionality would be tested here
-                // For now, we just verify we can access the activity
-            });
+            // Verify we're in details view (optional sanity check)
+            onView(withId(R.id.detailsViewBeerRatingBar))
+                .check(matches(isDisplayed()));
+
+            // Press back button to return to list
+            pressBack();
 
             // After pressing back, we should be back at the list
-            // Verify list view is displayed
+            // Verify main screen is displayed
             onView(withId(R.id.viewpager))
                 .check(matches(isDisplayed()));
         }
