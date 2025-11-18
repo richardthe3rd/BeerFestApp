@@ -138,13 +138,7 @@ public class SortingAndFilteringTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-            // Wait for app to load
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                // Ignore
             }
-
             // Verify sort menu item exists
             // Note: Menu items may not be immediately visible
             // Would need to use openActionBarOverflowOrOptionsMenu() for hidden items
@@ -168,13 +162,7 @@ public class SortingAndFilteringTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-            // Wait for app to load
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                // Ignore
             }
-
             // Click sort menu item
             // Note: This requires Espresso's menu interaction
             // onView(withId(R.id.sort)).perform(click());
@@ -193,13 +181,7 @@ public class SortingAndFilteringTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-            // Wait for app to load
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                // Ignore
             }
-
             // Verify filter menu item exists
             // onView(withId(R.id.showOnlyStyle)).check(matches(isDisplayed()));
         }
@@ -221,13 +203,7 @@ public class SortingAndFilteringTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-            // Wait for app to load
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                // Ignore
             }
-
             // Click filter menu item
             // onView(withId(R.id.showOnlyStyle)).perform(click());
 

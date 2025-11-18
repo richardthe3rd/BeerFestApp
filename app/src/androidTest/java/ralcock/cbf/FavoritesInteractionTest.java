@@ -104,14 +104,7 @@ public class FavoritesInteractionTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-            // Wait for data to load
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-
-            // Click first beer to open details
+                        // Click first beer to open details
             onView(withId(R.id.mainListView))
                 .perform(click());
 
@@ -140,14 +133,7 @@ public class FavoritesInteractionTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-            // Wait for data to load
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-
-            // Click first beer to open details
+                        // Click first beer to open details
             onView(withId(R.id.mainListView))
                 .perform(click());
 
@@ -184,14 +170,7 @@ public class FavoritesInteractionTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-            // Wait for data to load
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-
-            // Click first beer
+                        // Click first beer
             onView(withId(R.id.mainListView))
                 .perform(click());
 
@@ -204,14 +183,7 @@ public class FavoritesInteractionTest {
             // Recreate activity (simulates rotation)
             scenario.recreate();
 
-            // Wait for data to reload
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-
-            // Navigate back to the same beer
+                        // Navigate back to the same beer
             onView(withId(R.id.mainListView))
                 .perform(click());
 
@@ -229,14 +201,7 @@ public class FavoritesInteractionTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-            // Wait for data to load
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-
-            // Verify list is displayed
+                        // Verify list is displayed
             onView(withId(R.id.mainListView))
                 .check(matches(isDisplayed()));
 

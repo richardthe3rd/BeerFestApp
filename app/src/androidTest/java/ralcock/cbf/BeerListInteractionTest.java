@@ -28,6 +28,22 @@ import static org.hamcrest.Matchers.containsString;
  *   <li>Navigation between list and details</li>
  * </ul>
  *
+ * <h2>Test Synchronization:</h2>
+ * <p>These tests rely on Espresso's built-in synchronization mechanisms:
+ * <ul>
+ *   <li><b>No Thread.sleep():</b> Espresso automatically waits for the main thread to be idle</li>
+ *   <li><b>View matchers:</b> Automatically retry for a few seconds until views are ready</li>
+ *   <li><b>ActivityScenario:</b> Waits for activity to reach desired state before proceeding</li>
+ * </ul>
+ *
+ * <p><b>Future Improvement:</b> Implement custom IdlingResource for:
+ * <ul>
+ *   <li>UpdateService (beer list download from network)</li>
+ *   <li>Database queries (OrmLite operations)</li>
+ *   <li>Background thread operations</li>
+ * </ul>
+ * See: https://developer.android.com/training/testing/espresso/idling-resource
+ *
  * <h2>UI Structure Documented:</h2>
  * <ul>
  *   <li><b>Main Activity (CamBeerFestApplication):</b>
@@ -108,15 +124,7 @@ public class BeerListInteractionTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-            // Wait a moment for data to load
-            // TODO: Replace with IdlingResource for more reliable synchronization
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-
-            // Click on the first beer in the list
+                        // Click on the first beer in the list
             // Note: This uses mainListView which might be a ListView or RecyclerView
             // We try clicking on the list view itself
             onView(withId(R.id.mainListView))
@@ -137,14 +145,7 @@ public class BeerListInteractionTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-            // Wait for data to load
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-
-            // Click first beer
+                        // Click first beer
             onView(withId(R.id.mainListView))
                 .perform(click());
 
@@ -170,14 +171,7 @@ public class BeerListInteractionTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-            // Wait for data to load
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-
-            // Click first beer
+                        // Click first beer
             onView(withId(R.id.mainListView))
                 .perform(click());
 
@@ -196,14 +190,7 @@ public class BeerListInteractionTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-            // Wait for data to load
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-
-            // Click first beer to open details
+                        // Click first beer to open details
             onView(withId(R.id.mainListView))
                 .perform(click());
 

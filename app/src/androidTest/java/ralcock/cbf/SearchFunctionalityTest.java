@@ -48,14 +48,7 @@ public class SearchFunctionalityTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-            // Wait for app to load
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-
-            // Verify search menu item exists
+                        // Verify search menu item exists
             // Note: SearchView is in the toolbar menu (id: R.id.search)
             // Clicking it expands the SearchView widget
         }
@@ -77,14 +70,7 @@ public class SearchFunctionalityTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-            // Wait for app to load
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-
-            // Click search icon to expand
+                        // Click search icon to expand
             // onView(withId(R.id.search)).perform(click());
 
             // TODO: Verify SearchView is expanded
@@ -109,14 +95,7 @@ public class SearchFunctionalityTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-            // Wait for data to load
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-
-            // TODO: Get initial beer count
+                        // TODO: Get initial beer count
 
             // Click search icon to expand SearchView
             // onView(withId(R.id.search)).perform(click());
@@ -125,14 +104,7 @@ public class SearchFunctionalityTest {
             // onView(isAssignableFrom(EditText.class))
             //     .perform(typeText("IPA"), closeSoftKeyboard());
 
-            // Wait for filter to apply
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-
-            // TODO: Verify beer count decreased
+                        // TODO: Verify beer count decreased
             // TODO: Verify only matching beers are shown
         }
     }
