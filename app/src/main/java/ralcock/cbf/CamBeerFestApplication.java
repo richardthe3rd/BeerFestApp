@@ -232,7 +232,7 @@ public class CamBeerFestApplication extends AppCompatActivity {
 
                     @Override
                     public boolean onQueryTextChange(final String newText) {
-                        filterBy(newText.toString());
+                        filterBy(newText);
                         return true;
                     }
                 });
