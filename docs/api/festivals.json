@@ -1,0 +1,176 @@
+{
+  "version": "1.0",
+  "last_updated": "2025-11-18T12:00:00Z",
+  "festivals": [
+    {
+      "id": "cbf2025",
+      "name": "Cambridge Beer Festival 2025",
+      "short_name": "CBF 2025",
+      "type": "cbf",
+      "year": 2025,
+      "status": "active",
+      "dates": {
+        "start": "2025-05-19",
+        "end": "2025-05-24"
+      },
+      "location": {
+        "venue": "Jesus Green",
+        "city": "Cambridge",
+        "country": "UK",
+        "address": "Jesus Green, Cambridge CB4 3BT",
+        "postcode": "CB4 3BT",
+        "coordinates": {
+          "lat": 52.215297,
+          "lon": 0.126847
+        },
+        "what3words": "risks.purple.shares"
+      },
+      "metadata": {
+        "hashtag": "#cbf2025",
+        "description": "The 48th Cambridge Beer Festival featuring over 200 beers, ciders, and more",
+        "website": "https://www.cambridgebeerfestival.com/"
+      },
+      "data": {
+        "base_url": "https://data.cambridgebeerfestival.com/cbf2025",
+        "available_types": [
+          {
+            "type": "beer",
+            "label": "Beer",
+            "url": "beer.json",
+            "icon": "beer"
+          },
+          {
+            "type": "international-beer",
+            "label": "International Beer",
+            "url": "international-beer.json",
+            "icon": "beer_world"
+          },
+          {
+            "type": "cider",
+            "label": "Cider",
+            "url": "cider.json",
+            "icon": "cider"
+          },
+          {
+            "type": "mead",
+            "label": "Mead",
+            "url": "mead.json",
+            "icon": "mead"
+          },
+          {
+            "type": "perry",
+            "label": "Perry",
+            "url": "perry.json",
+            "icon": "perry"
+          },
+          {
+            "type": "wine",
+            "label": "Wine",
+            "url": "wine.json",
+            "icon": "wine"
+          },
+          {
+            "type": "apple-juice",
+            "label": "Apple Juice",
+            "url": "apple-juice.json",
+            "icon": "apple"
+          },
+          {
+            "type": "low-no",
+            "label": "Low/No Alcohol",
+            "url": "low-no.json",
+            "icon": "no_alcohol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "cbfw2025",
+      "name": "Cambridge Beer Festival Winter 2025",
+      "short_name": "CBFW 2025",
+      "type": "cbfw",
+      "year": 2025,
+      "status": "upcoming",
+      "dates": {
+        "start": "2025-01-27",
+        "end": "2025-02-01"
+      },
+      "location": {
+        "venue": "The Great Hall",
+        "city": "Cambridge",
+        "country": "UK",
+        "coordinates": {
+          "lat": 52.204100,
+          "lon": 0.119050
+        }
+      },
+      "metadata": {
+        "hashtag": "#cbfw2025",
+        "description": "Winter edition featuring warming ales and winter specialties",
+        "website": "https://www.cambridgebeerfestival.com/winter"
+      },
+      "data": {
+        "base_url": "https://data.cambridgebeerfestival.com/cbfw2025",
+        "available_types": [
+          {
+            "type": "beer",
+            "label": "Beer",
+            "url": "beer.json",
+            "icon": "beer"
+          },
+          {
+            "type": "low-no",
+            "label": "Low/No Alcohol",
+            "url": "low-no.json",
+            "icon": "no_alcohol"
+          }
+        ]
+      }
+    },
+    {
+      "id": "cbf2024",
+      "name": "Cambridge Beer Festival 2024",
+      "short_name": "CBF 2024",
+      "type": "cbf",
+      "year": 2024,
+      "status": "past",
+      "dates": {
+        "start": "2024-05-20",
+        "end": "2024-05-25"
+      },
+      "location": {
+        "venue": "Jesus Green",
+        "city": "Cambridge",
+        "country": "UK"
+      },
+      "metadata": {
+        "hashtag": "#cbf2024",
+        "description": "The 47th Cambridge Beer Festival",
+        "website": "https://www.cambridgebeerfestival.com/"
+      },
+      "data": {
+        "base_url": "https://data.cambridgebeerfestival.com/cbf2024",
+        "available_types": [
+          {
+            "type": "beer",
+            "label": "Beer",
+            "url": "beer.json",
+            "icon": "beer"
+          },
+          {
+            "type": "cider",
+            "label": "Cider",
+            "url": "cider.json",
+            "icon": "cider"
+          },
+          {
+            "type": "mead",
+            "label": "Mead",
+            "url": "mead.json",
+            "icon": "mead"
+          }
+        ]
+      }
+    }
+  ]
+}
