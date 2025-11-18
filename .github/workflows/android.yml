@@ -250,7 +250,8 @@ jobs:
           try:
               tree = ET.parse('$xml_file')
               root = tree.getroot()
-              counter = root.find(\".//counter[@type='LINE']\")
+              # Get the report-level LINE counter (direct child), not method-level counters
+              counter = root.find(\"counter[@type='LINE']\")
               if counter is not None:
                   covered = float(counter.get('covered', 0))
                   missed = float(counter.get('missed', 0))
