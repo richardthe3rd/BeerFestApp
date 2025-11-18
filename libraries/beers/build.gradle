@@ -29,6 +29,16 @@ jacoco {
     toolVersion = "0.8.8"
 }
 
+// Ensure test task has JaCoCo enabled
+test {
+    jacoco {
+        enabled = true
+        destinationFile = file("${buildDir}/jacoco/test.exec")
+        includeNoLocationClasses = true
+        excludes = ['jdk.internal.*']
+    }
+}
+
 jacocoTestReport {
     dependsOn test
 
@@ -48,5 +58,9 @@ jacocoTestReport {
         logger.lifecycle("  Source dirs: ${sourceDirectories.files}")
         logger.lifecycle("  Class dirs: ${classDirectories.files}")
         logger.lifecycle("  Execution data: ${executionData.files}")
+        logger.lifecycle("  Execution data exists: ${test.jacoco.destinationFile.exists()}")
+        if (test.jacoco.destinationFile.exists()) {
+            logger.lifecycle("  Execution data size: ${test.jacoco.destinationFile.length()} bytes")
+        }
     }
 }
