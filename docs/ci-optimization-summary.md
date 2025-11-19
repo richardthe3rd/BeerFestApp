@@ -136,7 +136,7 @@ org.gradle.workers.max=4           # Parallel task execution
 - Safe to use in CI environments
 
 ### JVM Heap Sizing
-- Increased from 2g to 3g to accommodate parallel builds
+- Increased from 2g to 4g to accommodate parallel builds
 - Conservative sizing for GitHub Actions runners (7GB total RAM)
 - Reduces garbage collection overhead while leaving headroom for system processes
 - MetaspaceSize limit prevents OutOfMemoryError
