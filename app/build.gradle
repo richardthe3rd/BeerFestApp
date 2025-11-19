@@ -58,6 +58,15 @@ android {
         }
     }
 
+    testOptions {
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
+        animationsDisabled = true
+
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+
     // See https://www.timroes.de/2013/09/22/handling-signing-configs-with-gradle/
     if(project.hasProperty("RELEASE") && new File("app/release.gradle").exists()){
         logger.quiet("Building release")
