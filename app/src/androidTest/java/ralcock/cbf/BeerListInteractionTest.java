@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import ralcock.cbf.view.BeerDetailsActivity;
 
+import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.Espresso.pressBack;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -16,6 +17,7 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.containsString;
 
 /**
@@ -126,9 +128,11 @@ public class BeerListInteractionTest {
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
             // Click on the first beer in the list
-            // Note: This uses mainListView which might be a ListView or RecyclerView
-            // We try clicking on the list view itself
-            onView(withId(R.id.mainListView))
+            // The ListView uses the standard Android ListView ID (@android:id/list)
+            // We use onData() to click on the first item
+            onData(anything())
+                .inAdapterView(withId(android.R.id.list))
+                .atPosition(0)
                 .perform(click());
 
             // After clicking, we should see the details view
@@ -147,7 +151,9 @@ public class BeerListInteractionTest {
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
             // Click first beer
-            onView(withId(R.id.mainListView))
+            onData(anything())
+                .inAdapterView(withId(android.R.id.list))
+                .atPosition(0)
                 .perform(click());
 
             // Verify rating bar is displayed in details
@@ -173,7 +179,9 @@ public class BeerListInteractionTest {
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
             // Click first beer
-            onView(withId(R.id.mainListView))
+            onData(anything())
+                .inAdapterView(withId(android.R.id.list))
+                .atPosition(0)
                 .perform(click());
 
             // Verify bookmark button is displayed in details
@@ -192,7 +200,9 @@ public class BeerListInteractionTest {
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
             // Click first beer to open details
-            onView(withId(R.id.mainListView))
+            onData(anything())
+                .inAdapterView(withId(android.R.id.list))
+                .atPosition(0)
                 .perform(click());
 
             // Verify we're in details view (optional sanity check)
