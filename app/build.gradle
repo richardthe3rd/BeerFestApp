@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.0.0'
+        classpath 'com.android.tools.build:gradle:8.7.3'
     }
 }
 
@@ -35,7 +35,7 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion 34
     namespace 'ralcock.cbf'
 
     defaultConfig {
