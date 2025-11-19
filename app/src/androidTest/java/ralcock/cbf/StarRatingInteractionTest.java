@@ -12,6 +12,7 @@ import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anything;
 
 /**
@@ -79,9 +80,10 @@ public class StarRatingInteractionTest {
 
             // Click first beer to open details
             // The ListView uses the standard Android ListView ID (@android:id/list)
-            // We use onData() to click on the first item
+            // Since ViewPager contains multiple fragments with the same ID,
+            // we need to specify the visible/displayed ListView
             onData(anything())
-                .inAdapterView(withId(android.R.id.list))
+                .inAdapterView(allOf(withId(android.R.id.list), isDisplayed()))
                 .atPosition(0)
                 .perform(click());
 
@@ -143,7 +145,7 @@ public class StarRatingInteractionTest {
 
             // Click first beer
             onData(anything())
-                .inAdapterView(withId(android.R.id.list))
+                .inAdapterView(allOf(withId(android.R.id.list), isDisplayed()))
                 .atPosition(0)
                 .perform(click());
 
@@ -161,7 +163,7 @@ public class StarRatingInteractionTest {
 
             // Navigate to the same beer
             onData(anything())
-                .inAdapterView(withId(android.R.id.list))
+                .inAdapterView(allOf(withId(android.R.id.list), isDisplayed()))
                 .atPosition(0)
                 .perform(click());
 
