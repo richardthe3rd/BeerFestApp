@@ -152,6 +152,20 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Cache Android SDK
+        uses: actions/cache@v4
+        with:
+          path: |
+            /usr/local/lib/android/sdk/build-tools
+            /usr/local/lib/android/sdk/platforms
+            /usr/local/lib/android/sdk/platform-tools
+          key: ${{ runner.os }}-android-sdk-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-android-sdk-
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
