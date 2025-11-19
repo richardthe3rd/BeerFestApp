@@ -49,16 +49,6 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Cache Android SDK
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.android/build-cache
-          ~/.android/cache
-        key: android-sdk-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          android-sdk-${{ runner.os }}-
-
     - name: Decode Keystore
       id: decode_keystore
       uses: timheuer/base64-to-file@v1
@@ -72,7 +62,6 @@ jobs:
         develocity-injection-enabled: true
         develocity-plugin-version: '3.18.2'
         cache-read-only: false
-        cache-write-only: false
 
     - name: Build with Gradle
       run: ./gradlew assembleRelease -PRELEASE --scan --build-cache --parallel
@@ -158,7 +147,6 @@ jobs:
           develocity-injection-enabled: true
           develocity-plugin-version: '3.18.2'
           cache-read-only: false
-          cache-write-only: false
 
       - name: AVD cache
         uses: actions/cache@v4
