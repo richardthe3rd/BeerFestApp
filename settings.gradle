@@ -1,16 +1,14 @@
 plugins {
-    id("com.gradle.enterprise") version("3.9")
+    id("com.gradle.develocity") version("3.18.2")
 }
 
-// Configure Gradle Enterprise lazily to avoid configuration-time resolution
-gradle.settingsEvaluated {
-    gradleEnterprise {
-        if (System.getenv("CI") != null) {
-            buildScan {
-                publishAlways()
-                termsOfServiceUrl = "https://gradle.com/terms-of-service"
-                termsOfServiceAgree = "yes"
-            }
+// Configure Develocity build scans for CI environments
+develocity {
+    if (System.getenv("CI") != null) {
+        buildScan {
+            publishing.onlyIf { true }
+            termsOfUseUrl = "https://gradle.com/help/legal-terms-of-use"
+            termsOfUseAgree = "yes"
         }
     }
 }
