@@ -10,16 +10,22 @@
 
 **Problem:** The build job was running `./gradlew build` which executes both assembly AND all tests, then tests were run again separately.
 
-**Solution:** Changed to `./gradlew assembleRelease` to only build the APK without running tests.
+**Solution:** 
+- Build job: Changed to `./gradlew assembleRelease` to only build the release APK without running tests
+- Test job: Explicitly builds debug variant for instrumented tests (`assembleDebug assembleDebugAndroidTest`)
 
 ```yaml
-# Before
+# Build job - Before
 - name: Build with Gradle
   run: ./gradlew build -PRELEASE --scan
 
-# After
+# Build job - After
 - name: Build with Gradle
   run: ./gradlew assembleRelease -PRELEASE --scan --build-cache --parallel
+
+# Test job - Added debug build step
+- name: Build debug APK for instrumented tests
+  run: ./gradlew assembleDebug assembleDebugAndroidTest --scan --build-cache --parallel
 ```
 
 **Impact:** ~4-5 minutes savings by avoiding duplicate test execution
@@ -75,8 +81,8 @@
 # Before
 org.gradle.jvmargs=-Xmx2g -Dfile.encoding=UTF-8
 
-# After
-org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8
+# After - 3g for safety on GitHub runners (7GB total RAM)
+org.gradle.jvmargs=-Xmx3g -XX:MaxMetaspaceSize=1g -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8
 
 # New additions
 org.gradle.vfs.watch=true          # Faster incremental builds (Gradle 7.0+)
@@ -116,8 +122,9 @@ org.gradle.workers.max=4           # Parallel task execution
 - Safe to use in CI environments
 
 ### JVM Heap Sizing
-- Increased from 2g to 4g to accommodate parallel builds
-- Reduces garbage collection overhead
+- Increased from 2g to 3g to accommodate parallel builds
+- Conservative sizing for GitHub Actions runners (7GB total RAM)
+- Reduces garbage collection overhead while leaving headroom for system processes
 - MetaspaceSize limit prevents OutOfMemoryError
 - HeapDumpOnOutOfMemoryError aids debugging if issues occur
 
