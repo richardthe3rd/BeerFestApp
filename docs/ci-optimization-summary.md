@@ -51,7 +51,21 @@
 
 **Impact:** ~2-3 minutes savings from reusing build outputs
 
-### 3. Android SDK Caching
+### 3. Workflow Concurrency Control
+
+**Problem:** Duplicate workflow runs were occurring for the same PR/commit (GitHub Actions bug causing `pull_request` events to trigger twice).
+
+**Solution:** Added concurrency group to prevent duplicate runs and cancel stale runs when new commits are pushed.
+
+```yaml
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+```
+
+**Impact:** Prevents wasted CI resources and confusion from duplicate workflow runs
+
+### 4. Android SDK Caching
 
 **Problem:** Android SDK build cache wasn't being persisted between workflow runs.
 
@@ -71,7 +85,7 @@
 
 **Impact:** ~1 minute savings from cached SDK components
 
-### 4. Gradle Performance Tuning (gradle.properties)
+### 5. Gradle Performance Tuning (gradle.properties)
 
 **Problem:** JVM heap size was modest (2g) and some modern Gradle features weren't enabled.
 
