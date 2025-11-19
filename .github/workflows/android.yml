@@ -45,6 +45,16 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
+    - name: Cache Android SDK
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.android/build-cache
+          ~/.android/cache
+        key: android-sdk-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          android-sdk-${{ runner.os }}-
+
     - name: Decode Keystore
       id: decode_keystore
       uses: timheuer/base64-to-file@v1
@@ -57,9 +67,11 @@ jobs:
       with:
         develocity-injection-enabled: true
         develocity-plugin-version: '3.18.2'
+        cache-read-only: false
+        cache-write-only: false
 
     - name: Build with Gradle
-      run: ./gradlew build -PRELEASE --scan
+      run: ./gradlew assembleRelease -PRELEASE --scan --build-cache --parallel
       env:
         SIGNING_KEYSTORE: ${{ steps.decode_keystore.outputs.filePath }}
         SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
@@ -67,7 +79,7 @@ jobs:
         SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
 
     - name: Run library unit tests with coverage
-      run: ./gradlew :libraries:beers:test :libraries:beers:jacocoTestReport --scan
+      run: ./gradlew :libraries:beers:test :libraries:beers:jacocoTestReport --scan --build-cache --parallel
 
     - name: Publish Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
@@ -141,6 +153,8 @@ jobs:
         with:
           develocity-injection-enabled: true
           develocity-plugin-version: '3.18.2'
+          cache-read-only: false
+          cache-write-only: false
 
       - name: AVD cache
         uses: actions/cache@v4
@@ -174,11 +188,11 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew connectedCheck --scan
+          script: ./gradlew connectedCheck --scan --build-cache --parallel
 
       - name: Generate coverage report
         if: always()
-        run: ./gradlew jacocoTestReport --scan
+        run: ./gradlew jacocoTestReport --scan --build-cache
 
       - name: Publish Instrumented Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
