@@ -131,7 +131,7 @@ android.defaults.buildfeatures.aidl=false
 android.defaults.buildfeatures.renderscript=false
 android.defaults.buildfeatures.resvalues=false
 android.defaults.buildfeatures.shaders=false
-android.enableAdditionalTestOutput=false
+android.enableAdditionalTestOutput=true  # Changed from false - required for AGP 8.7.3+ with test orchestrator
 ```
 
 **Benefits:**
@@ -139,7 +139,12 @@ android.enableAdditionalTestOutput=false
 - `android.enableR8.fullMode=true`: Better code optimization
 - Disabled unused Android build features reduce configuration overhead
 
-**Impact:** 5-10% faster builds
+**Impact:** 5-10% faster builds (originally; see note below)
+
+**⚠️ Note (AGP 8.7.3+ Update):**
+- `android.enableAdditionalTestOutput` must be `true` (or omitted for default) when using AGP 8.7.3+ with test orchestrator (`execution 'ANDROIDX_TEST_ORCHESTRATOR'`)
+- Setting to `false` causes: "Cannot query the value of property 'additionalTestOutputDir' because it has no value available"
+- Trade-off: May slightly impact build performance compared to having it disabled
 
 ---
 
@@ -754,8 +759,10 @@ android.defaults.buildfeatures.aidl=false
 android.defaults.buildfeatures.renderscript=false
 android.defaults.buildfeatures.resvalues=false
 android.defaults.buildfeatures.shaders=false
-android.enableAdditionalTestOutput=false
+android.enableAdditionalTestOutput=true  # Changed from false - required for AGP 8.7.3+ with test orchestrator
 ```
+
+**⚠️ AGP 8.7.3+ Note:** `android.enableAdditionalTestOutput` must be `true` when using test orchestrator. See Phase 1 implementation notes above.
 
 ---
 

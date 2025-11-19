@@ -32,6 +32,9 @@ dependencies {
     androidTestImplementation 'androidx.legacy:legacy-support-v4:1.0.0'
     androidTestImplementation 'android.arch.core:core-testing:1.1.1'
     androidTestImplementation 'org.easymock:easymock:3.6'
+
+    // Test Orchestrator - required when using execution 'ANDROIDX_TEST_ORCHESTRATOR'
+    androidTestUtil 'androidx.test:orchestrator:1.5.0'
 }
 
 android {
