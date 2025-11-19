@@ -51,16 +51,19 @@ jacocoTestReport {
     // Use Gradle's source sets to automatically find the right paths
     sourceDirectories.setFrom(sourceSets.main.allSource.srcDirs)
     classDirectories.setFrom(sourceSets.main.output)
-    executionData.setFrom(test.jacoco.destinationFile)
+
+    // Store the execution data file reference at configuration time for config cache compatibility
+    def execDataFile = test.jacoco.destinationFile
+    executionData.setFrom(execDataFile)
 
     doFirst {
         logger.lifecycle("JaCoCo Report Configuration:")
         logger.lifecycle("  Source dirs: ${sourceDirectories.files}")
         logger.lifecycle("  Class dirs: ${classDirectories.files}")
         logger.lifecycle("  Execution data: ${executionData.files}")
-        logger.lifecycle("  Execution data exists: ${test.jacoco.destinationFile.exists()}")
-        if (test.jacoco.destinationFile.exists()) {
-            logger.lifecycle("  Execution data size: ${test.jacoco.destinationFile.length()} bytes")
+        logger.lifecycle("  Execution data exists: ${execDataFile.exists()}")
+        if (execDataFile.exists()) {
+            logger.lifecycle("  Execution data size: ${execDataFile.length()} bytes")
         }
     }
 }
