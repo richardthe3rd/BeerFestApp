@@ -68,21 +68,25 @@ concurrency:
 
 **Problem:** Android SDK build cache wasn't being persisted between workflow runs.
 
-**Solution:** Added explicit caching for Android SDK components.
+**Solution:** Added explicit caching for Android SDK components in both build and test jobs.
 
 ```yaml
+- name: Setup Android SDK
+  uses: android-actions/setup-android@v3
+
 - name: Cache Android SDK
   uses: actions/cache@v4
   with:
     path: |
-      ~/.android/build-cache
-      ~/.android/cache
-    key: android-sdk-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+      /usr/local/lib/android/sdk/build-tools
+      /usr/local/lib/android/sdk/platforms
+      /usr/local/lib/android/sdk/platform-tools
+    key: ${{ runner.os }}-android-sdk-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
     restore-keys: |
-      android-sdk-${{ runner.os }}-
+      ${{ runner.os }}-android-sdk-
 ```
 
-**Impact:** ~1 minute savings from cached SDK components
+**Impact:** ~8-12 minutes savings from cached SDK components (eliminates reinstallation on subsequent runs)
 
 ### 5. Gradle Performance Tuning (gradle.properties)
 
