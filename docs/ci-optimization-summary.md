@@ -45,8 +45,7 @@
   with:
     develocity-injection-enabled: true
     develocity-plugin-version: '3.18.2'
-    cache-read-only: false      # Enable cache writes
-    cache-write-only: false     # Enable cache reads
+    cache-read-only: false      # Enable cache reads and writes
 ```
 
 **Impact:** ~2-3 minutes savings from reusing build outputs
