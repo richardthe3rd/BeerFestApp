@@ -17,6 +17,7 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.containsString;
 
@@ -129,9 +130,10 @@ public class BeerListInteractionTest {
 
             // Click on the first beer in the list
             // The ListView uses the standard Android ListView ID (@android:id/list)
-            // We use onData() to click on the first item
+            // Since ViewPager contains multiple fragments with the same ID,
+            // we need to specify the visible/displayed ListView
             onData(anything())
-                .inAdapterView(withId(android.R.id.list))
+                .inAdapterView(allOf(withId(android.R.id.list), isDisplayed()))
                 .atPosition(0)
                 .perform(click());
 
@@ -152,7 +154,7 @@ public class BeerListInteractionTest {
 
             // Click first beer
             onData(anything())
-                .inAdapterView(withId(android.R.id.list))
+                .inAdapterView(allOf(withId(android.R.id.list), isDisplayed()))
                 .atPosition(0)
                 .perform(click());
 
@@ -180,7 +182,7 @@ public class BeerListInteractionTest {
 
             // Click first beer
             onData(anything())
-                .inAdapterView(withId(android.R.id.list))
+                .inAdapterView(allOf(withId(android.R.id.list), isDisplayed()))
                 .atPosition(0)
                 .perform(click());
 
@@ -201,7 +203,7 @@ public class BeerListInteractionTest {
 
             // Click first beer to open details
             onData(anything())
-                .inAdapterView(withId(android.R.id.list))
+                .inAdapterView(allOf(withId(android.R.id.list), isDisplayed()))
                 .atPosition(0)
                 .perform(click());
 
