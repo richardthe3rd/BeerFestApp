@@ -6,11 +6,13 @@ import androidx.test.filters.LargeTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static org.hamcrest.Matchers.anything;
 
 /**
  * End-to-end tests for star rating functionality.
@@ -76,7 +78,11 @@ public class StarRatingInteractionTest {
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
             // Click first beer to open details
-            onView(withId(R.id.mainListView))
+            // The ListView uses the standard Android ListView ID (@android:id/list)
+            // We use onData() to click on the first item
+            onData(anything())
+                .inAdapterView(withId(android.R.id.list))
+                .atPosition(0)
                 .perform(click());
 
             // Verify rating bar is displayed
@@ -136,7 +142,9 @@ public class StarRatingInteractionTest {
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
             // Click first beer
-            onView(withId(R.id.mainListView))
+            onData(anything())
+                .inAdapterView(withId(android.R.id.list))
+                .atPosition(0)
                 .perform(click());
 
             // Verify rating bar is displayed
@@ -152,7 +160,9 @@ public class StarRatingInteractionTest {
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
             // Navigate to the same beer
-            onView(withId(R.id.mainListView))
+            onData(anything())
+                .inAdapterView(withId(android.R.id.list))
+                .atPosition(0)
                 .perform(click());
 
             // Verify rating bar is still displayed (basic sanity check)
