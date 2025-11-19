@@ -161,7 +161,7 @@ org.gradle.workers.max=4           # Parallel task execution
 After deployment, monitor:
 1. **Build duration** - Should drop to 5-7 minutes
 2. **Cache hit rate** - Should be >80% after first run
-3. **Memory usage** - Should stay under 4GB with new settings
+3. **JVM heap usage** - Should stay under the configured 4GB maximum (total process memory may be higher)
 4. **Build success rate** - Should remain at 100%
 
 If builds still take >8 minutes:
