@@ -39,9 +39,9 @@
 
 | Reference | Content |
 |-----------|---------|
+| **[CI/CD](docs/cicd/)** ⭐ | GitHub Actions optimization, build performance |
 | **[Architecture](docs/architecture/)** _(coming soon)_ | System design, MVC layers |
 | **[Development](docs/development/)** _(coming soon)_ | Build, test, code conventions |
-| **[CI/CD](docs/cicd/)** _(coming soon)_ | GitHub Actions, release process |
 | **[API Reference](docs/api/)** _(coming soon)_ | Data models, DAOs, JSON format |
 
 ---
