@@ -31,3 +31,5 @@ Minimum pre-PR sanity check (keep this short)
 
 Why this file is small
 - CLAUDE.md already contains the full checklist, commands, and pitfalls. This file avoids duplication and serves as the quick pointer for someone who needs only the minimal steps.
+
+Want me to open a PR adding this file to main now? If yes I will create the branch and PR with this content.
