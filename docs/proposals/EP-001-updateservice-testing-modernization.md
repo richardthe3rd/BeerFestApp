@@ -1,6 +1,6 @@
 # EP-001: UpdateService Testing and Modernization
 
-**Status:** Proposed (Revision 2)
+**Status:** Proposed (Revision 2.0.0)
 **Author:** Development Team
 **Created:** 2025-11-20
 **Updated:** 2025-11-20 (Revised after review feedback)
@@ -65,7 +65,7 @@ A **4-phase, 4-5 week initiative** to:
 ### Goals
 
 **Primary Goals:**
-- Achieve **80-90% test coverage** on UpdateService, UpdateTask, and update integration flow
+- Achieve **80-85% test coverage** on UpdateService, UpdateTask, and update integration flow
 - Enable **safe refactoring** away from deprecated APIs
 - **Prevent regressions** in critical update functionality
 - Establish **testing patterns** for future service development
@@ -266,7 +266,7 @@ public void testDownload() throws Exception {
 **Complete Setup Pattern:**
 
 ```java
-@RunWith(AndroidJUnit4.class)
+@RunWith(RobolectricTestRunner.class)
 public class UpdateTaskTest {
     private MockWebServer fMockServer;
     private BeerDatabaseHelper fDbHelper;
@@ -804,7 +804,7 @@ UpdateService → UpdateCallback interface → Activity implements callback
 ### Refactoring Checklist
 
 **Pre-Refactoring:**
-- [ ] All Phase 1-4 tests passing (50+ tests)
+- [ ] All Phase 1-4 tests passing (66 tests)
 - [ ] Code coverage ≥ 80% on update components
 - [ ] Tests run successfully in CI
 - [ ] Team review of test suite completed
@@ -871,8 +871,8 @@ test:
 ```
 
 **Coverage Thresholds:**
-- UpdateTask: 90% minimum
-- UpdateService: 85% minimum
+- UpdateTask: 85% minimum
+- UpdateService: 80% minimum
 - Overall update flow: 80% minimum
 - Fail build if coverage drops below thresholds
 
@@ -884,17 +884,17 @@ test:
 
 | Metric | Current | Target | Measured By |
 |--------|---------|--------|-------------|
-| **UpdateTask Coverage** | 0% | 90%+ | JaCoCo report |
-| **UpdateService Coverage** | 0% | 85%+ | JaCoCo report |
+| **UpdateTask Coverage** | 0% | 85%+ | JaCoCo report |
+| **UpdateService Coverage** | 0% | 80%+ | JaCoCo report |
 | **Integration Coverage** | 0% | 80%+ | JaCoCo report |
-| **Test Count** | 0 | 50+ | Test reports |
+| **Test Count** | 0 | 66 | Test reports |
 | **Test Execution Time** | N/A | < 5 min | CI logs |
 | **Flaky Tests** | N/A | 0 | Test stability |
 
 ### Qualitative Criteria
 
 **Phase 1-3 Complete When:**
-- ✅ All 50+ tests passing locally and in CI
+- ✅ All 66 tests passing locally and in CI
 - ✅ MockWebServer successfully mocking network calls
 - ✅ Robolectric tests running without real devices
 - ✅ Integration tests verifying UI refresh
@@ -974,7 +974,7 @@ test:
 
 ### Risk 5: Timeline Slippage
 
-**Risk:** 3-4 week timeline extends longer
+**Risk:** 4-5 week timeline extends longer
 **Probability:** Medium
 **Impact:** Medium (delays other work)
 
@@ -1059,9 +1059,9 @@ test:
 
 ### Technical Dependencies
 
-- **MockWebServer 5.2.1** - OkHttp's testing library for network mocking
-- **Robolectric 4.11** - Android framework mocking for unit tests
-- **Mockito 5.18.0** - Mocking library for Java
+- **MockWebServer 4.12.0** - OkHttp's testing library for network mocking
+- **Robolectric 4.13** - Android framework mocking for unit tests
+- **Mockito 5.14.2** - Mocking library for Java
 - **Awaitility 4.2.0** - Async test utilities
 - **AndroidX Test 1.5.0** - Instrumented testing framework
 - **Espresso 3.5.0** - UI testing framework
@@ -1074,7 +1074,7 @@ test:
 
 ### Human Dependencies
 
-- **Development team** - 1 developer, 3-4 weeks focused effort
+- **Development team** - 1 developer, 4-5 weeks focused effort
 - **Code reviewer** - For test design and implementation review
 - **QA** - Manual testing after refactoring phase
 
@@ -1259,9 +1259,9 @@ This EP assumes the following:
    - Alternative noted (dependency injection)
 
 6. **✅ Dependencies Updated**
-   - Robolectric: 4.11 → 4.13 (latest stable)
-   - Mockito: 5.18.0 → 5.14.2 (Java 8 compatible)
-   - MockWebServer: 5.2.1 → 4.12.0 (stable OkHttp 4.x)
+   - Robolectric: 4.11 (proposed) → 4.13 (latest stable)
+   - Mockito: Corrected to 5.14.2 (Java 8 compatible)
+   - MockWebServer: Corrected to 4.12.0 (stable OkHttp 4.x)
    - Justified each version choice
 
 7. **✅ Assumptions Added**
