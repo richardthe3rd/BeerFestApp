@@ -5,15 +5,19 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.robolectric.Shadows.shadowOf;
 
 import android.content.Context;
+import android.os.Looper;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.shadows.ShadowLooper;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -21,6 +25,9 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import ralcock.cbf.model.BeerDatabaseHelper;
 import ralcock.cbf.testutil.TestDataFactory;
@@ -1064,6 +1071,236 @@ public class UpdateTaskTest {
             hexString.append(hex);
         }
         return hexString.toString();
+    }
+
+    // ========================================
+    // AsyncTask Lifecycle Tests (Category 8) - Phase 3
+    // ========================================
+
+    /**
+     * Test 26: AsyncTask execute() calls doInBackground().
+     * CRITICAL: Verifies task actually runs when execute() is called.
+     * Tests the full AsyncTask lifecycle, not just direct doInBackground() call.
+     */
+    @Test
+    public void testExecuteCallsDoInBackground() throws Exception {
+        // Arrange
+        final AtomicBoolean doInBackgroundCalled = new AtomicBoolean(false);
+        final Context context = RuntimeEnvironment.getApplication();
+        fDbHelper = new BeerDatabaseHelper(context);
+
+        final String validJson = TestDataFactory.createValidBeerJSON(3);
+        final InputStream stream = new ByteArrayInputStream(validJson.getBytes());
+
+        final TestParams params = new TestParams(
+                true, true, true, stream, fDbHelper
+        );
+
+        // Create task that tracks execution
+        UpdateTask task = new UpdateTask() {
+            @Override
+            protected Result doInBackground(Params... params) {
+                doInBackgroundCalled.set(true);
+                return super.doInBackground(params);
+            }
+        };
+
+        // Act - Use execute() not direct call
+        task.execute(params);
+
+        // Wait for background thread (Robolectric 4.x approach)
+        // Note: AsyncTask in Robolectric runs synchronously on background scheduler
+        shadowOf(Looper.getMainLooper()).idle();
+
+        // Assert
+        assertTrue("execute() should call doInBackground()",
+                   doInBackgroundCalled.get());
+
+        // Verify result
+        final UpdateTask.Result result = task.get();
+        assertTrue("Task should complete successfully", result.success());
+    }
+
+    /**
+     * Test 27: onProgressUpdate() called during execution.
+     * CRITICAL: Verifies progress callbacks work (needed for UI updates).
+     */
+    @Test
+    public void testOnProgressUpdateCalled() throws Exception {
+        // Arrange
+        final AtomicInteger progressCallCount = new AtomicInteger(0);
+        final AtomicInteger lastProgress = new AtomicInteger(0);
+        final AtomicInteger lastTotal = new AtomicInteger(0);
+
+        final Context context = RuntimeEnvironment.getApplication();
+        fDbHelper = new BeerDatabaseHelper(context);
+
+        // Larger dataset to ensure multiple progress updates
+        final String validJson = TestDataFactory.createValidBeerJSON(50);
+        final InputStream stream = new ByteArrayInputStream(validJson.getBytes());
+
+        final TestParams params = new TestParams(
+                true, true, true, stream, fDbHelper
+        );
+
+        // Create task that tracks progress callbacks
+        UpdateTask task = new UpdateTask() {
+            @Override
+            protected void onProgressUpdate(Progress... values) {
+                super.onProgressUpdate(values);
+                progressCallCount.incrementAndGet();
+                lastProgress.set(values[0].getProgress());
+                lastTotal.set(values[0].getTotal());
+            }
+        };
+
+        // Act
+        task.execute(params);
+
+        // Wait for completion (Robolectric 4.x approach)
+        shadowOf(Looper.getMainLooper()).idle();
+
+        // Assert
+        assertTrue("onProgressUpdate should be called at least once",
+                   progressCallCount.get() > 0);
+        assertTrue("Progress should be > 0", lastProgress.get() > 0);
+        assertEquals("Total should match beer count", 50, lastTotal.get());
+        assertTrue("Final progress should be near total",
+                   lastProgress.get() >= 45); // Allow for async timing
+    }
+
+    /**
+     * Test 28: onPostExecute() called after completion.
+     * CRITICAL: Verifies result callback works (needed for broadcasting results).
+     */
+    @Test
+    public void testOnPostExecuteCalled() throws Exception {
+        // Arrange
+        final AtomicBoolean postExecuteCalled = new AtomicBoolean(false);
+        final AtomicReference<UpdateTask.Result> capturedResult =
+            new AtomicReference<>();
+
+        final Context context = RuntimeEnvironment.getApplication();
+        fDbHelper = new BeerDatabaseHelper(context);
+
+        final String validJson = TestDataFactory.createValidBeerJSON(10);
+        final InputStream stream = new ByteArrayInputStream(validJson.getBytes());
+
+        final TestParams params = new TestParams(
+                true, true, true, stream, fDbHelper
+        );
+
+        // Create task that tracks post-execute
+        UpdateTask task = new UpdateTask() {
+            @Override
+            protected void onPostExecute(Result result) {
+                super.onPostExecute(result);
+                postExecuteCalled.set(true);
+                capturedResult.set(result);
+            }
+        };
+
+        // Act
+        task.execute(params);
+
+        // Wait for completion (Robolectric 4.x approach)
+        shadowOf(Looper.getMainLooper()).idle();
+
+        // Assert
+        assertTrue("onPostExecute should be called", postExecuteCalled.get());
+        assertNotNull("Result should be captured", capturedResult.get());
+        assertTrue("Result should indicate success",
+                   capturedResult.get().success());
+
+        UpdateTask.UpdateResult updateResult =
+            (UpdateTask.UpdateResult) capturedResult.get();
+        assertEquals("Result should have correct count",
+                     10, updateResult.getCount());
+    }
+
+    /**
+     * Test 29: Task cancellation works.
+     * Verifies that AsyncTask can be cancelled mid-execution.
+     */
+    @Test
+    public void testTaskCancellation() throws Exception {
+        // Arrange
+        final AtomicBoolean cancelled = new AtomicBoolean(false);
+        final Context context = RuntimeEnvironment.getApplication();
+        fDbHelper = new BeerDatabaseHelper(context);
+
+        // Large dataset to allow time for cancellation
+        final String validJson = TestDataFactory.createValidBeerJSON(1000);
+        final InputStream stream = new ByteArrayInputStream(validJson.getBytes());
+
+        final TestParams params = new TestParams(
+                true, true, true, stream, fDbHelper
+        );
+
+        UpdateTask task = new UpdateTask() {
+            @Override
+            protected void onCancelled(Result result) {
+                super.onCancelled(result);
+                cancelled.set(true);
+            }
+        };
+
+        // Act - Start and immediately cancel
+        task.execute(params);
+        task.cancel(true);
+
+        // Wait for cancellation (Robolectric 4.x approach)
+        shadowOf(Looper.getMainLooper()).idle();
+
+        // Assert
+        assertTrue("Task should be cancelled", task.isCancelled());
+        assertTrue("onCancelled should be called", cancelled.get());
+    }
+
+    /**
+     * Test 30: Multiple tasks can run sequentially.
+     * Verifies that tasks don't interfere with each other.
+     */
+    @Test
+    public void testSequentialTaskExecution() throws Exception {
+        // Arrange
+        final Context context = RuntimeEnvironment.getApplication();
+        fDbHelper = new BeerDatabaseHelper(context);
+
+        // First task - insert 5 beers
+        final String json1 = TestDataFactory.createValidBeerJSON(5);
+        final InputStream stream1 = new ByteArrayInputStream(json1.getBytes());
+        final TestParams params1 = new TestParams(
+                true, true, true, stream1, fDbHelper
+        );
+
+        UpdateTask task1 = new UpdateTask();
+
+        // Act - Execute first task
+        task1.execute(params1);
+        shadowOf(Looper.getMainLooper()).idle();
+
+        assertEquals("First task should insert 5 beers",
+                     5, fDbHelper.getBeers().getNumberOfBeers());
+
+        // Second task - incremental update with 3 more
+        final String json2 = TestDataFactory.createValidBeerJSON(3);
+        final InputStream stream2 = new ByteArrayInputStream(json2.getBytes());
+        final TestParams params2 = new TestParams(
+                false, true, true, stream2, fDbHelper
+        );
+
+        UpdateTask task2 = new UpdateTask();
+
+        // Act - Execute second task
+        task2.execute(params2);
+        shadowOf(Looper.getMainLooper()).idle();
+
+        // Assert - Both tasks completed
+        assertTrue("First task should complete", task1.get().success());
+        assertTrue("Second task should complete", task2.get().success());
+        assertEquals("Should have 3 beers after incremental",
+                     3, fDbHelper.getBeers().getNumberOfBeers());
     }
 
     /**
