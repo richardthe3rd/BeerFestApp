@@ -164,7 +164,7 @@ public class SortingAndFilteringTest {
             onView(withId(R.id.sort)).perform(click());
 
             // Verify dialog is displayed by checking for dialog title
-            onView(withText("Order by")).check(matches(isDisplayed()));
+            onView(withText(R.string.sort_dialog_title)).check(matches(isDisplayed()));
         }
     }
 
