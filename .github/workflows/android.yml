@@ -23,6 +23,10 @@ on:
       - 'docs/**'
       - '*.md'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   checks: write
@@ -46,6 +50,17 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
+    - name: Cache Android SDK
+      uses: actions/cache@v4
+      with:
+        path: |
+          /usr/local/lib/android/sdk/build-tools
+          /usr/local/lib/android/sdk/platforms
+          /usr/local/lib/android/sdk/platform-tools
+        key: ${{ runner.os }}-android-sdk-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-android-sdk-
+
     - name: Decode Keystore
       id: decode_keystore
       uses: timheuer/base64-to-file@v1
@@ -58,9 +73,10 @@ jobs:
       with:
         develocity-injection-enabled: true
         develocity-plugin-version: '3.18.2'
+        cache-read-only: false
 
     - name: Build with Gradle
-      run: ./gradlew build -PRELEASE --scan
+      run: ./gradlew assembleRelease -PRELEASE --scan --build-cache --parallel
       env:
         SIGNING_KEYSTORE: ${{ steps.decode_keystore.outputs.filePath }}
         SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
@@ -68,7 +84,7 @@ jobs:
         SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
 
     - name: Run library unit tests with coverage
-      run: ./gradlew :libraries:beers:test :libraries:beers:jacocoTestReport --scan
+      run: ./gradlew :libraries:beers:test :libraries:beers:jacocoTestReport --scan --build-cache --parallel
 
     - name: Publish Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
@@ -138,11 +154,26 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Cache Android SDK
+        uses: actions/cache@v4
+        with:
+          path: |
+            /usr/local/lib/android/sdk/build-tools
+            /usr/local/lib/android/sdk/platforms
+            /usr/local/lib/android/sdk/platform-tools
+          key: ${{ runner.os }}-android-sdk-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-android-sdk-
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           develocity-injection-enabled: true
           develocity-plugin-version: '3.18.2'
+          cache-read-only: false
 
       - name: AVD cache
         uses: actions/cache@v4
@@ -152,6 +183,9 @@ jobs:
             ~/.android/avd/*
             ~/.android/adb*
           key: avd-${{ matrix.api-level }}
+
+      - name: Build debug APK for instrumented tests
+        run: ./gradlew assembleDebug assembleDebugAndroidTest --scan --build-cache --parallel
 
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
@@ -176,11 +210,11 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew connectedCheck --scan
+          script: ./gradlew connectedCheck --scan --build-cache --parallel
 
       - name: Generate coverage report
         if: always()
-        run: ./gradlew jacocoTestReport --scan
+        run: ./gradlew jacocoTestReport --scan --build-cache
 
       - name: Publish Instrumented Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
