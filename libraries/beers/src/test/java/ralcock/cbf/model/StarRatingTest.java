@@ -45,4 +45,54 @@ public class StarRatingTest
                    greaterThan(new StarRating(2)));
     }
 
+    @Test
+    public void toStringReturnsAsterisks()
+    {
+        assertThat(new StarRating(0).toString(), equalTo(""));
+        assertThat(new StarRating(1).toString(), equalTo("*"));
+        assertThat(new StarRating(3).toString(), equalTo("***"));
+        assertThat(new StarRating(5).toString(), equalTo("*****"));
+    }
+
+    @Test
+    public void toFancyStringReturnsUnicodeStars()
+    {
+        char star = 0x272F;
+        assertThat(new StarRating(0).toFancyString(), equalTo(""));
+        assertThat(new StarRating(1).toFancyString(), equalTo(String.valueOf(star)));
+        assertThat(new StarRating(3).toFancyString(),
+                   equalTo(String.valueOf(star) + star + star));
+    }
+
+    @Test
+    public void noStarsConstant()
+    {
+        assertThat(StarRating.NO_STARS.getNumberOfStars(), equalTo(0));
+        assertThat(StarRating.NO_STARS, comparesEqualTo(new StarRating(0)));
+    }
+
+    @Test
+    public void floatTruncation()
+    {
+        assertThat(new StarRating(3.7f).getNumberOfStars(), equalTo(3));
+        assertThat(new StarRating(4.9f).getNumberOfStars(), equalTo(4));
+        assertThat(new StarRating(0.5f).getNumberOfStars(), equalTo(0));
+    }
+
+    @Test
+    public void negativeRating()
+    {
+        StarRating negative = new StarRating(-1);
+        assertThat(negative.getNumberOfStars(), equalTo(-1));
+        assertThat(negative.toString(), equalTo(""));
+    }
+
+    @Test
+    public void ratingAboveFive()
+    {
+        StarRating aboveFive = new StarRating(10);
+        assertThat(aboveFive.getNumberOfStars(), equalTo(10));
+        assertThat(aboveFive.toString(), equalTo("**********"));
+    }
+
 }
