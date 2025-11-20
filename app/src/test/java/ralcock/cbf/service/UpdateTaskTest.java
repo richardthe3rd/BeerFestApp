@@ -14,6 +14,7 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -147,6 +148,41 @@ public class UpdateTaskTest {
         assertNotNull(result);
         assertTrue("Expected NoUpdateRequiredResult when MD5 matches",
                 result instanceof UpdateTask.NoUpdateRequiredResult);
+    }
+
+    /**
+     * Test 4: When stream throws IOException, should return FailedUpdateResult.
+     */
+    @Test
+    public void testFailedDownloadIOException() throws Exception {
+        // Arrange - Create a stream that throws IOException when read
+        final InputStream faultyStream = new InputStream() {
+            @Override
+            public int read() throws IOException {
+                throw new IOException("Network error");
+            }
+        };
+
+        final TestParams params = new TestParams(
+                false,  // cleanUpdate = false
+                true,   // updateDue = true
+                null,   // needsUpdate not checked (exception thrown first)
+                faultyStream,
+                null    // dbHelper not needed
+        );
+
+        final UpdateTask task = new UpdateTask();
+
+        // Act
+        final UpdateTask.Result result = task.doInBackground(params);
+
+        // Assert
+        assertNotNull(result);
+        assertTrue("Expected failure result when IOException occurs", !result.success());
+        assertNotNull("Failed result should contain throwable", result.getThrowable());
+        assertTrue("Throwable should be IOException",
+                result.getThrowable() instanceof IOException);
+        assertEquals("Network error", result.getThrowable().getMessage());
     }
 
     /**
