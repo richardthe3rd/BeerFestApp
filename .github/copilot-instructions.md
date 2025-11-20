@@ -6,7 +6,7 @@
 
 - **Language**: Java 17
 - **Build System**: Gradle Wrapper 8.1.1 (Android Gradle Plugin 8.0.0)
-- **Android SDK**: Min API 14, Target API 34, Compile API 34
+- **Android SDK**: Min API 14, Target API 34, Compile API 33
 - **Database**: OrmLite 5.0 for SQLite
 - **UI**: Material Design 1.8.0
 - **Repository**: https://github.com/richardthe3rd/BeerFestApp
