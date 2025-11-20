@@ -312,30 +312,30 @@ public class AppPreferencesTest {
 
         BeerList.Config config = fAppPreferences.getBeerListConfig();
 
-        assertThat(config.getSortOrder(), equalTo(expectedSort));
-        assertThat(config.getFilterText(), equalTo(expectedFilter));
-        assertThat(config.getStylesToHide(), equalTo(expectedStyles));
-        assertThat(config.getStatusToShow(), equalTo(StatusToShow.AVAILABLE_ONLY));
+        assertThat(config.SortOrder, equalTo(expectedSort));
+        assertThat(config.SearchText.toString(), equalTo(expectedFilter));
+        assertThat(config.StylesToHide, equalTo(expectedStyles));
+        assertThat(config.StatusToShow, equalTo(StatusToShow.AVAILABLE_ONLY));
     }
 
     @Test
     public void getBeerListConfig_returnsDefaultValuesWhenNothingSet() {
         BeerList.Config config = fAppPreferences.getBeerListConfig();
 
-        assertThat(config.getSortOrder(), equalTo(SortOrder.BREWERY_NAME_ASC));
-        assertThat(config.getFilterText(), equalTo(""));
-        assertThat(config.getStylesToHide().isEmpty(), is(true));
-        assertThat(config.getStatusToShow(), equalTo(StatusToShow.ALL));
+        assertThat(config.SortOrder, equalTo(SortOrder.BREWERY_NAME_ASC));
+        assertThat(config.SearchText.toString(), equalTo(""));
+        assertThat(config.StylesToHide.isEmpty(), is(true));
+        assertThat(config.StatusToShow, equalTo(StatusToShow.ALL));
     }
 
     @Test
     public void getBeerListConfig_reflectsPreferenceChanges() {
         BeerList.Config config1 = fAppPreferences.getBeerListConfig();
-        assertThat(config1.getSortOrder(), equalTo(SortOrder.BREWERY_NAME_ASC));
+        assertThat(config1.SortOrder, equalTo(SortOrder.BREWERY_NAME_ASC));
 
         fAppPreferences.setSortOrder(SortOrder.BEER_NAME_DESC);
         BeerList.Config config2 = fAppPreferences.getBeerListConfig();
-        assertThat(config2.getSortOrder(), equalTo(SortOrder.BEER_NAME_DESC));
+        assertThat(config2.SortOrder, equalTo(SortOrder.BEER_NAME_DESC));
     }
 
     @Test
@@ -369,5 +369,48 @@ public class AppPreferencesTest {
 
         assertThat(instance2.getSortOrder(), equalTo(SortOrder.BEER_ABV_ASC));
         assertThat(instance2.getFilterText(), equalTo("Shared"));
+    }
+
+    @Test
+    public void getStylesToHide_handlesCorruptedJSON() {
+        // Manually corrupt the JSON in SharedPreferences
+        fContext.getSharedPreferences(CamBeerFestApplication.class.getSimpleName(), 0)
+                .edit()
+                .putString("stylesToHide", "{this is not valid JSON[]")
+                .commit();
+
+        // Should return empty set when JSON is corrupted (default value)
+        Set<String> retrieved = fAppPreferences.getStylesToHide();
+        assertThat(retrieved, notNullValue());
+        assertThat(retrieved.isEmpty(), is(true));
+    }
+
+    @Test
+    public void getStylesToHide_returnsDefensiveCopy() {
+        Set<String> original = new HashSet<>(Arrays.asList("IPA", "Stout"));
+        fAppPreferences.setStylesToHide(original);
+
+        // Get the styles and modify the returned set
+        Set<String> retrieved = fAppPreferences.getStylesToHide();
+        retrieved.add("Lager");
+
+        // Original stored preferences should not be affected
+        Set<String> retrievedAgain = fAppPreferences.getStylesToHide();
+        assertThat(retrievedAgain, hasSize(2));
+        assertThat(retrievedAgain, equalTo(original));
+    }
+
+    @Test
+    public void setStylesToHide_doesNotShareReference() {
+        Set<String> original = new HashSet<>(Arrays.asList("IPA"));
+        fAppPreferences.setStylesToHide(original);
+
+        // Modify the original set after storing
+        original.add("Stout");
+
+        // Stored preferences should not be affected
+        Set<String> retrieved = fAppPreferences.getStylesToHide();
+        assertThat(retrieved, hasSize(1));
+        assertThat(retrieved, contains("IPA"));
     }
 }
