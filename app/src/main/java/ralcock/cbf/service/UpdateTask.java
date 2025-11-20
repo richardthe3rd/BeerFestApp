@@ -85,8 +85,15 @@ public class UpdateTask extends AsyncTask<UpdateTask.Params, UpdateTask.Progress
     }
 
     private static String toMD5String(final byte[] digest) {
-        BigInteger bigInt = new BigInteger(1, digest);
-        return bigInt.toString(16);
+        final StringBuilder hexString = new StringBuilder();
+        for (final byte b : digest) {
+            final String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
     }
 
     private static String readEntireStream(final InputStream inputStream) throws IOException {

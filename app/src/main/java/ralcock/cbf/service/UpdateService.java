@@ -75,7 +75,13 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         fBuilder.setContentIntent(pendingIntent);
 
-        doUpdate(intent.getBooleanExtra(CLEAN_UPDATE, false));
+        // Defensive check for null intent
+        boolean cleanUpdate = false;
+        if (intent != null) {
+            cleanUpdate = intent.getBooleanExtra(CLEAN_UPDATE, false);
+        }
+
+        doUpdate(cleanUpdate);
         return START_NOT_STICKY;
     }
 
@@ -165,8 +171,15 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
     }
 
     private static String toMD5String(final byte[] digest) {
-        BigInteger bigInt = new BigInteger(1, digest);
-        return bigInt.toString(16);
+        final StringBuilder hexString = new StringBuilder();
+        for (final byte b : digest) {
+            final String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
     }
 
     private void updateProgress(final int progress, final int max) {
