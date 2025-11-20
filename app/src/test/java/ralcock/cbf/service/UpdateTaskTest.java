@@ -122,6 +122,34 @@ public class UpdateTaskTest {
     }
 
     /**
+     * Test 3: When MD5 matches (needsUpdate returns false), should return NoUpdateRequiredResult.
+     */
+    @Test
+    public void testNoUpdateWhenMD5Matches() throws Exception {
+        // Arrange
+        final String validJson = TestDataFactory.createValidBeerJSON(3);
+        final InputStream stream = new ByteArrayInputStream(validJson.getBytes());
+
+        final TestParams params = new TestParams(
+                false,  // cleanUpdate = false
+                true,   // updateDue = true
+                false,  // needsUpdate = false (MD5 matches)
+                stream,
+                null    // dbHelper not needed
+        );
+
+        final UpdateTask task = new UpdateTask();
+
+        // Act
+        final UpdateTask.Result result = task.doInBackground(params);
+
+        // Assert
+        assertNotNull(result);
+        assertTrue("Expected NoUpdateRequiredResult when MD5 matches",
+                result instanceof UpdateTask.NoUpdateRequiredResult);
+    }
+
+    /**
      * Test implementation of UpdateTask.Params for testing.
      * Allows control over all decision points in UpdateTask logic.
      */
