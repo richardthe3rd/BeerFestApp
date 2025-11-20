@@ -33,7 +33,7 @@ dependencies {
     androidTestImplementation 'android.arch.core:core-testing:1.1.1'
     androidTestImplementation 'org.easymock:easymock:3.6'
 
-    // Test Orchestrator - required when using execution 'ANDROIDX_TEST_ORCHESTRATOR'
+    // Test Orchestrator - required to support the testOptions { execution 'ANDROIDX_TEST_ORCHESTRATOR' } configuration below
     // Version 1.6.1: Latest stable, removes Guava dependency, fixes args parsing bug
     androidTestUtil 'androidx.test:orchestrator:1.6.1'
 }
