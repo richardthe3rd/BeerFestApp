@@ -20,7 +20,6 @@ import ralcock.cbf.model.StatusToShow;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
 public class AppPreferencesTest {
@@ -31,12 +30,13 @@ public class AppPreferencesTest {
     @Before
     public void setUp() {
         fContext = ApplicationProvider.getApplicationContext();
-        fAppPreferences = new AppPreferences(fContext);
         // Clear all preferences before each test
         fContext.getSharedPreferences(CamBeerFestApplication.class.getSimpleName(), 0)
                 .edit()
                 .clear()
                 .commit();
+        // Create AppPreferences instance after clearing
+        fAppPreferences = new AppPreferences(fContext);
     }
 
     @After
