@@ -2,3 +2,36 @@
 node = '24'
 gh = 'latest'
 claude = 'latest'
+
+[tasks.test]
+description = 'Run all unit tests (lib + app)'
+dir = "{{ config_root }}"
+run = './gradlew test'
+
+[tasks.build]
+description = 'Full build with lint and all tests'
+dir = "{{ config_root }}"
+run = './gradlew build'
+
+[tasks."test:coverage"]
+description = 'Run tests with coverage reports'
+dir = "{{ config_root }}"
+run = '''
+./gradlew test :app:jacocoTestReport :libraries:beers:jacocoTestReport
+echo ""
+echo "📊 Coverage Summary"
+echo "==================="
+awk -F',' 'NR>1 {m+=$4; c+=$5} END {t=m+c; p=(t>0?int(c*100/t):0); print "✓ Libraries: " p "% (" c "/" t " instructions)"}' libraries/beers/build/reports/jacoco/test/jacocoTestReport.csv
+awk -F',' 'NR>1 {m+=$4; c+=$5} END {t=m+c; p=(t>0?int(c*100/t):0); print "✓ App:       " p "% (" c "/" t " instructions)"}' app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.csv
+echo ""
+echo "📁 HTML Reports"
+echo "==============="
+echo "Libraries: file://$(pwd)/libraries/beers/build/reports/jacoco/test/html/index.html"
+echo "App:       file://$(pwd)/app/build/reports/jacoco/jacocoTestReport/html/index.html"
+echo ""
+'''
+
+[tasks."test:clean"]
+description = 'Clean and run all tests'
+dir = "{{ config_root }}"
+run = './gradlew clean test '
