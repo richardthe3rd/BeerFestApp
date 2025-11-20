@@ -23,8 +23,9 @@ public class TestDataFactory {
 
             for (int i = 0; i < count; i++) {
                 final JSONObject producer = new JSONObject();
+                producer.put("id", "brewery-" + i);
                 producer.put("name", "Brewery " + i);
-                producer.put("location", "Location " + i);
+                producer.put("notes", "Location " + i);
 
                 final JSONArray products = new JSONArray();
                 final JSONObject product = new JSONObject();

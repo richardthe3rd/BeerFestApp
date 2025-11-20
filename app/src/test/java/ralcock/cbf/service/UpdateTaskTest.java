@@ -4,11 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import android.content.Context;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -63,6 +66,59 @@ public class UpdateTaskTest {
         assertNotNull(result);
         assertTrue("Expected NoUpdateRequiredResult when update not due",
                 result instanceof UpdateTask.NoUpdateRequiredResult);
+    }
+
+    /**
+     * Test 2: Successful download and database update with valid JSON.
+     */
+    @Test
+    public void testSuccessfulDownloadAndUpdate() throws Exception {
+        // Arrange - Create in-memory database
+        final Context context = RuntimeEnvironment.getApplication();
+        fDbHelper = new BeerDatabaseHelper(context);
+
+        // Create test data
+        final String validJson = TestDataFactory.createValidBeerJSON(5);
+        final InputStream stream = new ByteArrayInputStream(validJson.getBytes());
+
+        final TestParams params = new TestParams(
+                false,  // cleanUpdate = false
+                true,   // updateDue = true
+                true,   // needsUpdate = true (MD5 differs)
+                stream,
+                fDbHelper
+        );
+
+        final UpdateTask task = new UpdateTask();
+
+        // Act
+        final UpdateTask.Result result = task.doInBackground(params);
+
+        // Assert
+        assertNotNull(result);
+
+        // Debug: Check if update was successful
+        if (!result.success()) {
+            final Throwable throwable = result.getThrowable();
+            if (throwable != null) {
+                throwable.printStackTrace();
+                throw new AssertionError("Update failed with exception: " + throwable.getMessage(), throwable);
+            }
+            throw new AssertionError("Update was not successful, got result type: " + result.getClass().getName());
+        }
+
+        assertTrue("Expected UpdateResult after successful update, but got: " + result.getClass().getName(),
+                result instanceof UpdateTask.UpdateResult);
+
+        final UpdateTask.UpdateResult updateResult = (UpdateTask.UpdateResult) result;
+        assertEquals("Should have updated 5 beers", 5, updateResult.getCount());
+
+        // Verify database was updated
+        assertEquals("Database should contain 5 beers", 5, fDbHelper.getBeers().getNumberOfBeers());
+
+        // Verify MD5 digest was calculated
+        assertNotNull("MD5 digest should be present", updateResult.getDigest());
+        assertTrue("MD5 digest should not be empty", updateResult.getDigest().length() > 0);
     }
 
     /**
