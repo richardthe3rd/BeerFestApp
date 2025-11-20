@@ -5,7 +5,7 @@
 **Cambridge Beer Festival Android App** - A native Android application for discovering and tracking beers at the Cambridge Beer Festival.
 
 - **Language**: Java 17
-- **Build System**: Gradle 8.10.2
+- **Build System**: Gradle 8.1.1
 - **Android SDK**: Min API 14, Target API 34, Compile API 34
 - **Database**: OrmLite 5.0 for SQLite
 - **UI**: Material Design 1.8.0
