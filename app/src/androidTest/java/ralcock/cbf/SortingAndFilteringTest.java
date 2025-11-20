@@ -11,6 +11,7 @@ import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 /**
  * End-to-end tests for sorting and filtering functionality.
@@ -160,11 +161,10 @@ public class SortingAndFilteringTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
             // Click sort menu item
-            // Note: This requires Espresso's menu interaction
-            // onView(withId(R.id.sort)).perform(click());
+            onView(withId(R.id.sort)).perform(click());
 
-            // TODO: Verify dialog is displayed
-            // Would check for dialog elements or dialog fragment tag
+            // Verify dialog is displayed by checking for dialog title
+            onView(withText("Order by")).check(matches(isDisplayed()));
         }
     }
 
