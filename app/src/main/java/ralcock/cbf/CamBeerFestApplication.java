@@ -49,6 +49,8 @@ public class CamBeerFestApplication extends AppCompatActivity {
 
     private static final int SHOW_BEER_DETAILS_REQUEST_CODE = 1;
 
+    private static final int HOURS_UNTIL_NEXT_UPDATE = 4;
+
     private final ExceptionReporter fExceptionReporter;
 
     private final AppPreferences fAppPreferences;
@@ -132,7 +134,7 @@ public class CamBeerFestApplication extends AppCompatActivity {
     private Date calcNextUpdateTime() {
         Date now = new Date();
         // Can't use TimeUnit.Day on older Androids.
-        long one_day = 4 * 60 * 60 * TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS);
+        long one_day = HOURS_UNTIL_NEXT_UPDATE * 60 * 60 * TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS);
         return new Date(now.getTime() + one_day);
     }
 
