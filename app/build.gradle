@@ -95,7 +95,7 @@ jacoco {
 
 tasks.register('jacocoTestReport', JacocoReport) {
     group = "Reporting"
-    description = "Generate JaCoCo coverage reports from instrumented tests"
+    description = "Generate JaCoCo coverage reports from unit tests and instrumented tests"
 
     // Explicit dependencies to avoid Gradle task ordering issues
     dependsOn tasks.named('testDebugUnitTest')

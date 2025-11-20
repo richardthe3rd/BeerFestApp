@@ -371,9 +371,9 @@ public void testSomething() {
 ## 📝 Action Items
 
 - [ ] Review and delete/ignore 5 placeholder tests
-- [ ] Fix and test MD5 padding bug
-- [ ] Fix null intent handling
-- [ ] Add rating preservation test
+- [x] Fix and test MD5 padding bug
+- [x] Fix null intent handling
+- [x] Add rating preservation test
 - [ ] Refactor Params for testability
 - [ ] Document AsyncTask testing strategy
 - [ ] Plan Phase 3 integration tests

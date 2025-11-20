@@ -378,13 +378,10 @@ Test all UpdateTask logic using:
    - FailedUpdateResult on IOException
    - FailedUpdateResult on SQLException
 
-**Total:** 33 unit tests
+**Total:** 28 unit tests
 
 #### File Structure
 
-```
-app/src/test/java/ralcock/cbf/service/
-├── UpdateTaskTest.java          (main test class, 33 tests)
 └── UpdateTaskTestHelper.java    (test utilities)
 ```
 
@@ -474,7 +471,7 @@ Test UpdateService lifecycle, notification management, and broadcast sending usi
    - Clean update intent (CLEAN_UPDATE=true)
    - Null intent handling (defensive)
 
-**Total:** 18 unit tests
+**Total:** 10 unit tests
 
 #### File Structure
 

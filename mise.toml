@@ -34,4 +34,4 @@ echo ""
 [tasks."test:clean"]
 description = 'Clean and run all tests'
 dir = "{{ config_root }}"
-run = './gradlew clean test '
+run = './gradlew clean test'
