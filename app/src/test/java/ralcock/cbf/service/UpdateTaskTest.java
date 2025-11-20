@@ -3,6 +3,7 @@ package ralcock.cbf.service;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import android.content.Context;
 
@@ -183,6 +184,38 @@ public class UpdateTaskTest {
         assertTrue("Throwable should be IOException",
                 result.getThrowable() instanceof IOException);
         assertEquals("Network error", result.getThrowable().getMessage());
+    }
+
+    /**
+     * Test 5: When JSON is malformed, should return FailedUpdateResult with JSONException.
+     */
+    @Test
+    public void testMalformedJSON() throws Exception {
+        // Arrange - Use malformed JSON from TestDataFactory
+        final String malformedJson = TestDataFactory.createMalformedBeerJSON();
+        final InputStream stream = new ByteArrayInputStream(malformedJson.getBytes());
+
+        final Context context = RuntimeEnvironment.getApplication();
+        fDbHelper = new BeerDatabaseHelper(context);
+
+        final TestParams params = new TestParams(
+                false,  // cleanUpdate = false
+                true,   // updateDue = true
+                true,   // needsUpdate = true
+                stream,
+                fDbHelper
+        );
+
+        final UpdateTask task = new UpdateTask();
+
+        // Act
+        final UpdateTask.Result result = task.doInBackground(params);
+
+        // Assert
+        assertNotNull(result);
+        assertFalse("Expected failure result when JSON is malformed", result.success());
+        assertNotNull("Failed result should contain throwable", result.getThrowable());
+        // JSONException is the expected exception type
     }
 
     /**
