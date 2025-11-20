@@ -69,6 +69,12 @@ jobs:
     - name: Run library unit tests with coverage
       run: ./gradlew :libraries:beers:test :libraries:beers:jacocoTestReport --scan
 
+    - name: Run app unit tests with coverage
+      run: ./gradlew :app:testDebugUnitTest --scan
+
+    - name: Generate app unit test coverage report
+      run: ./gradlew :app:jacocoTestReport --scan
+
     - name: Publish Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
@@ -85,6 +91,15 @@ jobs:
         name: library-coverage-reports
         path: |
           libraries/beers/build/reports/jacoco/
+        retention-days: 7
+
+    - name: Archive app unit test coverage reports
+      uses: actions/upload-artifact@v4
+      if: success() || failure()
+      with:
+        name: app-unit-test-coverage-reports
+        path: |
+          app/build/reports/jacoco/
         retention-days: 7
 
     - name: Archive build reports
@@ -218,12 +233,19 @@ jobs:
           name: library-coverage-reports
           path: library-coverage/
 
-      - name: Download app coverage reports
+      - name: Download app unit test coverage reports
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: app-unit-test-coverage-reports
+          path: app-unit-test-coverage/
+
+      - name: Download app instrumented test coverage reports
         uses: actions/download-artifact@v4
         continue-on-error: true
         with:
           name: app-coverage-reports
-          path: app-coverage/
+          path: app-instrumented-coverage/
 
       - name: Add coverage report to PR
         id: jacoco
@@ -232,7 +254,8 @@ jobs:
         with:
           paths: |
             ${{ github.workspace }}/library-coverage/test/jacocoTestReport.xml,
-            ${{ github.workspace }}/app-coverage/jacocoTestReport/jacocoTestReport.xml
+            ${{ github.workspace }}/app-unit-test-coverage/jacocoTestReport/jacocoTestReport.xml,
+            ${{ github.workspace }}/app-instrumented-coverage/jacocoTestReport/jacocoTestReport.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 15
           min-coverage-changed-files: 50
