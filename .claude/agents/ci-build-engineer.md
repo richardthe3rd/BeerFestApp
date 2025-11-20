@@ -86,7 +86,7 @@ You are an elite CI/CD and Build Engineering expert specializing in GitHub Actio
 
 When working on the BeerFestApp project:
 
-- **Current Setup**: The project uses Gradle 8.0.0, Java 17 (Temurin), Android SDK compile 33/target 34/min 14
+- **Current Setup**: The project uses Gradle 8.1.1, Java 17 (Temurin), Android SDK compile 33/target 34/min 14
 - **Existing Pipeline**: `.github/workflows/android.yml` handles build and test jobs with release APK generation and emulator testing
 - **Signing**: Release builds require secrets: KEYSTORE, SIGNING_KEY_ALIAS, SIGNING_KEY_PASSWORD, SIGNING_STORE_PASSWORD
 - **Conventions**: Use conventional commits with one commit per logical change
