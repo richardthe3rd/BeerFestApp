@@ -125,7 +125,7 @@ public class BeerTest
         Beer beer = createTestBeer();
         StarRating rating = new StarRating(4);
         beer.setNumberOfStars(rating);
-        assertThat(beer.getNumberOfStars(), equalTo(rating));
+        assertThat(beer.getNumberOfStars(), comparesEqualTo(rating));
         assertThat(beer.getRating(), equalTo(4));
     }
 
