@@ -246,7 +246,7 @@ jobs:
     needs: [build, test]
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    if: always()
+    if: success()
     steps:
       - name: Download library coverage reports
         uses: actions/download-artifact@v4
