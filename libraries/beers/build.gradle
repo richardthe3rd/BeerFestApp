@@ -45,7 +45,7 @@ jacocoTestReport {
     reports {
         xml.required = true
         html.required = true
-        csv.required = false
+        csv.required = true
     }
 
     // Use Gradle's source sets to automatically find the right paths
