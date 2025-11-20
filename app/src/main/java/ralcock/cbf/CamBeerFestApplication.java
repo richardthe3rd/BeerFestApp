@@ -47,6 +47,8 @@ import ralcock.cbf.view.SortByDialogFragment;
 public class CamBeerFestApplication extends AppCompatActivity {
     private static final String TAG = CamBeerFestApplication.class.getName();
 
+    private static final String SELECTED_TAB_KEY = "selected.navigation.index";
+
     private static final int SHOW_BEER_DETAILS_REQUEST_CODE = 1;
 
     private final ExceptionReporter fExceptionReporter;
@@ -97,7 +99,7 @@ public class CamBeerFestApplication extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
 
         if (savedInstanceState != null) {
-            int selectedTab = savedInstanceState.getInt("selected.navigation.index");
+            int selectedTab = savedInstanceState.getInt(SELECTED_TAB_KEY);
             Log.i(TAG, "restoring tab " + selectedTab);
             viewPager.setCurrentItem(selectedTab);
         }
@@ -202,7 +204,7 @@ public class CamBeerFestApplication extends AppCompatActivity {
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         int selectedTab = viewPager.getCurrentItem();
         Log.i(TAG, "onSaveInstanceState saving " + selectedTab);
-        outState.putInt("selected.navigation.index", selectedTab);
+        outState.putInt(SELECTED_TAB_KEY, selectedTab);
         super.onSaveInstanceState(outState);
     }
 
