@@ -185,7 +185,7 @@ jobs:
           key: avd-${{ matrix.api-level }}
 
       - name: Build debug APK for instrumented tests
-        run: ./gradlew assembleDebug assembleDebugAndroidTest --scan --build-cache --parallel
+        run: ./gradlew assembleDebug assembleDebugAndroidTest --scan --no-configuration-cache
 
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
@@ -210,7 +210,7 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew connectedCheck --scan --build-cache --parallel
+          script: ./gradlew connectedCheck --scan --no-configuration-cache
 
       - name: Generate coverage report
         if: always()
