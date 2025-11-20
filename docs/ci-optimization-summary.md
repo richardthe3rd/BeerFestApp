@@ -99,7 +99,7 @@ concurrency:
 org.gradle.jvmargs=-Xmx2g -Dfile.encoding=UTF-8
 
 # After - 4g for safety on GitHub runners (7GB total RAM)
-org.gradle.jvmargs=-Xmx4g -Xms256m -XX:MaxMetaspaceSize=384m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8
+org.gradle.jvmargs=-Xmx4g -Xms256m -XX:MaxMetaspaceSize=1g -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8
 
 # New additions
 org.gradle.vfs.watch=true          # Faster incremental builds (Gradle 7.0+)
