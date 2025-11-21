@@ -1,12 +1,14 @@
 package ralcock.cbf;
 
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.runner.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -160,8 +162,12 @@ public class SortingAndFilteringTest {
     public void testClickingSortOpensDialog() {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
-            // Click sort menu item
-            onView(withId(R.id.sort)).perform(click());
+            // Open overflow menu in case sort item is not visible in action bar
+            // (on smaller screens or lower API levels, items may be in overflow)
+            openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext());
+
+            // Click sort menu item (text is "Order by…")
+            onView(withText("Order by…")).perform(click());
 
             // Verify dialog is displayed by checking for dialog title
             onView(withText(R.string.sort_dialog_title)).check(matches(isDisplayed()));
