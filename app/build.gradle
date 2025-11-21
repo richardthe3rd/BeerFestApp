@@ -1,15 +1,7 @@
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:8.0.0'
-    }
+plugins {
+    id 'com.android.application'
+    id 'jacoco'
 }
-
-apply plugin: 'com.android.application'
-apply plugin: 'jacoco'
 
 dependencies {
     implementation project(':libraries:beers')
