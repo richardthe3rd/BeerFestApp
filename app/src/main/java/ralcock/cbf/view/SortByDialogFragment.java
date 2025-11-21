@@ -1,19 +1,20 @@
 package ralcock.cbf.view;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.app.DialogFragment;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
+
 import ralcock.cbf.CamBeerFestApplication;
 import ralcock.cbf.R;
 import ralcock.cbf.model.SortOrder;
 
-// TODO: Migrate from deprecated android.app.DialogFragment to androidx.fragment.app.DialogFragment
-@SuppressWarnings("deprecation")
 public class SortByDialogFragment extends DialogFragment {
 
-    public static DialogFragment newInstance(SortOrder currentSortOrder) {
+    public static SortByDialogFragment newInstance(final SortOrder currentSortOrder) {
         SortByDialogFragment fragment = new SortByDialogFragment();
         Bundle args = new Bundle();
         args.putString("sortOrder", currentSortOrder.name());
@@ -21,6 +22,7 @@ public class SortByDialogFragment extends DialogFragment {
         return fragment;
     }
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
         SortOrder currentSortOrder = SortOrder.valueOf(getArguments().getString("sortOrder"));
@@ -35,12 +37,12 @@ public class SortByDialogFragment extends DialogFragment {
             }
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
         builder.setTitle(R.string.sort_dialog_title);
         builder.setSingleChoiceItems(items, checkedItem, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialogInterface, int i) {
+            public void onClick(final DialogInterface dialogInterface, final int i) {
                 dialogInterface.dismiss();
-                CamBeerFestApplication app = (CamBeerFestApplication) getActivity();
+                CamBeerFestApplication app = (CamBeerFestApplication) requireActivity();
                 app.doDismissSortDialog(sortOrders[i]);
             }
         });
