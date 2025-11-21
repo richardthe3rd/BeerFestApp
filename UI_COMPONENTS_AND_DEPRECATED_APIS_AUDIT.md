@@ -72,24 +72,22 @@
 **Deprecation Details:**
 - Deprecated in: API 28 (Android 9.0)
 - Replacement: `androidx.fragment.app.DialogFragment`
-- Status: 4 of 6 DialogFragment usages migrated
+- Status: All DialogFragment usages migrated or removed
 
-**Files Remaining:**
+### Dialog Fragment API - ✅ COMPLETE
 
-1. **UpdateBeersProgressDialogFragment.java**
-   - Extends `android.app.DialogFragment` (deprecated)
-   - Also uses `ProgressDialog` (deprecated)
+All usages of deprecated `android.app.DialogFragment` have been addressed:
 
-2. **LoadBeersProgressDialogFragment.java**
-   - Extends `android.app.DialogFragment` (deprecated)
-   - Also uses `ProgressDialog` (deprecated)
+- **Migrated to `androidx.fragment.app.DialogFragment`:**
+    1. `AboutDialogFragment.java`
+    2. `SortByDialogFragment.java`
+    3. `FilterByStyleDialogFragment.java`
 
-**Files Migrated:**
+- **Deleted as dead code:**
+    1. `UpdateBeersProgressDialogFragment.java`
+    2. `LoadBeersProgressDialogFragment.java`
 
-1. ✅ **AboutDialogFragment.java** - Now uses `androidx.fragment.app.DialogFragment`
-2. ✅ **SortByDialogFragment.java** - Now uses `androidx.fragment.app.DialogFragment`
-3. ✅ **FilterByStyleDialogFragment.java** - Now uses `androidx.fragment.app.DialogFragment`
-4. ✅ **CamBeerFestApplication.java** - Now uses `getSupportFragmentManager()`
+All DialogFragment migrations are now complete (3 migrated, 2 deleted as dead code).
 
 ---
 
