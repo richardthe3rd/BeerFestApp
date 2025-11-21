@@ -113,12 +113,12 @@ The affected files (`UpdateBeersProgressDialogFragment.java` and `LoadBeersProgr
 **Files Affected:**
 
 1. **CamBeerFestApplication.java**
-   - Line 13: Import `androidx.localbroadcastmanager.content.LocalBroadcastManager`
-   - Line 62-64: TODO comment documenting deprecation
-   - Line 65: `@SuppressWarnings("deprecation")`
-   - Line 66: Field `fLocalBroadcastManager: LocalBroadcastManager`
-   - Line 107: `LocalBroadcastManager.getInstance(this)`
-   - Lines 148-167: `onResume()` and `onPause()` - register/unregister receiver
+   - Line 12: Import `androidx.localbroadcastmanager.content.LocalBroadcastManager`
+   - Lines 55-57: TODO comment documenting deprecation
+   - Line 58: `@SuppressWarnings("deprecation")`
+   - Line 59: Field `fLocalBroadcastManager: LocalBroadcastManager`
+   - Line 100: `LocalBroadcastManager.getInstance(this)`
+   - Lines 141-160: `onResume()` and `onPause()` - register/unregister receiver
 
 2. **UpdateService.java**
    - Line 10: Import `androidx.localbroadcastmanager.content.LocalBroadcastManager`
