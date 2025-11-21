@@ -1,8 +1,27 @@
 # BeerFestApp UI Component & Deprecated API Audit Report
 
 **Generated:** 2025-11-21
+**Last Updated:** 2025-11-21
 **Project:** Cambridge Beer Festival Android App
 **Scope:** Complete UI audit including deprecated APIs and modernization opportunities
+
+---
+
+## MIGRATION STATUS
+
+| Component | Status | Commit |
+|-----------|--------|--------|
+| AboutDialogFragment | ✅ MIGRATED | `bcdf7bd` |
+| SortByDialogFragment | ✅ MIGRATED | `cc4f37d` |
+| FilterByStyleDialogFragment | ✅ MIGRATED | `c05d2df` |
+| LoadBeersProgressDialogFragment | ⏳ PENDING | - |
+| UpdateBeersProgressDialogFragment | ⏳ PENDING | - |
+| CamBeerFestApplication (getSupportFragmentManager) | ⏳ PENDING | - |
+| Activity Result API | ⏳ PENDING | - |
+| ViewPager → ViewPager2 | ⏳ PENDING | - |
+| ListView → RecyclerView | ⏳ PENDING | - |
+| AsyncTask → WorkManager | ⏳ PENDING | - |
+| LocalBroadcastManager → LiveData | ⏳ PENDING | - |
 
 ---
 
@@ -24,13 +43,13 @@
 | **BookmarkedBeerListFragment** | `app/src/main/java/ralcock/cbf/view/BookmarkedBeerListFragment.java` | Shows bookmarked beers | BeerListFragment |
 | **BeerDetailsFragment** | `app/src/main/java/ralcock/cbf/view/BeerDetailsFragment.java` | Beer detail content | Fragment |
 
-### 1.3 Dialog Fragments (ALL DEPRECATED)
+### 1.3 Dialog Fragments
 
-| Class | Location | API Status | Deprecation Details |
-|-------|----------|-----------|-------------------|
-| **AboutDialogFragment** | `app/src/main/java/ralcock/cbf/view/AboutDialogFragment.java` | DEPRECATED | Uses `android.app.DialogFragment` (deprecated in API 28) |
-| **SortByDialogFragment** | `app/src/main/java/ralcock/cbf/view/SortByDialogFragment.java` | DEPRECATED | Uses `android.app.DialogFragment` (deprecated in API 28) |
-| **FilterByStyleDialogFragment** | `app/src/main/java/ralcock/cbf/view/FilterByStyleDialogFragment.java` | DEPRECATED | Uses `android.app.DialogFragment` (deprecated in API 28) |
+| Class | Location | API Status | Notes |
+|-------|----------|-----------|-------|
+| **AboutDialogFragment** | `app/src/main/java/ralcock/cbf/view/AboutDialogFragment.java` | ✅ MIGRATED | Now uses `androidx.fragment.app.DialogFragment` |
+| **SortByDialogFragment** | `app/src/main/java/ralcock/cbf/view/SortByDialogFragment.java` | ✅ MIGRATED | Now uses `androidx.fragment.app.DialogFragment` |
+| **FilterByStyleDialogFragment** | `app/src/main/java/ralcock/cbf/view/FilterByStyleDialogFragment.java` | ✅ MIGRATED | Now uses `androidx.fragment.app.DialogFragment` |
 | **UpdateBeersProgressDialogFragment** | `app/src/main/java/ralcock/cbf/view/UpdateBeersProgressDialogFragment.java` | DEPRECATED | Uses `android.app.DialogFragment` + `ProgressDialog` (both deprecated) |
 | **LoadBeersProgressDialogFragment** | `app/src/main/java/ralcock/cbf/view/LoadBeersProgressDialogFragment.java` | DEPRECATED | Uses `android.app.DialogFragment` + `ProgressDialog` (both deprecated) |
 
@@ -48,45 +67,32 @@
 
 ## 2. DEPRECATED ANDROID APIs - DETAILED INVENTORY
 
-### 2.1 Dialog Fragment API (Critical - 5 files affected)
+### 2.1 Dialog Fragment API (Critical - 3 files remaining)
 
 **Deprecation Details:**
 - Deprecated in: API 28 (Android 9.0)
 - Replacement: `androidx.fragment.app.DialogFragment`
-- Status: All DialogFragment usages need migration
+- Status: 3 of 6 DialogFragment usages migrated
 
-**Files Affected:**
+**Files Remaining:**
 
 1. **CamBeerFestApplication.java**
-   - Line 3: Import `android.app.DialogFragment`
-   - Line 43-45: TODO comment documenting deprecation
-   - Line 46: `@SuppressWarnings("deprecation")`
    - Lines 289, 296, 303: Uses `getFragmentManager()` to show dialogs
+   - **Action needed:** Change to `getSupportFragmentManager()`
 
-2. **AboutDialogFragment.java**
-   - Line 9: Import `android.app.DialogFragment`
-   - Line 18-19: TODO comment and @SuppressWarnings
-   - Line 20: Extends `DialogFragment` (deprecated)
+2. **UpdateBeersProgressDialogFragment.java**
+   - Extends `android.app.DialogFragment` (deprecated)
+   - Also uses `ProgressDialog` (deprecated)
 
-3. **SortByDialogFragment.java**
-   - Line 7: Import `android.app.DialogFragment`
-   - Line 12-13: TODO comment and @SuppressWarnings
-   - Line 14: Extends `DialogFragment` (deprecated)
+3. **LoadBeersProgressDialogFragment.java**
+   - Extends `android.app.DialogFragment` (deprecated)
+   - Also uses `ProgressDialog` (deprecated)
 
-4. **FilterByStyleDialogFragment.java**
-   - Line 7: Import `android.app.DialogFragment`
-   - Line 15-16: TODO comment and @SuppressWarnings
-   - Line 17: Extends `DialogFragment` (deprecated)
+**Files Migrated:**
 
-5. **UpdateBeersProgressDialogFragment.java**
-   - Line 6: Import `android.app.DialogFragment`
-   - Line 9-10: TODO comment and @SuppressWarnings
-   - Line 11: Extends `DialogFragment` (deprecated)
-
-6. **LoadBeersProgressDialogFragment.java**
-   - Line 6: Import `android.app.DialogFragment`
-   - Line 9-10: TODO comment and @SuppressWarnings
-   - Line 11: Extends `DialogFragment` (deprecated)
+1. ✅ **AboutDialogFragment.java** - Now uses `androidx.fragment.app.DialogFragment`
+2. ✅ **SortByDialogFragment.java** - Now uses `androidx.fragment.app.DialogFragment`
+3. ✅ **FilterByStyleDialogFragment.java** - Now uses `androidx.fragment.app.DialogFragment`
 
 ---
 
