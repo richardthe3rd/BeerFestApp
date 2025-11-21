@@ -53,6 +53,10 @@
            mavenCentral()
            gradlePluginPortal()
        }
+       plugins {
+           id 'com.android.application' version '8.0.0'
+           id 'com.android.library' version '8.0.0'
+       }
    }
 
    dependencyResolutionManagement {
@@ -68,19 +72,26 @@
 
 2. Update `app/build.gradle`:
    - Remove `buildscript` block
-   - Replace `apply plugin` with `plugins` block
+   - Replace `apply plugin` with `plugins` block (version managed in settings.gradle)
    ```groovy
    plugins {
-       id 'com.android.application' version '8.0.0'
+       id 'com.android.application'
        id 'jacoco'
    }
    ```
 
 3. Update `build.gradle` (root):
+   - Remove `buildscript` block (moved to settings.gradle)
    - Remove `subprojects.repositories` block (moved to settings.gradle)
 
 4. Update `libraries/beers/build.gradle`:
-   - Migrate to plugins DSL syntax
+   - Migrate to plugins DSL syntax (version managed in settings.gradle)
+   ```groovy
+   plugins {
+       id 'com.android.library'
+       id 'java-library'
+   }
+   ```
 
 **Commit:** `refactor: migrate to Gradle plugins DSL`
 
@@ -115,10 +126,18 @@
 
 **Changes required:**
 
-1. Update AGP version in `app/build.gradle` (or `settings.gradle` if using plugins DSL):
+1. Update AGP version in `settings.gradle`:
    ```groovy
-   plugins {
-       id 'com.android.application' version '8.7.3'  // was 8.0.0
+   pluginManagement {
+       repositories {
+           google()
+           mavenCentral()
+           gradlePluginPortal()
+       }
+       plugins {
+           id 'com.android.application' version '8.7.3'  // was 8.0.0
+           id 'com.android.library' version '8.7.3'      // was 8.0.0
+       }
    }
    ```
 
