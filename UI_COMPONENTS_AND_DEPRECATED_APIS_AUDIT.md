@@ -14,10 +14,10 @@
 | AboutDialogFragment | ✅ MIGRATED | `bcdf7bd` |
 | SortByDialogFragment | ✅ MIGRATED | `cc4f37d` |
 | FilterByStyleDialogFragment | ✅ MIGRATED | `c05d2df` |
-| LoadBeersProgressDialogFragment | ⏳ PENDING | - |
-| UpdateBeersProgressDialogFragment | ⏳ PENDING | - |
+| LoadBeersProgressDialogFragment | 🗑️ DELETED | `fb00bbb` |
+| UpdateBeersProgressDialogFragment | 🗑️ DELETED | `fb00bbb` |
 | CamBeerFestApplication (getSupportFragmentManager) | ✅ MIGRATED | `fc536a8` |
-| Activity Result API | ⏳ PENDING | - |
+| Activity Result API | ✅ MIGRATED | `2fcdc78` |
 | ViewPager → ViewPager2 | ⏳ PENDING | - |
 | ListView → RecyclerView | ⏳ PENDING | - |
 | AsyncTask → WorkManager | ⏳ PENDING | - |
@@ -357,12 +357,12 @@ minSdkVersion 14
 
 | API | Deprecation | Status | Files Remaining | Migration Priority |
 |-----|------------|--------|-----------------|-------------------|
-| android.app.DialogFragment | API 28 (2018) | 🟡 IN PROGRESS | 2 files (progress dialogs) | **CRITICAL** |
-| ProgressDialog | API 26 (2017) | ⏳ PENDING | 2 files | **CRITICAL** |
+| android.app.DialogFragment | API 28 (2018) | ✅ DONE | 0 files | ~~CRITICAL~~ |
+| ProgressDialog | API 26 (2017) | 🗑️ DELETED | 0 files | ~~CRITICAL~~ |
 | LocalBroadcastManager | AndroidX 1.1.0 (2020) | ⏳ PENDING | 2 files | **HIGH** |
 | AsyncTask | API 30 (2020) | ⏳ PENDING | 1 file | **HIGH** |
 | getFragmentManager() | API 28+ | ✅ DONE | 0 files | ~~MEDIUM~~ |
-| onActivityResult() | API 31 (2021) | ⏳ PENDING | 2 files | **MEDIUM** |
+| onActivityResult() | API 31 (2021) | ✅ DONE | 0 files | ~~MEDIUM~~ |
 | ListFragment | AndroidX 1.1.0 (2020) | ⏳ PENDING | 1 file | **MEDIUM** |
 | FragmentPagerAdapter | AndroidX 1.1.0 (2020) | ⏳ PENDING | 1 file | **MEDIUM** |
 | ViewPager | Superseded by VP2 | ⏳ PENDING | 1 file | **MEDIUM** |
@@ -372,6 +372,9 @@ minSdkVersion 14
 - ✅ SortByDialogFragment → `androidx.fragment.app.DialogFragment`
 - ✅ FilterByStyleDialogFragment → `androidx.fragment.app.DialogFragment`
 - ✅ CamBeerFestApplication → `getSupportFragmentManager()`
+- ✅ BeerListFragment → `registerForActivityResult()`
+- 🗑️ LoadBeersProgressDialogFragment → Deleted (dead code)
+- 🗑️ UpdateBeersProgressDialogFragment → Deleted (dead code)
 
 ---
 
@@ -489,15 +492,15 @@ app/src/main/res/values/
 
 ## 10. RECOMMENDATIONS FOR MIGRATION
 
-### Phase 1: Critical (2-3 weeks effort) - 🟡 IN PROGRESS
-1. ~~Migrate DialogFragments → androidx.fragment.app.DialogFragment~~ ✅ DONE (3 of 5)
+### Phase 1: Critical - ✅ COMPLETE
+1. ~~Migrate DialogFragments → androidx.fragment.app.DialogFragment~~ ✅ DONE
    - ✅ AboutDialogFragment
    - ✅ SortByDialogFragment
    - ✅ FilterByStyleDialogFragment
-   - ⏳ LoadBeersProgressDialogFragment (also needs ProgressDialog replacement)
-   - ⏳ UpdateBeersProgressDialogFragment (also needs ProgressDialog replacement)
-2. Replace ProgressDialog → Material ProgressIndicator (⏳ PENDING)
-3. Replace startActivityForResult → registerForActivityResult() (⏳ PENDING)
+   - 🗑️ LoadBeersProgressDialogFragment (deleted - dead code)
+   - 🗑️ UpdateBeersProgressDialogFragment (deleted - dead code)
+2. ~~Replace ProgressDialog → Material ProgressIndicator~~ 🗑️ N/A (files deleted)
+3. ~~Replace startActivityForResult → registerForActivityResult()~~ ✅ DONE
 
 ### Phase 2: High Priority (2-3 weeks effort)
 1. Replace LocalBroadcastManager → LiveData + ViewModel
