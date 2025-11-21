@@ -1,6 +1,5 @@
 package ralcock.cbf;
 
-import android.app.DialogFragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -40,10 +39,6 @@ import ralcock.cbf.view.FilterByStyleDialogFragment;
 import ralcock.cbf.view.ListChangedListener;
 import ralcock.cbf.view.SortByDialogFragment;
 
-// TODO: Migrate from deprecated android.app.DialogFragment to androidx.fragment.app.DialogFragment
-// android.app.DialogFragment was deprecated in API 28 (Android 9.0)
-// This affects: AboutDialogFragment, SortByDialogFragment, FilterByStyleDialogFragment
-@SuppressWarnings("deprecation")
 public class CamBeerFestApplication extends AppCompatActivity {
     private static final String TAG = CamBeerFestApplication.class.getName();
 
@@ -285,22 +280,20 @@ public class CamBeerFestApplication extends AppCompatActivity {
         } catch (PackageManager.NameNotFoundException e) {
             fExceptionReporter.report(TAG, e.getMessage(), e);
         }
-        DialogFragment newFragment = AboutDialogFragment.newInstance(appName, versionName);
-        newFragment.show(getFragmentManager(), "about");
+        AboutDialogFragment newFragment = AboutDialogFragment.newInstance(appName, versionName);
+        newFragment.show(getSupportFragmentManager(), "about");
     }
 
-    // Copied from
-    // http://developer.android.com/reference/android/app/DialogFragment.html
     private void showSortByDialog() {
-        DialogFragment newFragment = SortByDialogFragment.newInstance(fAppPreferences.getSortOrder());
-        newFragment.show(getFragmentManager(), "sortBy");
+        SortByDialogFragment newFragment = SortByDialogFragment.newInstance(fAppPreferences.getSortOrder());
+        newFragment.show(getSupportFragmentManager(), "sortBy");
     }
 
     private void showFilterByStyleDialog() {
         final Set<String> allStyles = getBeerDao().getAvailableStyles();
         final Set<String> stylesToHide = fAppPreferences.getStylesToHide();
-        final DialogFragment newFragment = FilterByStyleDialogFragment.newInstance(stylesToHide, allStyles);
-        newFragment.show(getFragmentManager(), "filterByStyle");
+        FilterByStyleDialogFragment newFragment = FilterByStyleDialogFragment.newInstance(stylesToHide, allStyles);
+        newFragment.show(getSupportFragmentManager(), "filterByStyle");
     }
 
     @Override
