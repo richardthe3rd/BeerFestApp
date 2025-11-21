@@ -1,10 +1,13 @@
 package ralcock.cbf.view;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.app.DialogFragment;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
+
 import ralcock.cbf.CamBeerFestApplication;
 import ralcock.cbf.R;
 
@@ -12,11 +15,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-// TODO: Migrate from deprecated android.app.DialogFragment to androidx.fragment.app.DialogFragment
-@SuppressWarnings("deprecation")
 public class FilterByStyleDialogFragment extends DialogFragment {
 
-    public static DialogFragment newInstance(final Set<String> stylesToHide,
+    public static FilterByStyleDialogFragment newInstance(final Set<String> stylesToHide,
             final Set<String> allStyles) {
         FilterByStyleDialogFragment fragment = new FilterByStyleDialogFragment();
         Bundle args = new Bundle();
@@ -36,15 +37,16 @@ public class FilterByStyleDialogFragment extends DialogFragment {
         return new HashSet<String>(list);
     }
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
         Set<String> stylesToHide = getStringSet(getArguments(), "stylesToHide");
         Set<String> allStyles = getStringSet(getArguments(), "allStyles");
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
         builder.setTitle(R.string.filter_style_dialog_title);
 
-        final BeerStyleListAdapter listAdapter = new BeerStyleListAdapter(getActivity(), allStyles, stylesToHide);
+        final BeerStyleListAdapter listAdapter = new BeerStyleListAdapter(requireActivity(), allStyles, stylesToHide);
 
         builder.setAdapter(listAdapter, new DialogInterface.OnClickListener() {
             public void onClick(final DialogInterface dialogInterface, final int i) {
@@ -58,7 +60,7 @@ public class FilterByStyleDialogFragment extends DialogFragment {
                 BeerStyleListAdapter listAdapter = (BeerStyleListAdapter) alertDialog.getListView().getAdapter();
 
                 dialogInterface.dismiss();
-                CamBeerFestApplication app = (CamBeerFestApplication) getActivity();
+                CamBeerFestApplication app = (CamBeerFestApplication) requireActivity();
                 app.doDismissFilterByStyleDialog(listAdapter.getStylesToHide());
 
             }
