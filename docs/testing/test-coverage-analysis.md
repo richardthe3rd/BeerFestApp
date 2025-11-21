@@ -1,8 +1,10 @@
 # Test Coverage Analysis for BeerFestApp
 
-**Date:** 2025-11-17
+**Date:** 2025-11-20
 **Codebase Version:** 2025.0.0.1 (versionCode 27)
 **Database Version:** 32 (cbf2025)
+**Gradle Version:** 8.10.2
+**Android Gradle Plugin:** 8.7.3
 
 ---
 
@@ -17,6 +19,7 @@
 - ✅ Good coverage of basic models and DAOs
 - ⚠️ Only 1 trivial UI test (checks app launches)
 - 🔴 **Critical business logic is untested** (UpdateTask, BeerDatabaseHelper, AppPreferences)
+- ⚠️ **Instrumented tests experiencing performance issues in CI** (30+ min vs expected 8-9 min)
 
 ---
 
@@ -37,6 +40,55 @@
 
 #### Instrumented Tests (1 file)
 1. **CamBeerFestApplicationInstrumentedTest** - Only verifies app launches and shows list ⚠️
+
+---
+
+## Current CI/CD Test Status
+
+**Last Updated:** 2025-11-20
+
+### Build Infrastructure
+- **CI Platform:** GitHub Actions
+- **Gradle:** 8.10.2 (latest stable 8.x)
+- **AGP:** 8.7.3 (latest stable 8.x)
+- **setup-gradle:** v4
+- **Build Performance:** 62% improvement achieved (13min → 4-5min for builds)
+
+### Test Execution Status
+
+**Main Branch:** ✅ HEALTHY
+- Unit tests: Passing (included in build job)
+- Instrumented tests: Passing in ~8-9 minutes total
+- Build + Test: Complete in ~9 minutes
+
+**Feature Branch (fix/gradle-wrapper-scripts):** ⚠️ ISSUES DETECTED
+- **Problem:** Instrumented tests hanging/timing out
+- **Duration:** 30-40 minutes before manual cancellation (vs expected 8-9 minutes)
+- **Pattern:** Last 3 runs manually cancelled due to excessive duration
+- **Status:** Currently being re-run to investigate
+
+### Known Issues
+
+**Instrumented Test Performance:**
+- Tests running 3-4x longer than expected on feature branch
+- Possible causes being investigated:
+  - Emulator startup issues
+  - Test orchestrator configuration
+  - AVD caching problems
+  - Test timeout settings
+- Main branch unaffected, suggesting branch-specific configuration issue
+
+**Test Infrastructure:**
+- ✅ Gradle caching working perfectly (multi-layer strategy)
+- ✅ Android SDK caching functional
+- ✅ AVD caching enabled
+- ⚠️ Instrumented test reliability needs investigation
+
+### Recommendations
+1. **Immediate:** Monitor current test re-run to identify if issue is transient
+2. **Short-term:** Investigate emulator startup times and test orchestrator logs
+3. **Medium-term:** Add test timeout monitoring and alerting
+4. **Long-term:** Expand unit test coverage to reduce reliance on slow instrumented tests
 
 ---
 
@@ -386,7 +438,9 @@ The BeerFestApp has **basic model and DAO testing** but **critical gaps** in:
 
 **Document Information:**
 - **Created:** 2025-11-17
-- **Version:** 1.0.0
+- **Last Updated:** 2025-11-20
+- **Version:** 1.1.0
+- **Changes:** Added CI/CD test status section, updated build infrastructure details
 - **Author:** Test Coverage Analysis
 - **Related Documents:**
   - [Troubleshooting Guide](../troubleshooting/)

@@ -50,6 +50,16 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
         return getHelper().getBeers().getNumberOfBeers();
     }
 
+    /**
+     * Gets the beer list URL. Protected to allow test override.
+     * Tests can override this to inject MockWebServer URLs.
+     *
+     * @return URL string for beer list JSON
+     */
+    protected String getBeerListUrl() {
+        return getString(R.string.beer_list_url);
+    }
+
     public UpdateService() {
         fAppPreferences = new AppPreferences(this);
     }
@@ -75,45 +85,28 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         fBuilder.setContentIntent(pendingIntent);
 
-        doUpdate(intent.getBooleanExtra(CLEAN_UPDATE, false));
+        // Defensive check for null intent
+        boolean cleanUpdate = false;
+        if (intent != null) {
+            cleanUpdate = intent.getBooleanExtra(CLEAN_UPDATE, false);
+        }
+
+        doUpdate(cleanUpdate);
         return START_NOT_STICKY;
     }
 
-    @SuppressWarnings("deprecation")
-    private void doUpdate(final boolean cleanUpdate) {
-        Log.d(TAG, "doUpdate: cleanUpdate=" + cleanUpdate);
-        UpdateTask task = new UpdateTask() {
-            @Override
-            protected void onProgressUpdate(final Progress... values) {
-                Intent broadcastIntent = new Intent(UPDATE_SERVICE_PROGRESS);
-                broadcastIntent.putExtra(PROGRESS_EXTRA, values[0]);
-                fLocalBroadcastManager.sendBroadcast(broadcastIntent);
-
-                updateProgress(values[0].getProgress(), values[0].getTotal());
-            }
-
-            @Override
-            protected void onPostExecute(final Result result) {
-                Intent broadcastIntent = new Intent(UPDATE_SERVICE_RESULT);
-                broadcastIntent.putExtra(RESULT_EXTRA, result);
-                fLocalBroadcastManager.sendBroadcast(broadcastIntent);
-
-                fNotificationID = 0;
-                if (result.getCount() == 0) {
-                    fNotifyManager.cancel(fNotificationID);
-                } else {
-                    fBuilder.setProgress(fNotificationID, 0, false);
-                    fBuilder.setContentText(getString(R.string.update_complete_notification_text, result.getCount()));
-                    fNotifyManager.notify(fNotificationID, fBuilder.build());
-                }
-
-                // We're done. Stop the service.
-                Log.d(TAG, "Stopping UpdateService");
-                stopSelf();
-            }
-        };
-
-        UpdateTask.Params p = new UpdateTask.Params() {
+    /**
+     * Creates UpdateTask.Params with real business logic.
+     * Protected to allow test access to real decision logic.
+     *
+     * Tests can call this to verify actual updateDue() and needsUpdate()
+     * behavior instead of using TestParams which bypasses logic.
+     *
+     * @param cleanUpdate whether to perform clean update
+     * @return Params configured with production logic
+     */
+    protected UpdateTask.Params createParams(final boolean cleanUpdate) {
+        return new UpdateTask.Params() {
             @Override
             MessageDigest getDigest() throws NoSuchAlgorithmException {
                 return MessageDigest.getInstance("MD5");
@@ -121,8 +114,8 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
 
             @Override
             InputStream openStream() throws IOException {
-                String beerJsonURL = getString(R.string.beer_list_url);
-                URL url = new URL(beerJsonURL);
+                final String beerJsonURL = getBeerListUrl();
+                final URL url = new URL(beerJsonURL);
                 return url.openStream();
             }
 
@@ -161,12 +154,56 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
                 }
             }
         };
+    }
+
+    @SuppressWarnings("deprecation")
+    private void doUpdate(final boolean cleanUpdate) {
+        Log.d(TAG, "doUpdate: cleanUpdate=" + cleanUpdate);
+        UpdateTask task = new UpdateTask() {
+            @Override
+            protected void onProgressUpdate(final Progress... values) {
+                Intent broadcastIntent = new Intent(UPDATE_SERVICE_PROGRESS);
+                broadcastIntent.putExtra(PROGRESS_EXTRA, values[0]);
+                fLocalBroadcastManager.sendBroadcast(broadcastIntent);
+
+                updateProgress(values[0].getProgress(), values[0].getTotal());
+            }
+
+            @Override
+            protected void onPostExecute(final Result result) {
+                Intent broadcastIntent = new Intent(UPDATE_SERVICE_RESULT);
+                broadcastIntent.putExtra(RESULT_EXTRA, result);
+                fLocalBroadcastManager.sendBroadcast(broadcastIntent);
+
+                fNotificationID = 0;
+                if (result.getCount() == 0) {
+                    fNotifyManager.cancel(fNotificationID);
+                } else {
+                    fBuilder.setProgress(fNotificationID, 0, false);
+                    fBuilder.setContentText(getString(R.string.update_complete_notification_text, result.getCount()));
+                    fNotifyManager.notify(fNotificationID, fBuilder.build());
+                }
+
+                // We're done. Stop the service.
+                Log.d(TAG, "Stopping UpdateService");
+                stopSelf();
+            }
+        };
+
+        final UpdateTask.Params p = createParams(cleanUpdate);
         task.execute(p);
     }
 
     private static String toMD5String(final byte[] digest) {
-        BigInteger bigInt = new BigInteger(1, digest);
-        return bigInt.toString(16);
+        final StringBuilder hexString = new StringBuilder();
+        for (final byte b : digest) {
+            final String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
     }
 
     private void updateProgress(final int progress, final int max) {
