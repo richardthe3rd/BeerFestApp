@@ -121,8 +121,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        api-level: [34]
+        api-level: [29, 31, 34]
     steps:
       - name: Delete unnecessary tools 🔧
         uses: jlumbroso/free-disk-space@v1.3.1
@@ -208,7 +209,11 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: ./gradlew connectedCheck --scan --build-cache --parallel
+          script: |
+            echo "========================================="
+            echo "Running tests on Android API ${{ matrix.api-level }}"
+            echo "========================================="
+            ./gradlew connectedCheck --scan --build-cache --parallel
 
       - name: Generate coverage report
         if: always()
@@ -220,14 +225,14 @@ jobs:
         with:
           files: |
             **/build/outputs/androidTest-results/**/*.xml
-          check_name: Instrumented Test Results
+          check_name: Instrumented Test Results (API ${{ matrix.api-level }})
           comment_mode: off
 
       - name: Archive app coverage reports
         uses: actions/upload-artifact@v4
         if: success() || failure()
         with:
-          name: app-coverage-reports
+          name: app-coverage-reports-api-${{ matrix.api-level }}
           path: |
             app/build/reports/jacoco/
           retention-days: 7
@@ -236,7 +241,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: success() || failure()
         with:
-          name: test-reports
+          name: test-reports-api-${{ matrix.api-level }}
           path: ./app/build/reports/androidTests/connected/
           retention-days: 7
 
@@ -256,7 +261,7 @@ jobs:
         uses: actions/download-artifact@v4
         continue-on-error: true
         with:
-          name: app-coverage-reports
+          name: app-coverage-reports-api-34
           path: app-coverage/
 
       - name: Add coverage report to PR

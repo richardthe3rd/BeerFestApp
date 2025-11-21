@@ -307,6 +307,21 @@
 3. **Mixing JUnit3 and JUnit4** styles (AndroidTestCase vs. @Test)
 4. **No test data fixtures** for JSON parsing tests
 
+### ✅ Implemented: Multi-API Level Testing
+**Status:** Active (as of 2025-11-21)
+
+BeerFestApp now tests against **three Android API levels** in CI:
+- **API 29** (Android 10) - Minimum supported version + 15
+- **API 31** (Android 12) - Mid-range version
+- **API 34** (Android 14) - Current target SDK
+
+**Benefits:**
+- Catches API-specific compatibility issues early
+- Validates behavior across ~85% of active Android devices
+- Separate test reports per API level for easier debugging
+
+**See:** [Multi-API Testing Guide](multi-api-testing.md) for detailed documentation
+
 ### Recommended Improvements
 
 #### 1. Create Test Utilities
@@ -404,13 +419,15 @@ The BeerFestApp has **basic model and DAO testing** but **critical gaps** in:
 **Document Information:**
 - **Created:** 2025-11-17
 - **Last Updated:** 2025-11-21
-- **Version:** 1.1.0
+- **Version:** 1.2.0
 - **Author:** Test Coverage Analysis
 - **Changelog:**
+  - v1.2.0 (2025-11-21): Added multi-API testing documentation reference
   - v1.1.1 (2025-11-21): Fixed test count (16 tests, not 18)
   - v1.1.0 (2025-11-21): Updated to reflect BeerSearcher test completion
   - v1.0.0 (2025-11-17): Initial test coverage analysis
 - **Related Documents:**
   - [Troubleshooting Guide](../troubleshooting/)
   - [Features Roadmap](../features/README.md)
+  - [Multi-API Testing Guide](multi-api-testing.md)
   - [CLAUDE.md](../../CLAUDE.md)
