@@ -93,28 +93,15 @@
 
 ---
 
-### 2.2 ProgressDialog (Critical - 2 files affected)
+### 2.2 ProgressDialog - 🗑️ RESOLVED (files deleted)
 
 **Deprecation Details:**
 - Deprecated in: API 26 (Android 8.0)
 - Replacement: ProgressBar in custom dialog or Material ProgressIndicator
-- Status: Both progress dialog fragments should use modern progress indicators
 
-**⚠️ NOTE:** These classes appear to be **unused/dead code** - no references found in the codebase outside their own files. Consider deleting instead of migrating.
+**Status:** ✅ RESOLVED in commit `fb00bbb`
 
-**Files Affected:**
-
-1. **UpdateBeersProgressDialogFragment.java**
-   - Line 4: Import `android.app.ProgressDialog`
-   - Line 13: Field `fProgressDialog: ProgressDialog`
-   - Lines 31-38: Creates and configures ProgressDialog
-   - Lines 42, 46: Methods that interact with ProgressDialog
-
-2. **LoadBeersProgressDialogFragment.java**
-   - Line 4: Import `android.app.ProgressDialog`
-   - Line 13: Field `fProgressDialog: ProgressDialog`
-   - Line 21: Creates ProgressDialog
-   - Line 29: Interacts with ProgressDialog
+The affected files (`UpdateBeersProgressDialogFragment.java` and `LoadBeersProgressDialogFragment.java`) were identified as **dead code** with no references in the codebase. They were deleted rather than migrated.
 
 ---
 
@@ -165,22 +152,17 @@
 
 ---
 
-### 2.5 Activity Result Handling (Medium Priority - 1 file affected)
+### 2.5 Activity Result Handling - ✅ MIGRATED
 
 **Deprecation Details:**
 - Deprecated in: API 31 (Android 12)
 - Replacement: `registerForActivityResult()` with ActivityResultContracts
-- Status: One instance in BeerListFragment
 
-**File Affected:**
+**Status:** ✅ COMPLETED in commit `2fcdc78`
 
-1. **BeerListFragment.java**
-   - Line 71: `startActivityForResult(intent, SHOW_BEER_DETAILS_REQUEST_CODE)`
-   - **Note:** CamBeerFestApplication.java also overrides deprecated `onActivityResult()` at line 307
-
-2. **CamBeerFestApplication.java**
-   - Line 307: Override of deprecated `onActivityResult(int requestCode, int resultCode, Intent data)`
-   - Lines 307-313: Implementation handling result from BeerDetailsActivity
+**Changes made:**
+- `BeerListFragment.java` now uses `ActivityResultLauncher` with `registerForActivityResult()`
+- `CamBeerFestApplication.java` no longer overrides `onActivityResult()` - callback moved to fragment
 
 ---
 
@@ -395,13 +377,14 @@ minSdkVersion 14
 
 ### 7.2 UI Modernization Opportunities
 
-1. ~~**Replace DialogFragment** → androidx.fragment.app.DialogFragment~~ ✅ DONE (3 of 5 dialogs)
-2. **Replace ProgressDialog** → Material ProgressIndicator (2 files remaining)
-3. **Replace LocalBroadcastManager** → LiveData / ViewModel pattern
-4. **Replace AsyncTask** → WorkManager or Coroutines
-5. **Replace ListView** → RecyclerView
-6. **Replace ViewPager** → ViewPager2
-7. **Replace ListFragment** → Fragment with RecyclerView
+1. ~~**Replace DialogFragment** → androidx.fragment.app.DialogFragment~~ ✅ DONE
+2. ~~**Replace ProgressDialog** → Material ProgressIndicator~~ 🗑️ Files deleted (dead code)
+3. ~~**Replace onActivityResult** → registerForActivityResult()~~ ✅ DONE
+4. **Replace LocalBroadcastManager** → LiveData / ViewModel pattern (Phase 2)
+5. **Replace AsyncTask** → WorkManager or Coroutines (Phase 2)
+6. **Replace ListView** → RecyclerView (Phase 3)
+7. **Replace ViewPager** → ViewPager2 (Phase 3)
+8. **Replace ListFragment** → Fragment with RecyclerView (Phase 3)
 
 ---
 
@@ -422,40 +405,42 @@ minSdkVersion 14
 ### 8.3 TODO Comments
 
 The codebase includes well-documented TODO comments for deprecated APIs:
-- ~~Line 43-45 in CamBeerFestApplication.java~~ ✅ Resolved
-- Line 57-59 in CamBeerFestApplication.java (LocalBroadcastManager)
+- ~~Line 43-45 in CamBeerFestApplication.java (DialogFragment)~~ ✅ Resolved
+- Line 55-57 in CamBeerFestApplication.java (LocalBroadcastManager) - Phase 2
 - ~~Line 9-10 in AboutDialogFragment.java~~ ✅ Resolved
 - ~~Line 12-13 in SortByDialogFragment.java~~ ✅ Resolved
 - ~~Line 15-16 in FilterByStyleDialogFragment.java~~ ✅ Resolved
-- Line 9 in LoadBeersProgressDialogFragment.java (still pending)
-- Line 9 in UpdateBeersProgressDialogFragment.java (still pending)
-- Lines 24-28 in UpdateTask.java (AsyncTask)
+- ~~LoadBeersProgressDialogFragment.java~~ 🗑️ Deleted
+- ~~UpdateBeersProgressDialogFragment.java~~ 🗑️ Deleted
+- Lines 24-28 in UpdateTask.java (AsyncTask) - Phase 2
+- Line 39-40 in UpdateService.java (LocalBroadcastManager) - Phase 2
 
 ---
 
 ## 9. COMPREHENSIVE FILE LISTING
 
-### 9.1 UI-Related Java Files (12 files in view/ directory)
+### 9.1 UI-Related Java Files (10 files in view/ directory)
 
 ```
 app/src/main/java/ralcock/cbf/view/
-├── AboutDialogFragment.java
+├── AboutDialogFragment.java          ✅ Migrated to AndroidX
+├── AllBeersListFragment.java
 ├── BeerDetailsActivity.java
 ├── BeerDetailsFragment.java
-├── BeerDetailsView.java (inner class in fragment)
 ├── BeerFilter.java
 ├── BeerListAdapter.java
-├── BeerListFragment.java
-├── BeerListFragmentPagerAdapter.java
-├── BeerListItemView.java (inner class in adapter)
+├── BeerListFragment.java             ✅ Uses registerForActivityResult()
+├── BeerListFragmentPagerAdapter.java ⏳ Uses deprecated FragmentPagerAdapter
 ├── BeerStyleListAdapter.java
 ├── BookmarkedBeerListFragment.java
-├── FilterByStyleDialogFragment.java
+├── FilterByStyleDialogFragment.java  ✅ Migrated to AndroidX
 ├── ListChangedListener.java (interface)
-├── LoadBeersProgressDialogFragment.java
-├── SortByDialogFragment.java
-└── UpdateBeersProgressDialogFragment.java
+└── SortByDialogFragment.java         ✅ Migrated to AndroidX
 ```
+
+**Deleted files:**
+- ~~LoadBeersProgressDialogFragment.java~~ (dead code)
+- ~~UpdateBeersProgressDialogFragment.java~~ (dead code)
 
 ### 9.2 Layout XML Files (8 files)
 
