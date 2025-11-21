@@ -183,19 +183,31 @@ jobs:
         fileName: 'keystore/your_signing_keystore.jks'
         encodedString: ${{ secrets.KEYSTORE }}
 
+    - name: Get build-tools version
+      id: build-tools
+      run: |
+        BUILD_TOOLS_VERSION=$(ls -1 $ANDROID_HOME/build-tools | sort -V | tail -n 1)
+        echo "version=$BUILD_TOOLS_VERSION" >> $GITHUB_OUTPUT
+        echo "Using build-tools version: $BUILD_TOOLS_VERSION"
+
     - name: Sign release APK
       run: |
-        $ANDROID_HOME/build-tools/33.0.0/apksigner sign \
-          --ks ${{ steps.decode_keystore.outputs.filePath }} \
-          --ks-key-alias ${{ secrets.SIGNING_KEY_ALIAS }} \
-          --ks-pass pass:${{ secrets.SIGNING_STORE_PASSWORD }} \
-          --key-pass pass:${{ secrets.SIGNING_KEY_PASSWORD }} \
+        $ANDROID_HOME/build-tools/${{ steps.build-tools.outputs.version }}/apksigner sign \
+          --ks "$KEYSTORE_PATH" \
+          --ks-key-alias "$KEY_ALIAS" \
+          --ks-pass env:STORE_PASSWORD \
+          --key-pass env:KEY_PASSWORD \
           --out ./app-release-signed.apk \
           ./unsigned-apk/app-release-unsigned.apk
+      env:
+        KEYSTORE_PATH: ${{ steps.decode_keystore.outputs.filePath }}
+        KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+        STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+        KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
 
     - name: Verify APK signature
       run: |
-        $ANDROID_HOME/build-tools/33.0.0/apksigner verify --verbose ./app-release-signed.apk
+        $ANDROID_HOME/build-tools/${{ steps.build-tools.outputs.version }}/apksigner verify --verbose ./app-release-signed.apk
 
     - name: Archive signed release APK
       uses: actions/upload-artifact@v4
@@ -327,20 +339,25 @@ jobs:
             adb shell settings put global transition_animation_scale 0.0
             adb shell settings put global animator_duration_scale 0.0
 
-            # Install pre-built APKs
-            adb install ./app/build/outputs/apk/debug/app-debug.apk
-            adb install -t ./app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+            # Install pre-built APKs with error handling
+            adb install ./app/build/outputs/apk/debug/app-debug.apk || \
+              { echo "Failed to install app APK"; exit 1; }
+            adb install -t ./app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk || \
+              { echo "Failed to install test APK"; exit 1; }
 
-            # Run instrumented tests
+            # Run instrumented tests and capture exit code
+            set +e
             adb shell am instrument -w -r \
               -e coverage true \
               -e coverageFile /data/data/ralcock.cbf/coverage.ec \
-              ralcock.cbf.test/androidx.test.runner.AndroidJUnitRunner | tee test-output.txt
+              ralcock.cbf.test/androidx.test.runner.AndroidJUnitRunner
+            TEST_EXIT_CODE=$?
+            set -e
 
-            # Check for failures in output
-            if grep -q "FAILURES" test-output.txt; then
-              echo "Tests failed!"
-              exit 1
+            # Exit with the test runner's exit code
+            if [ $TEST_EXIT_CODE -ne 0 ]; then
+              echo "Tests failed with exit code: $TEST_EXIT_CODE"
+              exit $TEST_EXIT_CODE
             fi
 
       - name: Pull coverage data
@@ -382,7 +399,8 @@ jobs:
   coverage:
     needs: [build-release, instrumented-test]
     runs-on: ubuntu-latest
-    if: always()
+    # Run if at least one dependency succeeded (to have coverage data to report)
+    if: always() && (needs.build-release.result == 'success' || needs.instrumented-test.result == 'success')
     steps:
       - name: Download library coverage reports
         uses: actions/download-artifact@v4
