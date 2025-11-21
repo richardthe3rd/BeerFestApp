@@ -50,8 +50,8 @@
 | **AboutDialogFragment** | `app/src/main/java/ralcock/cbf/view/AboutDialogFragment.java` | ✅ MIGRATED | Now uses `androidx.fragment.app.DialogFragment` |
 | **SortByDialogFragment** | `app/src/main/java/ralcock/cbf/view/SortByDialogFragment.java` | ✅ MIGRATED | Now uses `androidx.fragment.app.DialogFragment` |
 | **FilterByStyleDialogFragment** | `app/src/main/java/ralcock/cbf/view/FilterByStyleDialogFragment.java` | ✅ MIGRATED | Now uses `androidx.fragment.app.DialogFragment` |
-| **UpdateBeersProgressDialogFragment** | `app/src/main/java/ralcock/cbf/view/UpdateBeersProgressDialogFragment.java` | DEPRECATED | Uses `android.app.DialogFragment` + `ProgressDialog` (both deprecated) |
-| **LoadBeersProgressDialogFragment** | `app/src/main/java/ralcock/cbf/view/LoadBeersProgressDialogFragment.java` | DEPRECATED | Uses `android.app.DialogFragment` + `ProgressDialog` (both deprecated) |
+| **UpdateBeersProgressDialogFragment** | `app/src/main/java/ralcock/cbf/view/UpdateBeersProgressDialogFragment.java` | 🗑️ DELETED | Uses `android.app.DialogFragment` + `ProgressDialog` (both deprecated) |
+| **LoadBeersProgressDialogFragment** | `app/src/main/java/ralcock/cbf/view/LoadBeersProgressDialogFragment.java` | 🗑️ DELETED | Uses `android.app.DialogFragment` + `ProgressDialog` (both deprecated) |
 
 ### 1.4 Adapter & UI Helper Classes
 
