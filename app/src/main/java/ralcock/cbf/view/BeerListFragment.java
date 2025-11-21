@@ -9,7 +9,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.ListFragment;
+
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import ralcock.cbf.CamBeerFestApplication;
 import ralcock.cbf.R;
@@ -27,14 +31,21 @@ import java.util.Set;
 public abstract class BeerListFragment extends ListFragment implements ListChangedListener {
     private static final String TAG = BeerListFragment.class.getName();
 
-    private static final int SHOW_BEER_DETAILS_REQUEST_CODE = 1;
-
     private BeerDatabaseHelper fDBHelper;
     private BeerList fBeerList;
     private BeerListAdapter fAdapter;
 
     private BeerSharer fBeerSharer;
     private BeerSearcher fBeerSearcher;
+
+    private final ActivityResultLauncher<Intent> fBeerDetailsLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                // Refresh the beer list when returning from details view
+                // (user may have toggled bookmark)
+                getCamBeerFestApplication().notifyBeersChanged();
+            }
+    );
 
     protected BeerListFragment() {
     }
@@ -68,7 +79,7 @@ public abstract class BeerListFragment extends ListFragment implements ListChang
                 Log.i(TAG, "Starting BeerDetails Activity with ID " + id);
                 Intent intent = new Intent(getActivity(), BeerDetailsActivity.class);
                 intent.putExtra(BeerDetailsActivity.EXTRA_BEER_ID, id);
-                startActivityForResult(intent, SHOW_BEER_DETAILS_REQUEST_CODE);
+                fBeerDetailsLauncher.launch(intent);
             }
         });
 

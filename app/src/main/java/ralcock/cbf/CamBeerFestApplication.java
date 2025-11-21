@@ -42,8 +42,6 @@ import ralcock.cbf.view.SortByDialogFragment;
 public class CamBeerFestApplication extends AppCompatActivity {
     private static final String TAG = CamBeerFestApplication.class.getName();
 
-    private static final int SHOW_BEER_DETAILS_REQUEST_CODE = 1;
-
     private static final int HOURS_UNTIL_NEXT_UPDATE = 4;
 
     private final ExceptionReporter fExceptionReporter;
@@ -294,15 +292,6 @@ public class CamBeerFestApplication extends AppCompatActivity {
         final Set<String> stylesToHide = fAppPreferences.getStylesToHide();
         FilterByStyleDialogFragment newFragment = FilterByStyleDialogFragment.newInstance(stylesToHide, allStyles);
         newFragment.show(getSupportFragmentManager(), "filterByStyle");
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == SHOW_BEER_DETAILS_REQUEST_CODE) {
-            notifyBeersChanged();
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
     }
 
     public void notifyBeersChanged() {
