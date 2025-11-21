@@ -166,8 +166,8 @@ public class SortingAndFilteringTest {
             // (on smaller screens or lower API levels, items may be in overflow)
             openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext());
 
-            // Click sort menu item (text is "Order by…")
-            onView(withText("Order by…")).perform(click());
+            // Click sort menu item
+            onView(withText(R.string.sort_menu_label)).perform(click());
 
             // Verify dialog is displayed by checking for dialog title
             onView(withText(R.string.sort_dialog_title)).check(matches(isDisplayed()));
