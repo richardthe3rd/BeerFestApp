@@ -34,7 +34,7 @@
 | Gradle | 8.14.3 | 8.9+ | Compatible |
 | JDK | 17 | 17+ | Compatible |
 | compileSdkVersion | 33 | 34+ | Upgrade needed |
-| minSdkVersion | 14 | 21+ (recommended) | Optional upgrade |
+| minSdkVersion | 14 | No minimum (21+ recommended) | Optional upgrade |
 
 ## Upgrade Steps
 
