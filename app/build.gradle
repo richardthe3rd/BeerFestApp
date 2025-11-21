@@ -9,7 +9,6 @@ dependencies {
     implementation group: 'com.j256.ormlite',            name: 'ormlite-android',  version: '5.0'
     implementation group: 'com.google.android.material', name: 'material',         version: '1.8.0'
     implementation group: 'org.slf4j',                   name: 'slf4j-android',    version: '1.7.25'
-    implementation 'androidx.multidex:multidex:2.0.1'
 
     // Updated AndroidX Test libraries for Android 13+ (API 33+) support
     // Versions 1.5.0+ add RECEIVER_EXPORTED flag support required by targetSdkVersion 34
@@ -33,9 +32,8 @@ android {
     defaultConfig {
            versionCode 27
            versionName "2025.0.0.1"
-           minSdkVersion 14
+           minSdkVersion 21
            targetSdkVersion 34
-           multiDexEnabled true
 
            testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
        }
