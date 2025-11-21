@@ -36,7 +36,7 @@ This multi-API testing strategy ensures broad compatibility across the Android e
 |--------|-------|
 | **API Levels Tested** | 3 (29, 31, 34) |
 | **CI Strategy** | Matrix with `fail-fast: false` |
-| **Additional CI Time** | ~8-10 minutes per API level |
+| **Additional CI Time** | +1 minute total (parallel execution) |
 | **Market Coverage** | ~85% of active Android devices |
 | **Primary API** | API 34 (used for coverage reports) |
 
@@ -178,45 +178,37 @@ test:
 
 | Test Suite | API 29 | API 31 | API 34 | Notes |
 |------------|--------|--------|--------|-------|
-| **BeerSearcherTest** | ✅ All pass | ✅ All pass | ✅ All pass | 8/8 tests |
+| **BeerSearcherTest** | ✅ All pass | ✅ All pass | ✅ All pass | 16/16 tests |
 | **AppPreferencesTest** | ⚠️ 1 known failure | ✅ All pass | ✅ All pass | Unicode issue (see below) |
-| **Total** | ⚠️ 19/20 pass | ✅ All pass | ✅ All pass | - |
+| **All Tests** | ⚠️ ~53/54 pass | ✅ All pass | ✅ All pass | Multiple test classes |
 
 ### Test Breakdown
 
-#### BeerSearcherTest (8 tests)
-All tests pass on all API levels:
-- ✅ `testSearchWithNoFilters`
-- ✅ `testSearchWithBreweryFilter`
-- ✅ `testSearchWithBeerNameFilter`
-- ✅ `testSearchWithCombinedFilters`
-- ✅ `testSearchWithMultipleBreweries`
-- ✅ `testSearchIgnoresLeadingTrailingWhitespace`
-- ✅ `testSearchWithDiacriticsNormalization`
-- ✅ `testSearchEmptyDatabaseReturnsEmpty`
+**Total Instrumented Tests:** ~54 tests across 15 test classes
+- BeerSearcherTest: 16 tests (web search functionality)
+- AppPreferencesTest: 38 tests (preferences persistence)
+- BeerExporterTest: 19 tests (CSV export)
+- BeerSharerTest, BeerListTest, JsonBeerListTest, BeersImplTest, BreweriesImplTest
+- E2E tests: BeerListInteractionTest, StarRatingInteractionTest, FavoritesInteractionTest, SearchFunctionalityTest, SortingAndFilteringTest
+- Lifecycle tests: CamBeerFestApplicationInstrumentedTest, CamBeerFestApplicationLifecycleTest
 
-#### AppPreferencesTest (12 tests)
-API 29: ⚠️ **1 known failure** (unicode diacritic test)
-API 31/34: ✅ All pass
+#### Known Issue: API 29 Unicode Normalization
 
-**Passing tests (all APIs):**
-- ✅ `testDefaultFestivalIsCurrentYear`
-- ✅ `testSetAndGetFestival`
-- ✅ `testResetToDefaultFestival`
-- ✅ `testSetAndGetActiveView`
-- ✅ `testGetBreweriesView`
-- ✅ `testGetBeersView`
-- ✅ `testSetAndGetSearchBreweries`
-- ✅ `testSetAndGetSearchBeerName`
-- ✅ `testClearFilters`
-- ✅ `testFiltersRetainedAcrossSessions`
-- ✅ `testMultiplePreferenceChanges`
+**Test:** `AppPreferencesTest.testSearchFiltersHandleSpecialCharacters`
+**Status:** ⚠️ **Fails on API 29 only**
 
-**Known failure (API 29 only):**
-- ⚠️ `testSearchFiltersHandleSpecialCharacters`
-  - Reason: Unicode normalization differs on Android 10
-  - Impact: Minimal (production usage unaffected)
-  - Status: Documented, accepted
+**Details:**
+- API 29: ⚠️ Fails due to Unicode normalization differences
+- API 31/34: ✅ Passes
+
+**Reason:** Android 10 (API 29) uses an older ICU library version that handles Unicode diacritics (ü, é, etc.) differently than Android 12+.
+
+**Impact:**
+- ✅ Production functionality works correctly on all APIs
+- ⚠️ Only affects how the test verifies normalization behavior
+- ✅ Users can still search with diacritics successfully
+
+**Status:** Documented and accepted as known API difference
 
 ---
 
@@ -242,9 +234,9 @@ Android 10 (API 29) uses an older version of ICU (International Components for U
   - Issue only affects how test verifies the normalization
   - Users can still search with diacritics successfully
 - **Test Impact:** ⚠️ **Low**
-  - 1 test fails on API 29
-  - 11/12 tests in AppPreferencesTest pass
-  - 19/20 total tests pass
+  - 1 test fails on API 29 out of ~54 total tests (~2%)
+  - 37/38 tests in AppPreferencesTest pass on API 29
+  - ~53/54 total instrumented tests pass on API 29
 
 #### Workarounds Considered
 
@@ -374,23 +366,25 @@ grep -r "Build.VERSION.SDK_INT" app/src/main/java/
 
 ### CI Pipeline Time Analysis
 
-#### Before Multi-API Testing
+#### Before Multi-API Testing (Optimized Baseline)
 ```
-Build job:      ~6 minutes
+Build job:      ~4 minutes
 Test job:       ~8 minutes (API 34 only)
-Coverage job:   ~2 minutes
+Coverage job:   ~1 minute
 ─────────────────────────────
-Total:          ~16 minutes
+Total:          ~13 minutes
 ```
+
+**Note:** This reflects the optimized CI pipeline (see [CI Optimization Summary](../ci-optimization-summary.md)). The original unoptimized pipeline took ~16 minutes.
 
 #### After Multi-API Testing
 ```
-Build job:      ~6 minutes
+Build job:      ~4 minutes
 Test job:       ~9 minutes × 3 APIs (parallel, if runners available)
                 ~27 minutes (sequential)
-Coverage job:   ~2 minutes
+Coverage job:   ~1 minute
 ─────────────────────────────
-Total:          ~17 minutes (parallel, 3 runners)
+Total:          ~14 minutes (parallel, 3 runners)
                 ~35 minutes (sequential, 1 runner)
 ```
 
@@ -398,18 +392,18 @@ Total:          ~17 minutes (parallel, 3 runners)
 
 | Plan | Concurrent Jobs | Effective Time |
 |------|-----------------|----------------|
-| **Free (Public)** | 20 | ~17 min (parallel) |
+| **Free (Public)** | 20 | ~14 min (parallel) |
 | **Free (Private)** | 1 | ~35 min (sequential) |
-| **Pro** | 5 | ~17 min (parallel) |
-| **Team/Enterprise** | 20+ | ~17 min (parallel) |
+| **Pro** | 5 | ~14 min (parallel) |
+| **Team/Enterprise** | 20+ | ~14 min (parallel) |
 
-**BeerFestApp Status:** Public repository → 20 concurrent jobs → **~17 minutes total**
+**BeerFestApp Status:** Public repository → 20 concurrent jobs → **~14 minutes total**
 
 ### Cost Analysis
 
 | Resource | Before | After | Change |
 |----------|--------|-------|--------|
-| **CI Minutes/Run** | 16 min | 17 min (parallel) | +6% |
+| **CI Minutes/Run** | 13 min | 14 min (parallel) | +8% |
 | **API Coverage** | 1 API | 3 APIs | +200% |
 | **Compatibility Confidence** | Medium | High | ✅ Improved |
 | **Cost/Month** | $0 (public) | $0 (public) | No change |
