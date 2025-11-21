@@ -16,7 +16,7 @@
 | FilterByStyleDialogFragment | ✅ MIGRATED | `c05d2df` |
 | LoadBeersProgressDialogFragment | ⏳ PENDING | - |
 | UpdateBeersProgressDialogFragment | ⏳ PENDING | - |
-| CamBeerFestApplication (getSupportFragmentManager) | ⏳ PENDING | - |
+| CamBeerFestApplication (getSupportFragmentManager) | ✅ MIGRATED | `fc536a8` |
 | Activity Result API | ⏳ PENDING | - |
 | ViewPager → ViewPager2 | ⏳ PENDING | - |
 | ListView → RecyclerView | ⏳ PENDING | - |
@@ -67,24 +67,20 @@
 
 ## 2. DEPRECATED ANDROID APIs - DETAILED INVENTORY
 
-### 2.1 Dialog Fragment API (Critical - 3 files remaining)
+### 2.1 Dialog Fragment API (Critical - 2 files remaining)
 
 **Deprecation Details:**
 - Deprecated in: API 28 (Android 9.0)
 - Replacement: `androidx.fragment.app.DialogFragment`
-- Status: 3 of 6 DialogFragment usages migrated
+- Status: 4 of 6 DialogFragment usages migrated
 
 **Files Remaining:**
 
-1. **CamBeerFestApplication.java**
-   - Lines 289, 296, 303: Uses `getFragmentManager()` to show dialogs
-   - **Action needed:** Change to `getSupportFragmentManager()`
-
-2. **UpdateBeersProgressDialogFragment.java**
+1. **UpdateBeersProgressDialogFragment.java**
    - Extends `android.app.DialogFragment` (deprecated)
    - Also uses `ProgressDialog` (deprecated)
 
-3. **LoadBeersProgressDialogFragment.java**
+2. **LoadBeersProgressDialogFragment.java**
    - Extends `android.app.DialogFragment` (deprecated)
    - Also uses `ProgressDialog` (deprecated)
 
@@ -93,6 +89,7 @@
 1. ✅ **AboutDialogFragment.java** - Now uses `androidx.fragment.app.DialogFragment`
 2. ✅ **SortByDialogFragment.java** - Now uses `androidx.fragment.app.DialogFragment`
 3. ✅ **FilterByStyleDialogFragment.java** - Now uses `androidx.fragment.app.DialogFragment`
+4. ✅ **CamBeerFestApplication.java** - Now uses `getSupportFragmentManager()`
 
 ---
 
