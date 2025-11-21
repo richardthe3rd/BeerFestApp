@@ -195,4 +195,4 @@ If issues arise at any step:
 
 - [AGP Release Notes](https://developer.android.com/build/releases/gradle-plugin)
 - [Gradle Compatibility Matrix](https://developer.android.com/build/releases/gradle-plugin#updating-gradle)
-- [Migrate to Plugins DSL](https://developer.android.com/build/migrate-to-catalogs)
+- [Migrate to Plugins DSL](https://docs.gradle.org/current/userguide/plugins.html#sec:plugins_block)
