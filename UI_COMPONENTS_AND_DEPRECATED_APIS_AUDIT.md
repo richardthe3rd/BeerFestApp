@@ -100,6 +100,8 @@
 - Replacement: ProgressBar in custom dialog or Material ProgressIndicator
 - Status: Both progress dialog fragments should use modern progress indicators
 
+**⚠️ NOTE:** These classes appear to be **unused/dead code** - no references found in the codebase outside their own files. Consider deleting instead of migrating.
+
 **Files Affected:**
 
 1. **UpdateBeersProgressDialogFragment.java**
@@ -182,18 +184,18 @@
 
 ---
 
-### 2.6 Fragment Manager (Medium Priority - 3 usages)
+### 2.6 Fragment Manager - ✅ MIGRATED
 
 **Deprecation Details:**
 - `getFragmentManager()` deprecated in favor of `getSupportFragmentManager()`
 - Affects: Dialog display from Activity
 
-**Files Affected:**
+**Status:** ✅ COMPLETED in commit `fc536a8`
 
-1. **CamBeerFestApplication.java**
-   - Line 289: `newFragment.show(getFragmentManager(), "about")`
-   - Line 296: `newFragment.show(getFragmentManager(), "sortBy")`
-   - Line 303: `newFragment.show(getFragmentManager(), "filterByStyle")`
+**CamBeerFestApplication.java** now uses:
+- Line 284: `newFragment.show(getSupportFragmentManager(), "about")`
+- Line 289: `newFragment.show(getSupportFragmentManager(), "sortBy")`
+- Line 296: `newFragment.show(getSupportFragmentManager(), "filterByStyle")`
 
 ---
 
@@ -353,17 +355,23 @@ minSdkVersion 14
 
 ## 6. DEPRECATED API USAGE SUMMARY TABLE
 
-| API | Deprecation | Files Affected | Lines | Migration Priority |
-|-----|------------|-----------------|-------|-------------------|
-| android.app.DialogFragment | API 28 (2018) | 6 files | 20+ occurrences | **CRITICAL** |
-| ProgressDialog | API 26 (2017) | 2 files | 15+ occurrences | **CRITICAL** |
-| LocalBroadcastManager | AndroidX 1.1.0 (2020) | 2 files | 8 occurrences | **HIGH** |
-| AsyncTask | API 30 (2020) | 1 file | 5 occurrences | **HIGH** |
-| getFragmentManager() | API 28+ | 3 locations in 1 file | 3 occurrences | **MEDIUM** |
-| onActivityResult() | API 31 (2021) | 2 files | 2 occurrences | **MEDIUM** |
-| ListFragment | AndroidX 1.1.0 (2020) | 1 file | 1 extension | **MEDIUM** |
-| FragmentPagerAdapter | AndroidX 1.1.0 (2020) | 1 file | 1 extension | **MEDIUM** |
-| ViewPager | Superseded by VP2 | 1 file | 1 usage | **MEDIUM** |
+| API | Deprecation | Status | Files Remaining | Migration Priority |
+|-----|------------|--------|-----------------|-------------------|
+| android.app.DialogFragment | API 28 (2018) | 🟡 IN PROGRESS | 2 files (progress dialogs) | **CRITICAL** |
+| ProgressDialog | API 26 (2017) | ⏳ PENDING | 2 files | **CRITICAL** |
+| LocalBroadcastManager | AndroidX 1.1.0 (2020) | ⏳ PENDING | 2 files | **HIGH** |
+| AsyncTask | API 30 (2020) | ⏳ PENDING | 1 file | **HIGH** |
+| getFragmentManager() | API 28+ | ✅ DONE | 0 files | ~~MEDIUM~~ |
+| onActivityResult() | API 31 (2021) | ⏳ PENDING | 2 files | **MEDIUM** |
+| ListFragment | AndroidX 1.1.0 (2020) | ⏳ PENDING | 1 file | **MEDIUM** |
+| FragmentPagerAdapter | AndroidX 1.1.0 (2020) | ⏳ PENDING | 1 file | **MEDIUM** |
+| ViewPager | Superseded by VP2 | ⏳ PENDING | 1 file | **MEDIUM** |
+
+**Completed migrations:**
+- ✅ AboutDialogFragment → `androidx.fragment.app.DialogFragment`
+- ✅ SortByDialogFragment → `androidx.fragment.app.DialogFragment`
+- ✅ FilterByStyleDialogFragment → `androidx.fragment.app.DialogFragment`
+- ✅ CamBeerFestApplication → `getSupportFragmentManager()`
 
 ---
 
@@ -384,8 +392,8 @@ minSdkVersion 14
 
 ### 7.2 UI Modernization Opportunities
 
-1. **Replace DialogFragment** → Material AlertDialog (or migrate to androidx.fragment.app.DialogFragment)
-2. **Replace ProgressDialog** → Material ProgressIndicator
+1. ~~**Replace DialogFragment** → androidx.fragment.app.DialogFragment~~ ✅ DONE (3 of 5 dialogs)
+2. **Replace ProgressDialog** → Material ProgressIndicator (2 files remaining)
 3. **Replace LocalBroadcastManager** → LiveData / ViewModel pattern
 4. **Replace AsyncTask** → WorkManager or Coroutines
 5. **Replace ListView** → RecyclerView
@@ -411,11 +419,14 @@ minSdkVersion 14
 ### 8.3 TODO Comments
 
 The codebase includes well-documented TODO comments for deprecated APIs:
-- Line 43-45 in CamBeerFestApplication.java
-- Line 62-64 in CamBeerFestApplication.java
-- Line 9-10 in AboutDialogFragment.java
-- Line 12-13 in SortByDialogFragment.java
-- And more...
+- ~~Line 43-45 in CamBeerFestApplication.java~~ ✅ Resolved
+- Line 57-59 in CamBeerFestApplication.java (LocalBroadcastManager)
+- ~~Line 9-10 in AboutDialogFragment.java~~ ✅ Resolved
+- ~~Line 12-13 in SortByDialogFragment.java~~ ✅ Resolved
+- ~~Line 15-16 in FilterByStyleDialogFragment.java~~ ✅ Resolved
+- Line 9 in LoadBeersProgressDialogFragment.java (still pending)
+- Line 9 in UpdateBeersProgressDialogFragment.java (still pending)
+- Lines 24-28 in UpdateTask.java (AsyncTask)
 
 ---
 
@@ -478,10 +489,15 @@ app/src/main/res/values/
 
 ## 10. RECOMMENDATIONS FOR MIGRATION
 
-### Phase 1: Critical (2-3 weeks effort)
-1. Migrate DialogFragments → androidx.fragment.app.DialogFragment
-2. Replace ProgressDialog → Material ProgressIndicator
-3. Replace startActivityForResult → registerForActivityResult()
+### Phase 1: Critical (2-3 weeks effort) - 🟡 IN PROGRESS
+1. ~~Migrate DialogFragments → androidx.fragment.app.DialogFragment~~ ✅ DONE (3 of 5)
+   - ✅ AboutDialogFragment
+   - ✅ SortByDialogFragment
+   - ✅ FilterByStyleDialogFragment
+   - ⏳ LoadBeersProgressDialogFragment (also needs ProgressDialog replacement)
+   - ⏳ UpdateBeersProgressDialogFragment (also needs ProgressDialog replacement)
+2. Replace ProgressDialog → Material ProgressIndicator (⏳ PENDING)
+3. Replace startActivityForResult → registerForActivityResult() (⏳ PENDING)
 
 ### Phase 2: High Priority (2-3 weeks effort)
 1. Replace LocalBroadcastManager → LiveData + ViewModel
