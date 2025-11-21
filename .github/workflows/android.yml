@@ -123,7 +123,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api-level: [29, 31, 34]
+        include:
+          - api-level: 29
+            profile: pixel_2
+          - api-level: 31
+            profile: pixel_2
+          - api-level: 34
+            profile: pixel_2
+          - api-level: 34
+            profile: pixel_tablet
     steps:
       - name: Delete unnecessary tools 🔧
         uses: jlumbroso/free-disk-space@v1.3.1
@@ -181,7 +189,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ matrix.api-level }}
+          key: avd-${{ matrix.api-level }}-${{ matrix.profile }}
 
       - name: Build debug APK for instrumented tests
         run: ./gradlew assembleDebug assembleDebugAndroidTest --scan --build-cache --parallel
@@ -191,6 +199,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
+          profile: ${{ matrix.profile }}
           force-avd-creation: false
           target: google_apis
           arch: x86_64
@@ -204,6 +213,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
+          profile: ${{ matrix.profile }}
           target: google_apis
           arch: x86_64
           force-avd-creation: false
@@ -211,7 +221,7 @@ jobs:
           disable-animations: true
           script: |
             echo "========================================="
-            echo "Running tests on Android API ${{ matrix.api-level }}"
+            echo "Running tests on Android API ${{ matrix.api-level }} (${{ matrix.profile }})"
             echo "========================================="
             ./gradlew connectedCheck --scan --build-cache --parallel
 
@@ -225,14 +235,14 @@ jobs:
         with:
           files: |
             **/build/outputs/androidTest-results/**/*.xml
-          check_name: Instrumented Test Results (API ${{ matrix.api-level }})
+          check_name: Instrumented Test Results (API ${{ matrix.api-level }}, ${{ matrix.profile }})
           comment_mode: off
 
       - name: Archive app coverage reports
         uses: actions/upload-artifact@v4
         if: success() || failure()
         with:
-          name: app-coverage-reports-api-${{ matrix.api-level }}
+          name: app-coverage-reports-api-${{ matrix.api-level }}-${{ matrix.profile }}
           path: |
             app/build/reports/jacoco/
           retention-days: 7
@@ -241,7 +251,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: success() || failure()
         with:
-          name: test-reports-api-${{ matrix.api-level }}
+          name: test-reports-api-${{ matrix.api-level }}-${{ matrix.profile }}
           path: ./app/build/reports/androidTests/connected/
           retention-days: 7
 
@@ -261,7 +271,7 @@ jobs:
         uses: actions/download-artifact@v4
         continue-on-error: true
         with:
-          name: app-coverage-reports-api-34
+          name: app-coverage-reports-api-34-pixel_2
           path: app-coverage/
 
       - name: Add coverage report to PR
