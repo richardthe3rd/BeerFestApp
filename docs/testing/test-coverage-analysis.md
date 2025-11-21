@@ -26,7 +26,7 @@
 
 #### Unit/Integration Tests (8 files)
 1. **BeerSharerTest** - Beer sharing functionality ✓
-2. **BeerSearcherTest** - Web search functionality ✓ (18 tests)
+2. **BeerSearcherTest** - Web search functionality ✓ (16 tests)
 3. **BeerExporterTest** - CSV export functionality ✓ (19 tests)
 4. **AppPreferencesTest** - User preferences persistence ✓
 5. **JsonBeerListTest** - JSON parsing ✓
@@ -142,13 +142,13 @@
 
 ### 🟡 MEDIUM PRIORITY - Untested User Actions
 
-#### 5. ~~**BeerSearcher**~~ ✅ **COMPLETE** (100% coverage - 18 tests)
+#### 5. ~~**BeerSearcher**~~ ✅ **COMPLETE** (100% coverage - 16 tests)
 **Location:** `app/src/main/java/ralcock/cbf/actions/BeerSearcher.java:8`
 **Test Location:** `app/src/androidTest/java/ralcock/cbf/actions/BeerSearcherTest.java`
 
 **Status:** ✅ Comprehensive test coverage implemented (2025-11-21)
 
-**Implemented Tests (18 methods):**
+**Implemented Tests (16 methods):**
 - ✅ Intent action verification (ACTION_WEB_SEARCH)
 - ✅ Query format validation (brewery and beer names in quotes)
 - ✅ Query order verification (brewery before beer)
@@ -272,7 +272,7 @@
 
 5. ✅ **BeerSearcher tests** ✅ **COMPLETE** (2025-11-21)
    - File: `app/src/androidTest/java/ralcock/cbf/actions/BeerSearcherTest.java`
-   - 18 comprehensive test methods
+   - 16 comprehensive test methods
    - Covers intent creation, query formatting, edge cases
 
 6. ⏳ **BeerFilter tests** (Pending)
@@ -407,7 +407,8 @@ The BeerFestApp has **basic model and DAO testing** but **critical gaps** in:
 - **Version:** 1.1.0
 - **Author:** Test Coverage Analysis
 - **Changelog:**
-  - v1.1.0 (2025-11-21): Updated to reflect BeerSearcher test completion (18 tests added)
+  - v1.1.1 (2025-11-21): Fixed test count (16 tests, not 18)
+  - v1.1.0 (2025-11-21): Updated to reflect BeerSearcher test completion
   - v1.0.0 (2025-11-17): Initial test coverage analysis
 - **Related Documents:**
   - [Troubleshooting Guide](../troubleshooting/)

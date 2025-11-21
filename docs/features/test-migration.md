@@ -33,7 +33,7 @@ The BeerFestApp test suite has been significantly expanded:
 - ✅ `FavoritesInteractionTest` (2025-11-18) - Bookmark/wishlist functionality
 - ✅ `SortingAndFilteringTest` (2025-11-18) - Sort and filter dialogs
 - ✅ `SearchFunctionalityTest` (2025-11-18) - Search/filter functionality
-- ✅ `BeerSearcherTest` (2025-11-21) - Web search functionality (18 tests)
+- ✅ `BeerSearcherTest` (2025-11-21) - Web search functionality (16 tests)
 - ✅ `/docs/ui-architecture.md` (2025-11-18) - Comprehensive UI documentation for modernization
 
 **Goal:** Complete migration of remaining 2 legacy tests and expand E2E test coverage.
@@ -65,7 +65,7 @@ The BeerFestApp test suite has been significantly expanded:
 |-----------|-------|--------------|-----------|
 | `CamBeerFestApplicationInstrumentedTest.java` | 28 | 1 | AndroidJUnit4, Espresso |
 | `actions/BeerSharerTest.java` | 108 | 3 | AndroidJUnit4 |
-| `actions/BeerSearcherTest.java` | 379 | 18 | AndroidJUnit4 |
+| `actions/BeerSearcherTest.java` | 379 | 16 | AndroidJUnit4 |
 | `actions/BeerExporterTest.java` | 453 | 20 | AndroidJUnit4 |
 | `AppPreferencesTest.java` | ~200 | ~15 | AndroidJUnit4 |
 | `model/JsonBeerListTest.java` | 84 | 2 | AndroidJUnit4 |

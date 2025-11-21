@@ -71,7 +71,7 @@ This section documents proposed features and improvements for BeerFestApp.
 
 **Completed Work (2025-11-18 to 2025-11-21):**
 - ✅ 15 modern test classes (8 unit/integration + 7 E2E)
-- ✅ BeerSearcherTest (18 test methods)
+- ✅ BeerSearcherTest (16 test methods)
 - ✅ BeerExporterTest (19 test methods)
 - ✅ AppPreferencesTest (~15 test methods)
 - ✅ E2E tests for list, rating, favorites, sorting, filtering, search
