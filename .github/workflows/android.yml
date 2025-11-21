@@ -68,7 +68,7 @@ jobs:
         encodedString: ${{ secrets.KEYSTORE }}
 
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v4
+      uses: gradle/actions/setup-gradle@v5
       with:
         develocity-injection-enabled: true
         develocity-plugin-version: '3.18.2'
@@ -176,7 +176,7 @@ jobs:
             ${{ runner.os }}-android-sdk-
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
         with:
           develocity-injection-enabled: true
           develocity-plugin-version: '3.18.2'
