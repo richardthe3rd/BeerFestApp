@@ -1,6 +1,1 @@
-subprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
+// Root build file - repositories managed centrally in settings.gradle

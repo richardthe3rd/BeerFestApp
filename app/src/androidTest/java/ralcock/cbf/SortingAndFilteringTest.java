@@ -1,17 +1,17 @@
 package ralcock.cbf;
 
 import androidx.test.core.app.ActivityScenario;
-import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.runner.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
@@ -133,6 +133,33 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 public class SortingAndFilteringTest {
 
     /**
+     * Helper method to click menu items that may be in action bar or overflow menu.
+     * Works across different screen sizes (phone/tablet) and API levels (including API 29).
+     * 
+     * <p>Strategy:
+     * <ul>
+     *   <li>First try: Click menu item directly by ID (works on tablets where item is in action bar)</li>
+     *   <li>On NoMatchingViewException: Click overflow button, then click by text (works on phones)</li>
+     *   <li>Avoids openActionBarOverflowOrOptionsMenu() which fails on API 29</li>
+     * </ul>
+     *
+     * @param menuItemId Resource ID of the menu item (e.g., R.id.sort)
+     * @param menuItemTextRes Resource ID of the menu item's text (e.g., R.string.sort_menu_label)
+     */
+    private void clickMenuItem(final int menuItemId, final int menuItemTextRes) {
+        try {
+            // Try clicking menu item directly (works if item is visible in action bar)
+            onView(withId(menuItemId)).perform(click());
+        } catch (NoMatchingViewException e) {
+            // Menu item is in overflow menu (not visible), open overflow first
+            // Use "More options" content description instead of MENU keyevent (API 29 compatible)
+            onView(withContentDescription("More options")).perform(click());
+            // Then click menu item by its text
+            onView(withText(menuItemTextRes)).perform(click());
+        }
+    }
+
+    /**
      * Test that sort button is displayed in toolbar.
      * The sort icon should be visible in the action bar.
      */
@@ -157,16 +184,16 @@ public class SortingAndFilteringTest {
      *   <li>Dialog shows available sort options</li>
      *   <li>Current sort option is pre-selected</li>
      * </ul>
+     *
+     * <p>Works across API levels (including API 29) and screen sizes (phone/tablet).
+     * Menu item may be in action bar (tablet) or overflow menu (phone).
      */
     @Test
     public void testClickingSortOpensDialog() {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
-            // Open options menu (handles both overflow menu and action bar menu items)
-            openActionBarOverflowOrOptionsMenu(InstrumentationRegistry.getInstrumentation().getTargetContext());
-
-            // Click sort menu item by text (more reliable than ID for menu items)
-            onView(withText(R.string.sort_menu_label)).perform(click());
+            // Click sort menu item (handles both action bar and overflow menu)
+            clickMenuItem(R.id.sort, R.string.sort_menu_label);
 
             // Verify dialog is displayed by checking for dialog title
             onView(withText(R.string.sort_dialog_title)).check(matches(isDisplayed()));
