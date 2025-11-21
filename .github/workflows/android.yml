@@ -200,29 +200,42 @@ jobs:
         with:
           api-level: ${{ matrix.api-level }}
           profile: ${{ matrix.profile }}
+          avd-name: test-${{ matrix.profile }}-api${{ matrix.api-level }}
           force-avd-creation: false
           target: google_apis
           arch: x86_64
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
+          disable-spellchecker: true
+          disable-linux-hw-accel: false
           disk-size: 6000M
           heap-size: 600M
-          script: echo "Generated AVD snapshot for caching."
+          script: |
+            adb shell settings put secure show_ime_with_hard_keyboard 0
+            echo "Generated AVD snapshot for caching."
 
       - name: Run instrumented tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
           profile: ${{ matrix.profile }}
+          avd-name: test-${{ matrix.profile }}-api${{ matrix.api-level }}
           target: google_apis
           arch: x86_64
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
+          disable-spellchecker: true
+          disable-linux-hw-accel: false
           script: |
             echo "========================================="
             echo "Running tests on Android API ${{ matrix.api-level }} (${{ matrix.profile }})"
+            echo "Device name: test-${{ matrix.profile }}-api${{ matrix.api-level }}"
             echo "========================================="
+            adb shell settings put secure show_ime_with_hard_keyboard 0
+            adb shell settings put global window_animation_scale 0.0
+            adb shell settings put global transition_animation_scale 0.0
+            adb shell settings put global animator_duration_scale 0.0
             ./gradlew connectedCheck --scan --build-cache --parallel
 
       - name: Generate coverage report
