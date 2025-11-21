@@ -279,8 +279,9 @@ jobs:
 
       - name: Download Instrumentationpretty for JUnit XML generation
         run: |
-          curl -L -o instrumentationpretty.jar \
-            https://github.com/jamesknowsbest/Instrumentationpretty/raw/master/Instrumentationpretty-all-v1.1.jar
+          # Pin to specific commit (75ecd09) for supply-chain security instead of master
+          curl -fsSL -o instrumentationpretty.jar \
+            https://github.com/jamesknowsbest/Instrumentationpretty/raw/75ecd099442abf0b57e00ed1334e14cd48ce7481/Instrumentationpretty-all-v1.1.jar
 
       - name: AVD cache
         uses: actions/cache@v4
