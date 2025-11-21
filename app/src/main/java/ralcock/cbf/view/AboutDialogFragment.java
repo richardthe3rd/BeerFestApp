@@ -1,25 +1,26 @@
 package ralcock.cbf.view;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.DialogFragment;
 import android.text.Spannable;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
+
 import ralcock.cbf.R;
 
-// TODO: Migrate from deprecated android.app.DialogFragment to androidx.fragment.app.DialogFragment
-@SuppressWarnings("deprecation")
 public class AboutDialogFragment extends DialogFragment {
-    public static DialogFragment newInstance(String appName, String versionName) {
-        DialogFragment fragment = new AboutDialogFragment();
+    public static AboutDialogFragment newInstance(final String appName, final String versionName) {
+        AboutDialogFragment fragment = new AboutDialogFragment();
         Bundle args = new Bundle();
         args.putString("appName", appName);
         args.putString("versionName", versionName);
@@ -27,11 +28,12 @@ public class AboutDialogFragment extends DialogFragment {
         return fragment;
     }
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
         String versionName = getArguments().getString("versionName");
         String appName = getArguments().getString("appName");
-        View layout = LayoutInflater.from(getActivity()).inflate(R.layout.about_dialog, null);
+        View layout = LayoutInflater.from(requireActivity()).inflate(R.layout.about_dialog, null);
         TextView version = (TextView) layout.findViewById(R.id.aboutVersion);
         version.setText(appName + " v" + versionName);
 
@@ -52,7 +54,7 @@ public class AboutDialogFragment extends DialogFragment {
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         festival.setMovementMethod(LinkMovementMethod.getInstance());
 
-        return new AlertDialog.Builder(getActivity())
+        return new AlertDialog.Builder(requireActivity())
                 .setTitle(appName)
                 .setView(layout)
                 .setNeutralButton("Close", new DialogInterface.OnClickListener() {
