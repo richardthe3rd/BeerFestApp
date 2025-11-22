@@ -268,10 +268,23 @@ This project uses [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) forma
 - `Security` - Security fixes
 
 **Release process:**
-1. Move items from `[Unreleased]` to a new version section
-2. Add the release date: `## [2025.12.0] - 2025-12-15`
-3. Update comparison links at bottom of file
-4. Commit, then create and push the tag
+
+1. **Prepare** - Update `CHANGELOG.md`:
+   - Move items from `[Unreleased]` to new version section
+   - Add release date: `## [2025.12.0] - 2025-12-15`
+   - Update comparison links at bottom of file
+   - Commit: `git commit -am "chore: prepare release 2025.12.0"`
+
+2. **Merge** - Create PR and merge to main
+
+3. **Tag** - Create and push tag to trigger release:
+   ```bash
+   git checkout main && git pull
+   git tag v2025.12.0
+   git push origin v2025.12.0
+   ```
+
+The tag triggers CI which creates a draft GitHub Release with changelog notes.
 
 ---
 
