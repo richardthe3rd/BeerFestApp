@@ -156,11 +156,13 @@ android {
   --scan --build-cache --parallel
 ```
 
-## Validation
+## Validation (Proposal)
+
+> **Status:** Not yet implemented. These validations are proposed for future enhancement.
 
 ### Tag Format Validation
 
-The release job should validate tag format:
+The release job could validate tag format:
 ```bash
 if [[ ! "$GITHUB_REF_NAME" =~ ^v[0-9]{4}\.[0-9]{2}\.[0-9]+$ ]]; then
   echo "::error::Invalid tag format. Expected vYYYY.MM.PATCH (e.g., v2025.11.0)"
@@ -170,7 +172,7 @@ fi
 
 ### versionCode Validation
 
-Ensure versionCode is higher than previous release:
+Could ensure versionCode is higher than previous release:
 ```bash
 LATEST_CODE=$(gh release view --json tagName -q '.tagName' | ... calculate ...)
 if [ $VERSION_CODE -le $LATEST_CODE ]; then
