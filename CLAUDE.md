@@ -228,8 +228,10 @@ try {
 **Platform:** GitHub Actions (`.github/workflows/android.yml`)
 
 **Jobs:**
-1. **Build** - Builds release APK with signing
-2. **Test** - Runs instrumented tests on API 34 emulator
+1. **build-release** - Builds unsigned release APK, runs unit tests
+2. **instrumented-test** - Matrix testing on 4 emulator configurations (API 29/31/34, pixel_2/tablet)
+3. **release** - Signs APK (main branch only, after tests pass)
+4. **coverage** - Aggregates coverage reports for PRs
 
 **Triggers:**
 - Push to `main`
@@ -237,10 +239,14 @@ try {
 - Manual workflow dispatch
 
 **Artifacts:**
+- `release-apk-unsigned` - Unsigned release APK
+- `release-apk-signed` - Signed release APK (main branch only)
 - `build-reports` - Build and lint reports
-- `build-artifacts` - Release APKs
+- `library-coverage-reports` - Unit test coverage
+- `app-coverage-reports-api-*` - Instrumented test coverage
 
 **Secrets Required:** KEYSTORE, SIGNING_KEY_ALIAS, SIGNING_KEY_PASSWORD, SIGNING_STORE_PASSWORD
+(Only accessed by `release` job on main branch)
 
 ---
 
