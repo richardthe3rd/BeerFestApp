@@ -38,7 +38,7 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
         return false;
     }
 
-    private View newView(ViewGroup viewGroup) {
+    private View newView(final ViewGroup viewGroup) {
         LayoutInflater layoutInflater = LayoutInflater.from(fContext);
         View view = layoutInflater.inflate(R.layout.beer_listitem, viewGroup, false);
         BeerListItemView beerListItemView = new BeerListItemView(view);
@@ -46,7 +46,7 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
         return view;
     }
 
-    private void bindView(View view, final Beer beer) {
+    private void bindView(final View view, final Beer beer) {
         BeerListItemView beerListItemView = (BeerListItemView) view.getTag();
 
         Brewery brewery = beer.getBrewery();

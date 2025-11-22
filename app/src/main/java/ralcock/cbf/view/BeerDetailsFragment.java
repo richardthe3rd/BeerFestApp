@@ -105,13 +105,13 @@ public class BeerDetailsFragment extends Fragment {
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
-    private void rateBeer(Beer beer, StarRating rating) {
+    private void rateBeer(final Beer beer, final StarRating rating) {
         beer.setNumberOfStars(rating);
         getHelper().getBeers().updateBeer(beer);
         displayBeer(beer);
     }
 
-    private void toggleBookmark(Beer beer) {
+    private void toggleBookmark(final Beer beer) {
         beer.setIsOnWishList(!beer.isIsOnWishList());
         getHelper().getBeers().updateBeer(beer);
         displayBeer(beer);
