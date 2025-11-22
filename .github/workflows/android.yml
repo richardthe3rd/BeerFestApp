@@ -176,7 +176,19 @@ jobs:
     - name: Get build-tools version
       id: build-tools
       run: |
-        BUILD_TOOLS_VERSION=$(ls -1 $ANDROID_HOME/build-tools | sort -V | tail -n 1)
+        if [ ! -d "$ANDROID_HOME/build-tools" ]; then
+          echo "::error::Android build-tools directory not found at $ANDROID_HOME/build-tools"
+          exit 1
+        fi
+        BUILD_TOOLS_VERSION=$(ls -1 "$ANDROID_HOME/build-tools" 2>/dev/null | sort -V | tail -n 1)
+        if [ -z "$BUILD_TOOLS_VERSION" ]; then
+          echo "::error::No build-tools versions found in $ANDROID_HOME/build-tools"
+          exit 1
+        fi
+        if [ ! -x "$ANDROID_HOME/build-tools/$BUILD_TOOLS_VERSION/apksigner" ]; then
+          echo "::error::apksigner not found in build-tools $BUILD_TOOLS_VERSION"
+          exit 1
+        fi
         echo "version=$BUILD_TOOLS_VERSION" >> $GITHUB_OUTPUT
         echo "Using build-tools version: $BUILD_TOOLS_VERSION"
 
