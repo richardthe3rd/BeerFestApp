@@ -2,12 +2,6 @@ name: Android CI
 
 on:
   workflow_dispatch:
-    inputs:
-      sign_release:
-        description: 'Sign APK for sideload testing'
-        required: false
-        default: true
-        type: boolean
 
   push:
     branches: [ "main" ]
@@ -147,72 +141,6 @@ jobs:
         name: release-aab-unsigned
         path: ./app/build/outputs/bundle/release/
         retention-days: 7
-
-  # Sign APK for sideload testing (without creating a GitHub release)
-  # Runs on: workflow_dispatch, main branch pushes (non-tag)
-  # Does NOT run on: tag pushes (handled by release job), fork PRs (no secrets)
-  sign-for-testing:
-    needs: [build-release]
-    runs-on: ubuntu-latest
-    if: |
-      !startsWith(github.ref, 'refs/tags/v') &&
-      (github.event_name == 'workflow_dispatch' ||
-       (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-       (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository))
-    steps:
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-
-    - name: Download unsigned release APK
-      uses: actions/download-artifact@v4
-      with:
-        name: release-apk-unsigned
-        path: ./unsigned-apk/
-
-    - name: Decode Keystore
-      id: decode_keystore
-      uses: timheuer/base64-to-file@v1
-      with:
-        fileName: 'keystore/your_signing_keystore.jks'
-        encodedString: ${{ secrets.KEYSTORE }}
-
-    - name: Get build-tools version
-      id: build-tools
-      run: |
-        BUILD_TOOLS_VERSION=$(ls -1 "$ANDROID_HOME/build-tools" 2>/dev/null | sort -V | tail -n 1)
-        if [ -z "$BUILD_TOOLS_VERSION" ]; then
-          echo "::error::No build-tools versions found"
-          exit 1
-        fi
-        echo "version=$BUILD_TOOLS_VERSION" >> $GITHUB_OUTPUT
-
-    - name: Sign APK for testing
-      run: |
-        VERSION="${{ needs.build-release.outputs.version_name }}"
-        $ANDROID_HOME/build-tools/${{ steps.build-tools.outputs.version }}/apksigner sign \
-          --ks "$KEYSTORE_PATH" \
-          --ks-key-alias "$KEY_ALIAS" \
-          --ks-pass env:STORE_PASSWORD \
-          --key-pass env:KEY_PASSWORD \
-          --out ./BeerFestApp-${VERSION}-test.apk \
-          ./unsigned-apk/app-release-unsigned.apk
-      env:
-        KEYSTORE_PATH: ${{ steps.decode_keystore.outputs.filePath }}
-        KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
-        STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
-        KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
-
-    - name: Verify APK signature
-      run: |
-        VERSION="${{ needs.build-release.outputs.version_name }}"
-        $ANDROID_HOME/build-tools/${{ steps.build-tools.outputs.version }}/apksigner verify --verbose ./BeerFestApp-${VERSION}-test.apk
-
-    - name: Archive signed test APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: release-apk-signed-test
-        path: ./BeerFestApp-*-test.apk
-        retention-days: 14
 
   release:
     needs: [build-release, instrumented-test]

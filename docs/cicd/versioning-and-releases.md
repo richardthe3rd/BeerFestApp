@@ -40,13 +40,12 @@ This allows:
 
 ### Triggers
 
-| Event | Jobs Run | Release Created | Signed APK |
-|-------|----------|-----------------|------------|
-| PR to main (internal) | build-release, instrumented-test, sign-for-testing, coverage | No | Yes |
-| PR to main (fork) | build-release, instrumented-test, coverage | No | No (debug APK only) |
-| Push to main | build-release, instrumented-test, sign-for-testing, coverage | No | Yes |
-| Push tag `v*` | build-release, instrumented-test, release, coverage | Yes | Yes |
-| workflow_dispatch | build-release, sign-for-testing | No | Yes |
+| Event | Jobs Run | Release Created | Sideloadable APK |
+|-------|----------|-----------------|------------------|
+| PR to main | build-release, instrumented-test, coverage | No | Yes (debug) |
+| Push to main | build-release, instrumented-test, coverage | No | Yes (debug) |
+| Push tag `v*` | build-release, instrumented-test, release, coverage | Yes | Yes (signed release) |
+| workflow_dispatch | build-release | No | Yes (debug) |
 
 ### Release Process
 
@@ -202,40 +201,19 @@ git push origin v2025.11.1
 
 ## Sideload Testing
 
-For testing builds on physical devices before release, CI provides multiple options:
+For testing builds on physical devices before release, download the `debug-apk` artifact from any CI run.
 
-### Artifacts Available
+### How to Sideload
 
-| Artifact | When Available | Signed | Use Case |
-|----------|----------------|--------|----------|
-| `debug-apk` | All builds | Yes (debug key) | Quick sideload testing |
-| `release-apk-signed-test` | Internal PRs, main, workflow_dispatch | Yes (release key) | Production-like testing |
-| `release-apk-unsigned` | All builds | No | Manual signing |
-
-### How to Get a Sideloadable APK
-
-**Option 1: Debug APK (always available)**
-1. Go to the workflow run
+1. Go to the workflow run in GitHub Actions
 2. Download `debug-apk` artifact
 3. Install on device via `adb install` or file manager
 
-**Option 2: Signed Release APK (internal builds)**
-1. Go to the workflow run (must be internal PR or main branch)
-2. Download `release-apk-signed-test` artifact
-3. Install on device
-
-**Option 3: Manual Trigger**
-1. Go to Actions → Android CI → Run workflow
-2. Check "Sign APK for sideload testing"
-3. Download `release-apk-signed-test` after completion
-
-### Fork PRs
-
-For security reasons, PRs from forks cannot access signing secrets. Fork contributors can use the `debug-apk` artifact for testing.
+The debug APK is auto-signed with the debug key, so it installs directly on any Android device.
 
 ## Security Considerations
 
-- Signing secrets only accessed for internal repository events
+- Signing secrets only accessed on tag pushes (release job)
 - Tags can only be pushed by users with write access
 - GitHub Release artifacts are immutable once published
 

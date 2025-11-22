@@ -232,28 +232,26 @@ try {
 **Jobs:**
 1. **build-release** - Builds unsigned release APK + debug APK, runs unit tests
 2. **instrumented-test** - Matrix testing on 3 emulator configurations (API 31/34/35)
-3. **sign-for-testing** - Signs APK for sideload testing (internal PRs, main, workflow_dispatch)
-4. **release** - Signs APK and creates GitHub Release (tag pushes only, after tests pass)
-5. **coverage** - Aggregates coverage reports for PRs
-6. **edge-case-test** - Manual-only testing for API 29 and tablet (workflow_dispatch)
+3. **release** - Signs APK and creates GitHub Release (tag pushes only, after tests pass)
+4. **coverage** - Aggregates coverage reports for PRs
+5. **edge-case-test** - Manual-only testing for API 29 and tablet (workflow_dispatch)
 
 **Triggers:**
 - Push to `main`
 - Push tags matching `v*` (e.g., `v2025.11.0`)
 - Pull requests to `main`
-- Manual workflow dispatch (with option to sign for testing)
+- Manual workflow dispatch
 
 **Artifacts:**
-- `debug-apk` - Debug APK (always sideloadable)
+- `debug-apk` - Debug APK (always sideloadable for testing)
 - `release-apk-unsigned` - Unsigned release APK
-- `release-apk-signed-test` - Signed release APK for testing (internal builds only)
 - `release-apk-signed` - Signed release APK (tag pushes only)
 - `build-reports` - Build and lint reports
 - `library-coverage-reports` - Unit test coverage
 - `app-coverage-reports-api-*` - Instrumented test coverage
 
 **Secrets Required:** KEYSTORE, SIGNING_KEY_ALIAS, SIGNING_KEY_PASSWORD, SIGNING_STORE_PASSWORD
-(Accessed by `sign-for-testing` on internal builds and `release` job on tag pushes)
+(Only accessed by `release` job on tag pushes)
 
 ---
 
