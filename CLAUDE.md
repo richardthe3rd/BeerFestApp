@@ -62,10 +62,11 @@ git commit -am "cbf2026"
 
 **📖 Full Guide:** [Annual Updates](docs/annual-updates/)
 
-**Files to modify:** 3
+**Files to modify:** 4
 - `app/build.gradle` - Version
 - `app/src/main/res/values/festival.xml` - Festival config
 - `BeerDatabaseHelper.java` - Database version
+- `CHANGELOG.md` - Release notes
 
 **⚠️ Common Mistakes:**
 - Forgetting to increment DB_VERSION → stale data
@@ -135,7 +136,8 @@ BeerFestApp/
 │   ├── features/
 │   └── ...
 ├── .github/workflows/      # CI/CD (GitHub Actions)
-└── scripts/                # Automation scripts
+├── scripts/                # Automation scripts
+└── CHANGELOG.md            # Release notes (Keep a Changelog format)
 ```
 
 **Code size:** ~3,500 lines of production code (26 Java files)
@@ -251,13 +253,49 @@ try {
 
 ---
 
+## Changelog
+
+This project uses [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format. Release notes are automatically generated from `CHANGELOG.md`.
+
+**When to update:** Before creating a release tag, add your changes to the `[Unreleased]` section.
+
+**Categories:**
+- `Added` - New features
+- `Changed` - Changes to existing functionality
+- `Fixed` - Bug fixes
+- `Deprecated` - Soon-to-be removed features
+- `Removed` - Removed features
+- `Security` - Security fixes
+
+**Release process:**
+
+1. **Prepare** - Update `CHANGELOG.md`:
+   - Move items from `[Unreleased]` to new version section
+   - Add release date: `## [2025.12.0] - 2025-12-15`
+   - Update comparison links at bottom of file
+   - Commit: `git commit -am "chore: prepare release 2025.12.0"`
+
+2. **Merge** - Create PR and merge to main (fast - CI skips `.md` files)
+
+3. **Tag** - Create and push tag to trigger release:
+   ```bash
+   git checkout main && git pull
+   git tag v2025.12.0
+   git push origin v2025.12.0
+   ```
+
+The tag triggers CI which creates a draft GitHub Release with changelog notes.
+
+---
+
 ## Annual Update Checklist
 
-**3 Files to Update:**
+**4 Files to Update:**
 
 - [ ] `app/build.gradle` - Increment versionCode, update versionName year
 - [ ] `app/src/main/res/values/festival.xml` - Update festival_name, festival_hashtag, beer_list_url
 - [ ] `BeerDatabaseHelper.java` - Increment DB_VERSION, update comment
+- [ ] `CHANGELOG.md` - Add new version section with changes
 
 **Verify:** All years match across all files!
 

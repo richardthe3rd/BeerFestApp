@@ -130,6 +130,17 @@ jobs:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Read changelog
+      id: changelog
+      uses: mindsers/changelog-reader-action@v2
+      with:
+        version: ${{ needs.build-release.outputs.version_name }}
+        path: ./CHANGELOG.md
+        validation_level: error
+
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
@@ -172,7 +183,7 @@ jobs:
           --ks-key-alias "$KEY_ALIAS" \
           --ks-pass env:STORE_PASSWORD \
           --key-pass env:KEY_PASSWORD \
-          --out ./app-release-signed.apk \
+          --out ./BeerFestApp-v${{ needs.build-release.outputs.version_name }}.apk \
           ./unsigned-apk/app-release-unsigned.apk
       env:
         KEYSTORE_PATH: ${{ steps.decode_keystore.outputs.filePath }}
@@ -182,27 +193,38 @@ jobs:
 
     - name: Verify APK signature
       run: |
-        $ANDROID_HOME/build-tools/${{ steps.build-tools.outputs.version }}/apksigner verify --verbose ./app-release-signed.apk
+        $ANDROID_HOME/build-tools/${{ steps.build-tools.outputs.version }}/apksigner verify --verbose ./BeerFestApp-v${{ needs.build-release.outputs.version_name }}.apk
 
     - name: Archive signed release APK
       uses: actions/upload-artifact@v4
       with:
         name: release-apk-signed
-        path: ./app-release-signed.apk
+        path: ./BeerFestApp-v${{ needs.build-release.outputs.version_name }}.apk
         retention-days: 30
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        draft: true  # Set to false after testing
-        name: Cambridge Beer Festival ${{ needs.build-release.outputs.version_name }}
-        generate_release_notes: true
+        draft: true
+        name: Cambridge Beer Festival App v${{ needs.build-release.outputs.version_name }}
+        generate_release_notes: false
         body: |
-          ## Cambridge Beer Festival App v${{ needs.build-release.outputs.version_name }}
+          ${{ steps.changelog.outputs.changes }}
 
-          ### Installation
-          Download and install `app-release-signed.apk` on your Android device.
-        files: ./app-release-signed.apk
+          ## Installation
+
+          1. Download `BeerFestApp-v${{ needs.build-release.outputs.version_name }}.apk` below
+          2. On your Android device, enable "Install from unknown sources" if prompted
+          3. Open the downloaded APK to install
+
+          ## Requirements
+
+          - Android 5.0 (Lollipop) or higher
+
+          ## Feedback
+
+          Found a bug or have a suggestion? [Open an issue](https://github.com/richardthe3rd/BeerFestApp/issues)
+        files: ./BeerFestApp-v${{ needs.build-release.outputs.version_name }}.apk
         fail_on_unmatched_files: true
 
   instrumented-test:
