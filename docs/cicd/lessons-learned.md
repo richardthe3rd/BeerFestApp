@@ -173,7 +173,7 @@ if (project.hasProperty("RELEASE")) {
 ```
 build-release ──────────────────────────┐
   └─ assembleRelease + unit tests       │
-                                        ├──> release (main only)
+                                        ├──> release (tag only)
 instrumented-test (4x matrix) ──────────┤    └─ sign APK
   └─ connectedCheck (standard Gradle)   │
                                         └──> coverage

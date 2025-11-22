@@ -174,7 +174,7 @@ BeerFestApp/
 | **Language** | Java | Primary language |
 | **JDK** | 17 (Temurin) | Development kit |
 | **Build** | Gradle 8.0.0 | Build automation |
-| **Android SDK** | Compile: 33, Target: 34, Min: 14 | Android platform |
+| **Android SDK** | Compile: 34, Target: 34, Min: 21 | Android platform |
 | **OrmLite** | 5.0 | Database ORM |
 | **Material Design** | 1.8.0 | UI components |
 
