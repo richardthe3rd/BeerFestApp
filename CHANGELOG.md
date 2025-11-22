@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Target Android 15 (API 35) for Google Play Store compliance
+- Optimized CI test matrix based on Play Console user data (81% coverage with 3 AVDs)
+
+### Added
+- Manual edge-case testing job for API 29 and tablet (workflow_dispatch)
+
 ## [2025.11.0] - 2025-11-22
 
 ### Added
