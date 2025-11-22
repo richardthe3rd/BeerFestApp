@@ -194,14 +194,27 @@ jobs:
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        draft: true  # Set to false after testing
-        name: Cambridge Beer Festival ${{ needs.build-release.outputs.version_name }}
-        generate_release_notes: true
+        draft: true
+        name: Cambridge Beer Festival App v${{ needs.build-release.outputs.version_name }}
+        generate_release_notes: false
         body: |
-          ## Cambridge Beer Festival App v${{ needs.build-release.outputs.version_name }}
+          ## What's New
 
-          ### Installation
-          Download and install `app-release-signed.apk` on your Android device.
+          This release includes updates to the Cambridge Beer Festival companion app.
+
+          ## Installation
+
+          1. Download `app-release-signed.apk` below
+          2. On your Android device, enable "Install from unknown sources" if prompted
+          3. Open the downloaded APK to install
+
+          ## Requirements
+
+          - Android 5.0 (Lollipop) or higher
+
+          ## Feedback
+
+          Found a bug or have a suggestion? [Open an issue](https://github.com/richardthe3rd/BeerFestApp/issues)
         files: ./app-release-signed.apk
         fail_on_unmatched_files: true
 
