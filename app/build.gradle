@@ -23,6 +23,9 @@ dependencies {
     androidTestImplementation 'androidx.legacy:legacy-support-v4:1.0.0'
     androidTestImplementation 'android.arch.core:core-testing:1.1.1'
     androidTestImplementation 'org.easymock:easymock:3.6'
+
+    // Screenshot capture for instrumented tests
+    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
 }
 
 // Version defaults - overridden by CI for tagged releases

@@ -5,8 +5,10 @@ import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.runner.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import ralcock.cbf.testing.ScreenshotOnFailureRule;
 import ralcock.cbf.view.BeerDetailsActivity;
 
 import static androidx.test.espresso.Espresso.onData;
@@ -73,6 +75,9 @@ import static org.hamcrest.Matchers.containsString;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class BeerListInteractionTest {
+
+    @Rule
+    public ScreenshotOnFailureRule fScreenshotRule = new ScreenshotOnFailureRule();
 
     /**
      * Test that the main beer list view displays on app launch.

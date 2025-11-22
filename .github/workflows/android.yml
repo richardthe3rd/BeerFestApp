@@ -390,7 +390,40 @@ jobs:
             adb shell settings put global window_animation_scale 0.0
             adb shell settings put global transition_animation_scale 0.0
             adb shell settings put global animator_duration_scale 0.0
+
+            # Run tests and capture exit code
+            set +e
             ./gradlew connectedCheck --build-cache --parallel
+            TEST_EXIT_CODE=$?
+            set -e
+
+            # Pull screenshots from device after tests complete (before emulator shuts down)
+            echo "========================================="
+            echo "Collecting test screenshots..."
+            echo "========================================="
+            mkdir -p ./test-screenshots
+            adb pull /sdcard/Android/data/ralcock.cbf/files/Pictures/screenshots/ ./test-screenshots/ 2>/dev/null || echo "No screenshots found on external storage"
+            adb pull /data/data/ralcock.cbf/files/Pictures/screenshots/ ./test-screenshots/ 2>/dev/null || echo "No screenshots found on internal storage"
+
+            # List any captured screenshots
+            if [ -d "./test-screenshots" ] && [ "$(ls -A ./test-screenshots 2>/dev/null)" ]; then
+              echo "Screenshots captured:"
+              ls -la ./test-screenshots/
+            else
+              echo "No screenshots were captured (normal if no tests failed)"
+            fi
+
+            # Exit with the original test exit code
+            exit $TEST_EXIT_CODE
+
+      - name: Archive test screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-screenshots-api-${{ matrix.api-level }}-${{ matrix.profile }}
+          path: ./test-screenshots/
+          retention-days: 7
+          if-no-files-found: ignore
 
       - name: Generate coverage report
         if: always()
@@ -527,4 +560,37 @@ jobs:
             adb shell settings put global window_animation_scale 0.0
             adb shell settings put global transition_animation_scale 0.0
             adb shell settings put global animator_duration_scale 0.0
+
+            # Run tests and capture exit code
+            set +e
             ./gradlew connectedCheck --build-cache --parallel
+            TEST_EXIT_CODE=$?
+            set -e
+
+            # Pull screenshots from device after tests complete
+            echo "========================================="
+            echo "Collecting test screenshots..."
+            echo "========================================="
+            mkdir -p ./test-screenshots
+            adb pull /sdcard/Android/data/ralcock.cbf/files/Pictures/screenshots/ ./test-screenshots/ 2>/dev/null || echo "No screenshots found on external storage"
+            adb pull /data/data/ralcock.cbf/files/Pictures/screenshots/ ./test-screenshots/ 2>/dev/null || echo "No screenshots found on internal storage"
+
+            # List any captured screenshots
+            if [ -d "./test-screenshots" ] && [ "$(ls -A ./test-screenshots 2>/dev/null)" ]; then
+              echo "Screenshots captured:"
+              ls -la ./test-screenshots/
+            else
+              echo "No screenshots were captured (normal if no tests failed)"
+            fi
+
+            # Exit with the original test exit code
+            exit $TEST_EXIT_CODE
+
+      - name: Archive edge-case test screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-screenshots-edge-${{ matrix.profile }}-api-${{ matrix.api-level }}
+          path: ./test-screenshots/
+          retention-days: 7
+          if-no-files-found: ignore
