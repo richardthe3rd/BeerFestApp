@@ -82,6 +82,8 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
     @SuppressWarnings("deprecation")
     private void doUpdate(final boolean cleanUpdate) {
         Log.d(TAG, "doUpdate: cleanUpdate=" + cleanUpdate);
+        // Cache helper reference before async task starts to avoid accessing it after onDestroy
+        final BeerDatabaseHelper cachedHelper = getHelper();
         UpdateTask task = new UpdateTask() {
             @Override
             protected void onProgressUpdate(final Progress... values) {
@@ -128,7 +130,7 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
 
             @Override
             BeerDatabaseHelper getDatabaseHelper() {
-                return getHelper();
+                return cachedHelper;
             }
 
             @Override
