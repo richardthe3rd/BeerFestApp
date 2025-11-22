@@ -50,12 +50,14 @@ public class BeerListTest {
                 eq(sortOrder),
                 eq(mild),
                 eq(EMPTY_SET),
+                eq(EMPTY_SET),
                 eq(EMPTY_SET)
         )).andReturn(Arrays.asList(aMild));
 
         expect(fBeers.allBeersList(
                 eq(sortOrder),
                 eq(best),
+                eq(EMPTY_SET),
                 eq(EMPTY_SET),
                 eq(EMPTY_SET)
         )).andReturn(Arrays.asList(aBest, anotherBest));
@@ -89,6 +91,7 @@ public class BeerListTest {
                 eq(sortOrder1),
                 eq(filterText),
                 eq(EMPTY_SET),
+                eq(EMPTY_SET),
                 eq(EMPTY_SET)
         )).andReturn(Arrays.asList(beer1, beer2, beer3));
 
@@ -96,6 +99,7 @@ public class BeerListTest {
         expect(fBeers.allBeersList(
                 eq(sortOrder2),
                 eq(filterText),
+                eq(EMPTY_SET),
                 eq(EMPTY_SET),
                 eq(EMPTY_SET)
         )).andReturn(Arrays.asList(beer2, beer1, beer3));
@@ -130,6 +134,7 @@ public class BeerListTest {
                 eq(sortOrder),
                 eq(filterText),
                 eq(stylesToHide),
+                eq(EMPTY_SET),
                 eq(EMPTY_SET)
         )).andReturn(Arrays.asList(new Beer()));
         replay(fBeers, fBreweries);

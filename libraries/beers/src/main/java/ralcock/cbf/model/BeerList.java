@@ -57,12 +57,12 @@ public class BeerList {
             return this;
         }
 
-        public Config withStylesToHide(Set<String> stylesToHide) {
+        public Config withStylesToHide(final Set<String> stylesToHide) {
             StylesToHide = stylesToHide;
             return this;
         }
 
-        public Config withAllergensToHide(Set<String> allergensToHide) {
+        public Config withAllergensToHide(final Set<String> allergensToHide) {
             AllergensToHide = allergensToHide;
             return this;
         }
@@ -113,12 +113,12 @@ public class BeerList {
         updateBeerList();
     }
 
-    public void filterBy(CharSequence filterText) {
+    public void filterBy(final CharSequence filterText) {
         fFilterText = filterText;
         updateBeerList();
     }
 
-    public void sortBy(SortOrder sortOrder) {
+    public void sortBy(final SortOrder sortOrder) {
         fSortOrder = sortOrder;
         updateBeerList();
     }
