@@ -86,10 +86,14 @@ public class CamBeerFestApplication extends AppCompatActivity {
 
         // Handle window insets for edge-to-edge display
         final View mainView = findViewById(R.id.mainListView);
-        ViewCompat.setOnApplyWindowInsetsListener(mainView, (v, windowInsets) -> {
-            Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(insets.left, insets.top, insets.right, insets.bottom);
-            return WindowInsetsCompat.CONSUMED;
+        ViewCompat.setOnApplyWindowInsetsListener(mainView, new androidx.core.view.OnApplyWindowInsetsListener() {
+            @Override
+            public WindowInsetsCompat onApplyWindowInsets(final View v, final WindowInsetsCompat windowInsets) {
+                Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+                v.setPadding(insets.left, insets.top, insets.right, insets.bottom);
+                // Don't consume - allow child views to also handle insets
+                return windowInsets;
+            }
         });
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);

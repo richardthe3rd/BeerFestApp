@@ -53,10 +53,14 @@ public final class BeerDetailsActivity extends AppCompatActivity {
 
         // Handle window insets for edge-to-edge display
         final View rootView = findViewById(R.id.details_root);
-        ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, windowInsets) -> {
-            Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(insets.left, insets.top, insets.right, insets.bottom);
-            return WindowInsetsCompat.CONSUMED;
+        ViewCompat.setOnApplyWindowInsetsListener(rootView, new androidx.core.view.OnApplyWindowInsetsListener() {
+            @Override
+            public WindowInsetsCompat onApplyWindowInsets(final View v, final WindowInsetsCompat windowInsets) {
+                Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+                v.setPadding(insets.left, insets.top, insets.right, insets.bottom);
+                // Don't consume - allow child views (fragment) to also handle insets
+                return windowInsets;
+            }
         });
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
