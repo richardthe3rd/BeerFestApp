@@ -112,32 +112,49 @@ org.gradle.workers.max=4           # Parallel task execution
 
 **Problem:** Testing on single API level (API 34) may miss compatibility issues on older devices.
 
-**Solution:** Implemented matrix strategy to test against three Android API levels:
-- **API 29** (Android 10) - Minimum supported version + 15
-- **API 31** (Android 12) - Mid-range version
-- **API 34** (Android 14) - Current target SDK
-
-```yaml
-test:
-  runs-on: ubuntu-latest
-  strategy:
-    fail-fast: false
-    matrix:
-      api-level: [29, 31, 34]
-```
+**Solution:** Implemented matrix strategy to test against multiple Android API levels and device profiles:
+- **API 29** (Android 10) - pixel_2
+- **API 31** (Android 12) - pixel_2
+- **API 34** (Android 14) - pixel_2
+- **API 34** (Android 14) - pixel_tablet
 
 **Features:**
 - API-specific test reports and artifacts
 - Independent test execution (fail-fast disabled)
 - Enhanced logging for each API level
-- Coverage reports use API 34 as primary source
+- Coverage reports use API 34 pixel_2 as primary source
 
 **Impact:**
 - ✅ Broader compatibility validation (~85% of active Android devices)
-- ⚠️ Each API level takes ~8-9 minutes; with parallel execution total is ~14 minutes
-- ✅ Catches API-specific issues early in development
+- ⚠️ Each configuration takes ~8-9 minutes; runs in parallel
+- ✅ Catches API-specific and form-factor issues early
 
 **Reference:** [Multi-API Testing Guide](testing/multi-api-testing.md)
+
+### 7. Separate Release Signing Job (Added 2025-11-22)
+
+**Problem:** Signing secrets were accessed during every build, even for PRs where signing isn't needed.
+
+**Solution:** Split the workflow into separate jobs with signing isolated:
+
+```yaml
+jobs:
+  build-release:      # Builds unsigned APK + runs unit tests
+  instrumented-test:  # Matrix of emulator tests (4 configurations)
+  release:            # Signs APK + creates GitHub Release (tag pushes only)
+  coverage:           # Aggregates coverage reports
+```
+
+**Key changes:**
+- `build-release`: Builds unsigned release APK, runs library unit tests
+- `instrumented-test`: Uses standard `./gradlew connectedCheck` for reliable test execution
+- `release`: Only runs on tag pushes (v*), downloads unsigned APK, signs it, creates GitHub Release
+- Signing secrets (KEYSTORE, etc.) only accessed by `release` job
+
+**Impact:**
+- ✅ Improved security - signing secrets not exposed during PR builds
+- ✅ Simpler test execution - standard Gradle tooling handles JUnit XML, exit codes
+- ✅ Clear job separation - easier to understand and maintain
 
 ## Performance Breakdown
 
