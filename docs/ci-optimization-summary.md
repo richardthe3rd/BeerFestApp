@@ -148,7 +148,7 @@ jobs:
 **Key changes:**
 - `build-release`: Builds unsigned release APK, runs library unit tests
 - `instrumented-test`: Uses standard `./gradlew connectedCheck` for reliable test execution
-- `release`: Only runs on main branch pushes, downloads unsigned APK and signs it
+- `release`: Only runs on tag pushes, downloads unsigned APK and signs it
 - Signing secrets (KEYSTORE, etc.) only accessed by `release` job
 
 **Impact:**
