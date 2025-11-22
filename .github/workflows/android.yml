@@ -172,7 +172,7 @@ jobs:
           --ks-key-alias "$KEY_ALIAS" \
           --ks-pass env:STORE_PASSWORD \
           --key-pass env:KEY_PASSWORD \
-          --out ./app-release-signed.apk \
+          --out ./BeerFestApp-v${{ needs.build-release.outputs.version_name }}.apk \
           ./unsigned-apk/app-release-unsigned.apk
       env:
         KEYSTORE_PATH: ${{ steps.decode_keystore.outputs.filePath }}
@@ -182,13 +182,13 @@ jobs:
 
     - name: Verify APK signature
       run: |
-        $ANDROID_HOME/build-tools/${{ steps.build-tools.outputs.version }}/apksigner verify --verbose ./app-release-signed.apk
+        $ANDROID_HOME/build-tools/${{ steps.build-tools.outputs.version }}/apksigner verify --verbose ./BeerFestApp-v${{ needs.build-release.outputs.version_name }}.apk
 
     - name: Archive signed release APK
       uses: actions/upload-artifact@v4
       with:
         name: release-apk-signed
-        path: ./app-release-signed.apk
+        path: ./BeerFestApp-v${{ needs.build-release.outputs.version_name }}.apk
         retention-days: 30
 
     - name: Create GitHub Release
@@ -204,7 +204,7 @@ jobs:
 
           ## Installation
 
-          1. Download `app-release-signed.apk` below
+          1. Download `BeerFestApp-v${{ needs.build-release.outputs.version_name }}.apk` below
           2. On your Android device, enable "Install from unknown sources" if prompted
           3. Open the downloaded APK to install
 
@@ -215,7 +215,7 @@ jobs:
           ## Feedback
 
           Found a bug or have a suggestion? [Open an issue](https://github.com/richardthe3rd/BeerFestApp/issues)
-        files: ./app-release-signed.apk
+        files: ./BeerFestApp-v${{ needs.build-release.outputs.version_name }}.apk
         fail_on_unmatched_files: true
 
   instrumented-test:
