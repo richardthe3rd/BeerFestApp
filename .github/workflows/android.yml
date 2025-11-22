@@ -354,13 +354,10 @@ jobs:
               { echo "Failed to install test APK"; exit 1; }
 
             # Run instrumented tests, capture output for JUnit XML generation
-            set +e
             adb shell am instrument -w -r \
               -e coverage true \
               -e coverageFile /data/data/ralcock.cbf/coverage.ec \
               ralcock.cbf.test/androidx.test.runner.AndroidJUnitRunner | tee test-output.txt
-            TEST_EXIT_CODE=${PIPESTATUS[0]}
-            set -e
 
             # Generate JUnit XML report from instrumentation output
             mkdir -p ./app/build/outputs/androidTest-results/connected
@@ -369,17 +366,23 @@ jobs:
               echo "::warning::JUnit XML generation failed - test results may not be reported properly"
             fi
 
-            # Exit with the test runner's exit code
-            if [ $TEST_EXIT_CODE -ne 0 ]; then
-              echo "Tests failed with exit code: $TEST_EXIT_CODE"
-              exit $TEST_EXIT_CODE
+            # Check test results by parsing output (adb shell returns 0 even on test failure)
+            if grep -q "FAILURES\!\!\!" test-output.txt; then
+              echo "::error::Instrumented tests failed"
+              exit 1
+            elif grep -q "OK (" test-output.txt; then
+              echo "All tests passed"
+            else
+              echo "::warning::Could not determine test result from output"
             fi
 
       - name: Pull coverage data
         if: always()
         run: |
           mkdir -p app/build/outputs/code_coverage/debugAndroidTest/connected/
-          adb pull /data/data/ralcock.cbf/coverage.ec app/build/outputs/code_coverage/debugAndroidTest/connected/ || true
+          if ! adb pull /data/data/ralcock.cbf/coverage.ec app/build/outputs/code_coverage/debugAndroidTest/connected/; then
+            echo "::warning::Failed to pull coverage data - coverage report may be incomplete"
+          fi
 
       - name: Generate coverage report
         if: always()
