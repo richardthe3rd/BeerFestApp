@@ -3,6 +3,17 @@ plugins {
     id 'jacoco'
 }
 
+// Force consistent Kotlin stdlib version to avoid duplicate class errors
+// androidx.activity:1.8.0 brings kotlin-stdlib:1.8.22, but older transitive
+// dependencies bring kotlin-stdlib-jdk7/jdk8:1.6.21 causing conflicts
+configurations.all {
+    resolutionStrategy {
+        force 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22'
+        force 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22'
+        force 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22'
+    }
+}
+
 dependencies {
     implementation project(':libraries:beers')
     implementation group: 'com.j256.ormlite',            name: 'ormlite-core',     version: '5.0'
