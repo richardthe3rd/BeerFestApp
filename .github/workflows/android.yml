@@ -85,8 +85,8 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v5
 
-    - name: Build release APK (unsigned)
-      run: ./gradlew assembleRelease -PversionName=${{ steps.version.outputs.version_name }} -PversionCode=${{ steps.version.outputs.version_code }} --build-cache --parallel
+    - name: Build release APK and AAB (unsigned)
+      run: ./gradlew assembleRelease bundleRelease -PversionName=${{ steps.version.outputs.version_name }} -PversionCode=${{ steps.version.outputs.version_code }} --build-cache --parallel
 
     - name: Run library unit tests with coverage
       run: ./gradlew :libraries:beers:test :libraries:beers:jacocoTestReport --build-cache --parallel
@@ -125,6 +125,13 @@ jobs:
         path: ./app/build/outputs/apk/release/
         retention-days: 7
 
+    - name: Archive unsigned release AAB
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-aab-unsigned
+        path: ./app/build/outputs/bundle/release/
+        retention-days: 7
+
   release:
     needs: [build-release, instrumented-test]
     runs-on: ubuntu-latest
@@ -149,6 +156,12 @@ jobs:
       with:
         name: release-apk-unsigned
         path: ./unsigned-apk/
+
+    - name: Download unsigned release AAB
+      uses: actions/download-artifact@v4
+      with:
+        name: release-aab-unsigned
+        path: ./unsigned-aab/
 
     - name: Decode Keystore
       id: decode_keystore
@@ -195,11 +208,39 @@ jobs:
       run: |
         $ANDROID_HOME/build-tools/${{ steps.build-tools.outputs.version }}/apksigner verify --verbose ./BeerFestApp-v${{ needs.build-release.outputs.version_name }}.apk
 
+    - name: Sign release AAB
+      run: |
+        jarsigner -verbose \
+          -sigalg SHA256withRSA \
+          -digestalg SHA-256 \
+          -keystore "$KEYSTORE_PATH" \
+          -storepass "$STORE_PASSWORD" \
+          -keypass "$KEY_PASSWORD" \
+          -signedjar ./BeerFestApp-v${{ needs.build-release.outputs.version_name }}.aab \
+          ./unsigned-aab/app-release.aab \
+          "$KEY_ALIAS"
+      env:
+        KEYSTORE_PATH: ${{ steps.decode_keystore.outputs.filePath }}
+        KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+        STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+        KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+
+    - name: Verify AAB signature
+      run: |
+        jarsigner -verify -verbose ./BeerFestApp-v${{ needs.build-release.outputs.version_name }}.aab
+
     - name: Archive signed release APK
       uses: actions/upload-artifact@v4
       with:
         name: release-apk-signed
         path: ./BeerFestApp-v${{ needs.build-release.outputs.version_name }}.apk
+        retention-days: 30
+
+    - name: Archive signed release AAB
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-aab-signed
+        path: ./BeerFestApp-v${{ needs.build-release.outputs.version_name }}.aab
         retention-days: 30
 
     - name: Create GitHub Release
@@ -211,11 +252,22 @@ jobs:
         body: |
           ${{ steps.changelog.outputs.changes }}
 
-          ## Installation
+          ## Downloads
+
+          | File | Purpose |
+          |------|---------|
+          | `BeerFestApp-v${{ needs.build-release.outputs.version_name }}.aab` | Android App Bundle for Google Play Store |
+          | `BeerFestApp-v${{ needs.build-release.outputs.version_name }}.apk` | APK for direct installation (sideloading) |
+
+          ## Installation (APK)
 
           1. Download `BeerFestApp-v${{ needs.build-release.outputs.version_name }}.apk` below
           2. On your Android device, enable "Install from unknown sources" if prompted
           3. Open the downloaded APK to install
+
+          ## Google Play Store (AAB)
+
+          The `.aab` file is the Android App Bundle format required for Google Play Store uploads.
 
           ## Requirements
 
@@ -224,7 +276,9 @@ jobs:
           ## Feedback
 
           Found a bug or have a suggestion? [Open an issue](https://github.com/richardthe3rd/BeerFestApp/issues)
-        files: ./BeerFestApp-v${{ needs.build-release.outputs.version_name }}.apk
+        files: |
+          ./BeerFestApp-v${{ needs.build-release.outputs.version_name }}.apk
+          ./BeerFestApp-v${{ needs.build-release.outputs.version_name }}.aab
         fail_on_unmatched_files: true
 
   instrumented-test:
