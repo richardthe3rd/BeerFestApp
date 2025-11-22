@@ -19,6 +19,7 @@ import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.BeerDatabaseHelper;
 import ralcock.cbf.model.StarRating;
 import java.util.Locale;
+import android.view.View;
 
 public class BeerDetailsFragment extends Fragment {
     private BeerDetailsView fBeerDetailsView;
@@ -59,6 +60,15 @@ public class BeerDetailsFragment extends Fragment {
         fBeerDetailsView.BreweryName.setText(beer.getBrewery().getName());
         fBeerDetailsView.BreweryDescription.setText(beer.getBrewery().getDescription());
         fBeerDetailsView.BeerDispense.setText(beer.getDispenseMethod());
+
+        // Display allergens
+        if (beer.hasAllergens()) {
+            String allergenText = AllergenHelper.toDisplayText(beer.getAllergens());
+            fBeerDetailsView.Allergens.setText(allergenText);
+            fBeerDetailsView.Allergens.setVisibility(View.VISIBLE);
+        } else {
+            fBeerDetailsView.Allergens.setVisibility(View.GONE);
+        }
 
         fBeerDetailsView.BeerRatingBar.setRating(beer.getRating());
 
@@ -120,6 +130,7 @@ public class BeerDetailsFragment extends Fragment {
         final TextView SearchOnline;
         final ImageView BookmarkImage;
         final TextView BeerDispense;
+        final TextView Allergens;
 
         private BeerDetailsView(final View view) {
             BeerNameAndAbv = (TextView) view.findViewById(R.id.detailsViewBeerNameAndAbv);
@@ -135,6 +146,7 @@ public class BeerDetailsFragment extends Fragment {
             SearchOnline.setMovementMethod(LinkMovementMethod.getInstance());
             BookmarkImage = (ImageView) view.findViewById(R.id.bookmark_image);
             BeerDispense = (TextView) view.findViewById(R.id.detailsViewBeerDispense);
+            Allergens = (TextView) view.findViewById(R.id.detailsViewAllergens);
         }
     }
 }

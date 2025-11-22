@@ -27,6 +27,7 @@ public final class AppPreferences {
     private static final String NEXT_UPDATE_TIME_KEY = "lastUpdateTime";
     private static final String HIDE_UNAVAILABLE_KEY = "hideUnavailable";
     private static final String STYLES_TO_HIDE_KEY = "stylesToHide";
+    private static final String ALLERGENS_TO_HIDE_KEY = "allergensToHide";
     private static final String LAST_UPDATE_MD5_KEY = "lastUpdateMD5";
 
     private final Context fContext;
@@ -50,6 +51,14 @@ public final class AppPreferences {
 
     public Set<String> getStylesToHide() {
         return getPreference(STYLES_TO_HIDE_KEY, new HashSet<String>());
+    }
+
+    public void setAllergensToHide(Set<String> allergensToHide) {
+        setPreference(ALLERGENS_TO_HIDE_KEY, allergensToHide);
+    }
+
+    public Set<String> getAllergensToHide() {
+        return getPreference(ALLERGENS_TO_HIDE_KEY, new HashSet<String>());
     }
 
     public void setFilterText(String filterText) {
@@ -162,6 +171,7 @@ public final class AppPreferences {
                 getSortOrder(),
                 getFilterText(),
                 getStylesToHide(),
+                getAllergensToHide(),
                 getStatusToShow());
     }
 }

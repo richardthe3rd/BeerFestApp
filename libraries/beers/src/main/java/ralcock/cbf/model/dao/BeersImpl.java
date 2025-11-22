@@ -134,10 +134,12 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
     public List<Beer> allBeersList(final SortOrder sortOrder,
                                    final CharSequence filterText,
                                    final Set<String> stylesToHide,
+                                   final Set<String> allergensToHide,
                                    final Set<String> statusToHide) {
         QueryBuilder<Beer, Long> query = buildSortedFilteredBeerQuery(sortOrder, filterText, stylesToHide, statusToHide);
         try {
-            return query.query();
+            List<Beer> beers = query.query();
+            return filterByAllergens(beers, allergensToHide);
         } catch (SQLException e) {
             throw newBeerAccessException("Failed to get all beers list", e);
         }
@@ -146,13 +148,41 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
     public List<Beer> bookmarkedBeersList(final SortOrder sortOrder,
                                           final CharSequence filterText,
                                           final Set<String> stylesToHide,
+                                          final Set<String> allergensToHide,
                                           final Set<String> statusToHide) {
         QueryBuilder<Beer, Long> query = buildBookmarkQuery(sortOrder, filterText, stylesToHide, statusToHide);
         try {
-            return query.query();
+            List<Beer> beers = query.query();
+            return filterByAllergens(beers, allergensToHide);
         } catch (SQLException e) {
             throw newBeerAccessException("Failed to get bookmarked beer list", e);
         }
+    }
+
+    private List<Beer> filterByAllergens(final List<Beer> beers, final Set<String> allergensToHide) {
+        if (allergensToHide == null || allergensToHide.isEmpty()) {
+            return beers;
+        }
+        List<Beer> filtered = new java.util.ArrayList<>();
+        for (Beer beer : beers) {
+            if (!containsAnyAllergen(beer.getAllergens(), allergensToHide)) {
+                filtered.add(beer);
+            }
+        }
+        return filtered;
+    }
+
+    private boolean containsAnyAllergen(final String beerAllergens, final Set<String> allergensToHide) {
+        if (beerAllergens == null || beerAllergens.isEmpty()) {
+            return false;
+        }
+        String lowerAllergens = beerAllergens.toLowerCase();
+        for (String allergen : allergensToHide) {
+            if (lowerAllergens.contains(allergen.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private QueryBuilder<Beer, Long> buildBookmarkQuery(final SortOrder sortOrder,
@@ -231,6 +261,7 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
         SelectArg beerAbv = new SelectArg(festivalBeerDescription.getAbv());
         SelectArg beerStatus = new SelectArg(festivalBeerDescription.getStatus());
         SelectArg beerStyle = new SelectArg(festivalBeerDescription.getStyle());
+        SelectArg beerAllergens = new SelectArg(festivalBeerDescription.getAllergens());
         SelectArg beerFestivalId = new SelectArg(festivalBeerDescription.getFestivalID());
 
         UpdateBuilder<Beer, Long> updateBuilder = updateBuilder();
@@ -240,6 +271,7 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
         updateBuilder.updateColumnValue(Beer.ABV_FIELD, beerAbv);
         updateBuilder.updateColumnValue(Beer.STATUS_FIELD, beerStatus);
         updateBuilder.updateColumnValue(Beer.STYLE_FIELD, beerStyle);
+        updateBuilder.updateColumnValue(Beer.ALLERGENS_FIELD, beerAllergens);
 
         updateBuilder.where().eq(Beer.FESTIVAL_ID_FIELD, beerFestivalId);
         PreparedUpdate<Beer> preparedUpdate = updateBuilder.prepare();

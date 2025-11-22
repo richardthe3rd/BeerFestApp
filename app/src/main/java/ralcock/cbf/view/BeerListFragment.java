@@ -153,6 +153,11 @@ public abstract class BeerListFragment extends ListFragment implements ListChang
         fAdapter.notifyDataSetChanged();
     }
 
+    public void allergensToHideChanged(final Set<String> allergensToHide) {
+        fBeerList.allergensToHide(allergensToHide);
+        fAdapter.notifyDataSetChanged();
+    }
+
     public void statusToShowChanged(final StatusToShow statusToShow) {
         fBeerList.setStatusToShow(statusToShow);
         fAdapter.notifyDataSetChanged();

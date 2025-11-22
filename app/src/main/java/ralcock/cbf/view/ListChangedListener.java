@@ -12,6 +12,8 @@ public interface ListChangedListener {
 
     void stylesToHideChanged(Set<String> stylesToHide);
 
+    void allergensToHideChanged(Set<String> allergensToHide);
+
     void statusToShowChanged(StatusToShow statusToShow);
 
     void beersChanged();

@@ -63,6 +63,19 @@
             android:layout_alignLeft="@+id/beerDispense"
             />
 
+        <TextView
+            android:id="@+id/beerAllergens"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="#D32F2F"
+            android:text="[ALLERGENS]"
+            android:visibility="gone"
+            android:layout_below="@+id/beerStatus"
+            android:layout_alignLeft="@+id/beerStatus"
+            />
+
         <ImageView
             android:id="@+id/bookmark_image"
             android:layout_height="wrap_content"

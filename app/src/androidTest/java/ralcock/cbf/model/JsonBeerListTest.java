@@ -18,6 +18,19 @@ public class JsonBeerListTest {
     private final Brewery fBrewery1 = new Brewery("1", "BREWERY_ONE", "BREWERY_ONE_NOTES");
     private final Brewery fBrewery2 = new Brewery("2", "BREWERY_TWO", "BREWERY_TWO_NOTES");
 
+    // Expected beer for one_beer.json (has gluten + sulphites)
+    private final Beer fOneBeerExpected = new BeerBuilder()
+            .withFestivalId("1")
+            .called("BEER_ONE")
+            .withABV(1.1f)
+            .withDescription("BEER_ONE_NOTES")
+            .withStyle("STYLE1")
+            .withStatus("BEER_ONE_STATUS")
+            .withAllergens("gluten, sulphites")
+            .fromBrewery(fBrewery1)
+            .build();
+
+    // Expected beer for two_breweries_three_beers.json (has only gluten)
     private final Beer fBrewery1Beer1 = new BeerBuilder()
             .withFestivalId("1")
             .called("BEER_ONE")
@@ -25,6 +38,7 @@ public class JsonBeerListTest {
             .withDescription("BEER_ONE_NOTES")
             .withStyle("STYLE1")
             .withStatus("BEER_ONE_STATUS")
+            .withAllergens("gluten")
             .fromBrewery(fBrewery1)
             .build();
 
@@ -35,6 +49,7 @@ public class JsonBeerListTest {
             .withDescription("BEER_TWO_NOTES")
             .withStyle("STYLE2")
             .withStatus("BEER_TWO_STATUS")
+            .withAllergens("sulphites")
             .fromBrewery(fBrewery2)
             .build();
 
@@ -45,6 +60,7 @@ public class JsonBeerListTest {
             .withDescription("BEER_THREE_NOTES")
             .withStyle("STYLE3")
             .withStatus("BEER_THREE_STATUS")
+            .withAllergens("")
             .fromBrewery(fBrewery2)
             .build();
 
@@ -59,7 +75,7 @@ public class JsonBeerListTest {
     @Test
     public void testLoadBeers() throws JSONException {
         InputStream inputStream = JsonBeerListTest.class.getResourceAsStream("/ralcock/cbf/model/one_beer.json");
-        final Beer expectedBeer = fBrewery1Beer1;
+        final Beer expectedBeer = fOneBeerExpected;
         JsonBeerList jsonBeerList = new JsonBeerList(convertStreamToString(inputStream));
         for (Beer beer : jsonBeerList) {
             assertEquals(expectedBeer, beer);
