@@ -237,8 +237,6 @@ jobs:
             profile: pixel_2
           - api-level: 34
             profile: pixel_2
-          - api-level: 34
-            profile: pixel_tablet
           - api-level: 35
             profile: pixel_2
     steps:
@@ -403,3 +401,76 @@ jobs:
           min-coverage-changed-files: 50
           title: '📊 JaCoCo Code Coverage'
           update-comment: true
+
+  # Manual edge-case testing for low-usage configurations
+  # Covers: API 29 (2.8% of users), tablet form factor (2.3% of users)
+  edge-case-test:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - api-level: 29
+            profile: pixel_2
+            name: "Android 10 (API 29)"
+          - api-level: 34
+            profile: pixel_tablet
+            name: "Tablet (API 34)"
+    steps:
+      - name: Delete unnecessary tools
+        uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          android: false
+          tool-cache: true
+          dotnet: true
+          haskell: true
+          swap-storage: true
+          docker-images: false
+          large-packages: false
+
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          ls /dev/kvm
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Run edge-case tests (${{ matrix.name }})
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          profile: ${{ matrix.profile }}
+          avd-name: edge-${{ matrix.profile }}-api${{ matrix.api-level }}
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: true
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          disable-spellchecker: true
+          disable-linux-hw-accel: false
+          script: |
+            echo "========================================="
+            echo "Edge-case test: ${{ matrix.name }}"
+            echo "========================================="
+            adb shell settings put secure show_ime_with_hard_keyboard 0
+            adb shell settings put global window_animation_scale 0.0
+            adb shell settings put global transition_animation_scale 0.0
+            adb shell settings put global animator_duration_scale 0.0
+            ./gradlew connectedCheck --build-cache --parallel

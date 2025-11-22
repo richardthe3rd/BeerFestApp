@@ -231,9 +231,10 @@ try {
 
 **Jobs:**
 1. **build-release** - Builds unsigned release APK, runs unit tests
-2. **instrumented-test** - Matrix testing on 4 emulator configurations (API 31/34/35, pixel_2/tablet)
+2. **instrumented-test** - Matrix testing on 3 emulator configurations (API 31/34/35)
 3. **release** - Signs APK and creates GitHub Release (tag pushes only, after tests pass)
 4. **coverage** - Aggregates coverage reports for PRs
+5. **edge-case-test** - Manual-only testing for API 29 and tablet (workflow_dispatch)
 
 **Triggers:**
 - Push to `main`
