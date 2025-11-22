@@ -1,20 +1,16 @@
 android {
-    // Only configure signing if environment variables are present
-    // This allows building unsigned release APKs in CI (signing happens in separate job)
-    if (System.getenv("SIGNING_KEYSTORE") != null) {
-        signingConfigs {
-            release {
-                storeFile new File(System.getenv("SIGNING_KEYSTORE"))
-                storePassword System.getenv("SIGNING_STORE_PASSWORD")
-                keyAlias System.getenv("SIGNING_KEY_ALIAS")
-                keyPassword System.getenv("SIGNING_KEY_PASSWORD")
-            }
+    signingConfigs {
+        release {
+            storeFile new File(System.getenv("SIGNING_KEYSTORE"))
+            storePassword System.getenv("SIGNING_STORE_PASSWORD")
+            keyAlias System.getenv("SIGNING_KEY_ALIAS")
+            keyPassword System.getenv("SIGNING_KEY_PASSWORD")
         }
+    }
 
-        buildTypes {
-            release {
-                signingConfig signingConfigs.release
-            }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
         }
     }
 }

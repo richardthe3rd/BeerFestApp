@@ -68,7 +68,7 @@ jobs:
         cache-read-only: false
 
     - name: Build release APK (unsigned)
-      run: ./gradlew assembleRelease -PRELEASE --scan --build-cache --parallel
+      run: ./gradlew assembleRelease --scan --build-cache --parallel
 
     - name: Run library unit tests with coverage
       run: ./gradlew :libraries:beers:test :libraries:beers:jacocoTestReport --scan --build-cache --parallel
