@@ -275,7 +275,7 @@ This project uses [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) forma
    - Update comparison links at bottom of file
    - Commit: `git commit -am "chore: prepare release 2025.12.0"`
 
-2. **Merge** - Create PR and merge to main
+2. **Merge** - Create PR and merge to main (fast - CI skips `.md` files)
 
 3. **Tag** - Create and push tag to trigger release:
    ```bash
