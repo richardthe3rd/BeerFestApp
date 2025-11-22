@@ -139,6 +139,7 @@ jobs:
       with:
         version: ${{ needs.build-release.outputs.version_name }}
         path: ./CHANGELOG.md
+        validation_level: error
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
