@@ -88,6 +88,9 @@ jobs:
     - name: Build release APK and AAB (unsigned)
       run: ./gradlew assembleRelease bundleRelease -PversionName=${{ steps.version.outputs.version_name }} -PversionCode=${{ steps.version.outputs.version_code }} --build-cache --parallel
 
+    - name: Build debug APK (for sideload testing)
+      run: ./gradlew assembleDebug -PversionName=${{ steps.version.outputs.version_name }} -PversionCode=${{ steps.version.outputs.version_code }} --build-cache --parallel
+
     - name: Run library unit tests with coverage
       run: ./gradlew :libraries:beers:test :libraries:beers:jacocoTestReport --build-cache --parallel
 
@@ -123,6 +126,13 @@ jobs:
       with:
         name: release-apk-unsigned
         path: ./app/build/outputs/apk/release/
+        retention-days: 7
+
+    - name: Archive debug APK (sideloadable)
+      uses: actions/upload-artifact@v4
+      with:
+        name: debug-apk
+        path: ./app/build/outputs/apk/debug/
         retention-days: 7
 
     - name: Archive unsigned release AAB

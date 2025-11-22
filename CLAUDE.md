@@ -230,7 +230,7 @@ try {
 **Platform:** GitHub Actions (`.github/workflows/android.yml`)
 
 **Jobs:**
-1. **build-release** - Builds unsigned release APK, runs unit tests
+1. **build-release** - Builds unsigned release APK + debug APK, runs unit tests
 2. **instrumented-test** - Matrix testing on 3 emulator configurations (API 31/34/35)
 3. **release** - Signs APK and creates GitHub Release (tag pushes only, after tests pass)
 4. **coverage** - Aggregates coverage reports for PRs
@@ -243,6 +243,7 @@ try {
 - Manual workflow dispatch
 
 **Artifacts:**
+- `debug-apk` - Debug APK (always sideloadable for testing)
 - `release-apk-unsigned` - Unsigned release APK
 - `release-apk-signed` - Signed release APK (tag pushes only)
 - `build-reports` - Build and lint reports

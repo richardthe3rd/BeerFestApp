@@ -40,11 +40,12 @@ This allows:
 
 ### Triggers
 
-| Event | Jobs Run | Release Created |
-|-------|----------|-----------------|
-| PR to main | build-release, instrumented-test, coverage | No |
-| Push to main | build-release, instrumented-test, coverage | No |
-| Push tag `v*` | build-release, instrumented-test, release, coverage | Yes |
+| Event | Jobs Run | Release Created | Sideloadable APK |
+|-------|----------|-----------------|------------------|
+| PR to main | build-release, instrumented-test, coverage | No | Yes (debug) |
+| Push to main | build-release, instrumented-test, coverage | No | Yes (debug) |
+| Push tag `v*` | build-release, instrumented-test, release, coverage | Yes | Yes (signed release) |
+| workflow_dispatch | build-release | No | Yes (debug) |
 
 ### Release Process
 
@@ -198,9 +199,21 @@ git tag v2025.11.1
 git push origin v2025.11.1
 ```
 
+## Sideload Testing
+
+For testing builds on physical devices before release, download the `debug-apk` artifact from any CI run.
+
+### How to Sideload
+
+1. Go to the workflow run in GitHub Actions
+2. Download `debug-apk` artifact
+3. Install on device via `adb install` or file manager
+
+The debug APK is auto-signed with the debug key, so it installs directly on any Android device.
+
 ## Security Considerations
 
-- Signing secrets only accessed when tag is pushed
+- Signing secrets only accessed on tag pushes (release job)
 - Tags can only be pushed by users with write access
 - GitHub Release artifacts are immutable once published
 
