@@ -38,7 +38,7 @@ This section documents proposed features and improvements for BeerFestApp.
 **Status:** Documented in [Known Issues](../../CLAUDE.md#4-beverage-type-limitation)
 **Effort:** 1-2 weeks
 
-### UI Modernization
+### [UI Modernization / Material 3 Migration](material3-migration.md)
 
 **Problem:** App uses outdated design patterns (pre-2020).
 
@@ -48,8 +48,10 @@ This section documents proposed features and improvements for BeerFestApp.
 - Modern architecture (ViewModel, LiveData)
 - Better visual hierarchy
 
-**Status:** Fully documented in [CLAUDE.md](../../CLAUDE.md#uiux-modernization)
-**Effort:** 6-9 weeks (3 phases)
+**Status:** Detailed migration plan with risk analysis
+**Effort:** 6-9 days (incremental approach)
+
+[Read full migration plan →](material3-migration.md)
 
 ### Testing Improvements
 
