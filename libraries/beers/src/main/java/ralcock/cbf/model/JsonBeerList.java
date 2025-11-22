@@ -79,12 +79,34 @@ public class JsonBeerList implements Iterable<Beer> {
         Iterator<String> keys = allergensObj.keys();
         while (keys.hasNext()) {
             String allergen = keys.next();
-            if (allergensList.length() > 0) {
-                allergensList.append(", ");
+            // Only include allergens with truthy values (1, true, non-empty string)
+            // API sends empty string "" for allergens not present
+            Object value = allergensObj.get(allergen);
+            if (isTruthyAllergenValue(value)) {
+                if (allergensList.length() > 0) {
+                    allergensList.append(", ");
+                }
+                allergensList.append(allergen);
             }
-            allergensList.append(allergen);
         }
         return allergensList.toString();
+    }
+
+    private boolean isTruthyAllergenValue(final Object value) {
+        if (value == null) {
+            return false;
+        }
+        if (value instanceof Number) {
+            return ((Number) value).intValue() != 0;
+        }
+        if (value instanceof Boolean) {
+            return (Boolean) value;
+        }
+        if (value instanceof String) {
+            String str = (String) value;
+            return !str.isEmpty() && !"0".equals(str) && !"false".equalsIgnoreCase(str);
+        }
+        return true;
     }
 
     private Brewery makeBrewery(final JSONObject producer) throws JSONException {
