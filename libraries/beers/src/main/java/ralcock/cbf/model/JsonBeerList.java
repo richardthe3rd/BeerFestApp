@@ -22,7 +22,7 @@ public class JsonBeerList implements Iterable<Beer> {
     private static final String IDENTIFIER = "id";
     private static final String DISPENSE = "dispense";
     private static final String BAR = "bar";
-    private static final String ALLERGENS = "allegens";
+    private static final String ALLERGENS = "allergens";
 
     private List<Beer> fBeerList;
 
@@ -63,7 +63,28 @@ public class JsonBeerList implements Iterable<Beer> {
             .withStyle(product.isNull(STYLE)   ? "Unknown" : product.getString(STYLE))
             .withStatus(product.isNull(STATUS) ? "Unknown" : product.getString(STATUS))
             .withDispenseMethod(product.isNull(DISPENSE) ? "" : product.getString(DISPENSE))
+            .withAllergens(parseAllergens(product))
             .build();
+    }
+
+    private String parseAllergens(final JSONObject product) throws JSONException {
+        if (product.isNull(ALLERGENS)) {
+            return "";
+        }
+        JSONObject allergensObj = product.getJSONObject(ALLERGENS);
+        if (allergensObj.length() == 0) {
+            return "";
+        }
+        StringBuilder allergensList = new StringBuilder();
+        Iterator<String> keys = allergensObj.keys();
+        while (keys.hasNext()) {
+            String allergen = keys.next();
+            if (allergensList.length() > 0) {
+                allergensList.append(", ");
+            }
+            allergensList.append(allergen);
+        }
+        return allergensList.toString();
     }
 
     private Brewery makeBrewery(final JSONObject producer) throws JSONException {

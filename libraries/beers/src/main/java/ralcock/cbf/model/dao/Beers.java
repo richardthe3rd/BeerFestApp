@@ -18,11 +18,13 @@ public interface Beers extends Dao<Beer, Long> {
     List<Beer> allBeersList(SortOrder sortOrder,
                             CharSequence filterText,
                             Set<String> filterStyles,
+                            Set<String> allergensToHide,
                             Set<String> statusToHide);
 
     List<Beer> bookmarkedBeersList(SortOrder sortOrder,
                                    CharSequence filterText,
                                    Set<String> filterStyles,
+                                   Set<String> allergensToHide,
                                    Set<String> statusToHide);
 
     void updateFromFestivalOrCreate(Beer beer);

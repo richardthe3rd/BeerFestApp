@@ -138,26 +138,37 @@ public abstract class BeerListFragment extends ListFragment implements ListChang
         getCamBeerFestApplication().removeListChangedListener(this);
     }
 
-    public void filterTextChanged(String filterText) {
+    @Override
+    public void filterTextChanged(final String filterText) {
         fBeerList.filterBy(filterText);
         fAdapter.notifyDataSetChanged();
     }
 
+    @Override
     public void sortOrderChanged(final SortOrder sortOrder) {
         fBeerList.sortBy(sortOrder);
         fAdapter.notifyDataSetChanged();
     }
 
+    @Override
     public void stylesToHideChanged(final Set<String> stylesToHide) {
         fBeerList.stylesToHide(stylesToHide);
         fAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void allergensToHideChanged(final Set<String> allergensToHide) {
+        fBeerList.allergensToHide(allergensToHide);
+        fAdapter.notifyDataSetChanged();
+    }
+
+    @Override
     public void statusToShowChanged(final StatusToShow statusToShow) {
         fBeerList.setStatusToShow(statusToShow);
         fAdapter.notifyDataSetChanged();
     }
 
+    @Override
     public void beersChanged() {
         Log.i(TAG, "beersChanged: notifying ListAdapter of changed DataSet.");
         fBeerList.updateBeerList();

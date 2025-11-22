@@ -23,6 +23,7 @@ public final class Beer implements Serializable {
     public static final String RATING_FIELD = "rating";
     public static final String ON_WISH_LIST_FIELD = "on_wish_list";
     public static final String USER_COMMENTS_FIELD = "user_comments";
+    public static final String ALLERGENS_FIELD = "allergens";
 
     @DatabaseField(columnName = "_id", generatedId = true)
     private long fId;
@@ -60,6 +61,9 @@ public final class Beer implements Serializable {
     @DatabaseField(columnName = USER_COMMENTS_FIELD)
     private String fUserComments;
 
+    @DatabaseField(columnName = ALLERGENS_FIELD)
+    private String fAllergens;
+
     @SuppressWarnings("UnusedDeclaration")
         // needed by ormlite
     Beer() {
@@ -72,6 +76,7 @@ public final class Beer implements Serializable {
                 final String style,
                 final String status,
                 final String dispense,
+                final String allergens,
                 final Brewery brewery) {
         fFestivalID = festivalId;
         fBrewery = brewery;
@@ -81,6 +86,7 @@ public final class Beer implements Serializable {
         fStyle = style;
         fStatus = status;
         fDispense = dispense;
+        fAllergens = allergens;
     }
 
     public String getFestivalID() {
@@ -159,6 +165,26 @@ public final class Beer implements Serializable {
         fDispense = dispense;
     }
 
+    public String getAllergens() {
+        return fAllergens;
+    }
+
+    public void setAllergens(final String allergens) {
+        fAllergens = allergens;
+    }
+
+    public boolean hasAllergens() {
+        return fAllergens != null && !fAllergens.isEmpty();
+    }
+
+    public boolean containsAllergen(final String allergen) {
+        if (fAllergens == null || fAllergens.isEmpty()) {
+            return false;
+        }
+        String lowerAllergens = fAllergens.toLowerCase();
+        return lowerAllergens.contains(allergen.toLowerCase());
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
@@ -178,6 +204,7 @@ public final class Beer implements Serializable {
         if (fDispense != null ? !fDispense.equals(beer.fDispense) : beer.fDispense != null) return false;
         if (fUserComments != null ? !fUserComments.equals(beer.fUserComments) : beer.fUserComments != null)
             return false;
+        if (fAllergens != null ? !fAllergens.equals(beer.fAllergens) : beer.fAllergens != null) return false;
 
         return true;
     }
@@ -195,6 +222,7 @@ public final class Beer implements Serializable {
         result = 31 * result + (fDispense != null ? fDispense.hashCode() : 0);
         result = 31 * result + (fIsOnWishList ? 1 : 0);
         result = 31 * result + (fUserComments != null ? fUserComments.hashCode() : 0);
+        result = 31 * result + (fAllergens != null ? fAllergens.hashCode() : 0);
         return result;
     }
 
@@ -214,6 +242,7 @@ public final class Beer implements Serializable {
         sb.append(", fDispense='").append(fDispense).append('\'');
         sb.append(", fIsOnWishList=").append(fIsOnWishList);
         sb.append(", fUserComments='").append(fUserComments).append('\'');
+        sb.append(", fAllergens='").append(fAllergens).append('\'');
         sb.append('}');
         return sb.toString();
     }

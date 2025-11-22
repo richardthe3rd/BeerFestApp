@@ -34,6 +34,10 @@
     <string name="filter_available_all">Show all beers</string>
     <string name="filter_available_hide">Hide unavailable beers</string>
 
+    <string name="filter_allergen_label">Filter by allergen…</string>
+    <string name="filter_allergen_dialog_title">Hide beers containing:</string>
+    <string name="filter_allergen_clear_all">Clear All</string>
+
     <string name="OK">OK</string>
     <string name="CANCEL">Cancel</string>
     <string name="NoInternetConnection">Not updating beers as there is no internet connection.</string>

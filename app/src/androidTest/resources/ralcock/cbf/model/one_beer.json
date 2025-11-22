@@ -11,7 +11,11 @@
                     "style": "STYLE1",
                     "notes": "BEER_ONE_NOTES",
                     "abv": 1.1,
-                    "status_text": "BEER_ONE_STATUS"
+                    "status_text": "BEER_ONE_STATUS",
+                    "allergens": {
+                        "gluten": 1,
+                        "sulphites": 1
+                    }
                 }
             ]
         }

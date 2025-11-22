@@ -26,6 +26,12 @@
             />
 
     <item
+            android:id="@+id/filterByAllergen"
+            android:title="@string/filter_allergen_label"
+            android:showAsAction="never"
+            />
+
+    <item
             android:id="@+id/hideUnavailable"
             android:visible="false"
             android:title="@string/show_only_available_label"

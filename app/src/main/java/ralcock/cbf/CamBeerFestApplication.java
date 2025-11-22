@@ -39,6 +39,7 @@ import ralcock.cbf.service.UpdateTask;
 import ralcock.cbf.util.ExceptionReporter;
 import ralcock.cbf.view.AboutDialogFragment;
 import ralcock.cbf.view.BeerListFragmentPagerAdapter;
+import ralcock.cbf.view.FilterByAllergenDialogFragment;
 import ralcock.cbf.view.FilterByStyleDialogFragment;
 import ralcock.cbf.view.ListChangedListener;
 import ralcock.cbf.view.SortByDialogFragment;
@@ -262,6 +263,9 @@ public class CamBeerFestApplication extends AppCompatActivity {
         } else if (itemId == R.id.showOnlyStyle) {
             showFilterByStyleDialog();
             return true;
+        } else if (itemId == R.id.filterByAllergen) {
+            showFilterByAllergenDialog();
+            return true;
         } else if (itemId == R.id.hideUnavailable) {
             return true;
         } else if (itemId == R.id.visitFestivalWebsite) {
@@ -313,6 +317,12 @@ public class CamBeerFestApplication extends AppCompatActivity {
         newFragment.show(getSupportFragmentManager(), "filterByStyle");
     }
 
+    private void showFilterByAllergenDialog() {
+        final Set<String> allergensToHide = fAppPreferences.getAllergensToHide();
+        FilterByAllergenDialogFragment newFragment = FilterByAllergenDialogFragment.newInstance(allergensToHide);
+        newFragment.show(getSupportFragmentManager(), "filterByAllergen");
+    }
+
     public void notifyBeersChanged() {
         fireBeerListChanged();
     }
@@ -332,6 +342,10 @@ public class CamBeerFestApplication extends AppCompatActivity {
         filterByBeerStyle(stylesToHide);
     }
 
+    public void doDismissFilterByAllergenDialog(final Set<String> allergensToHide) {
+        filterByAllergen(allergensToHide);
+    }
+
     private void sortBy(SortOrder sortOrder) {
         fireSortByChanged(sortOrder);
         fAppPreferences.setSortOrder(sortOrder);
@@ -340,6 +354,11 @@ public class CamBeerFestApplication extends AppCompatActivity {
     private void filterByBeerStyle(Set<String> stylesToHide) {
         fireStylesToHideChanged(stylesToHide);
         fAppPreferences.setStylesToHide(stylesToHide);
+    }
+
+    private void filterByAllergen(Set<String> allergensToHide) {
+        fireAllergensToHideChanged(allergensToHide);
+        fAppPreferences.setAllergensToHide(allergensToHide);
     }
 
     public void addListChangedListener(final ListChangedListener listChangedListener) {
@@ -365,6 +384,12 @@ public class CamBeerFestApplication extends AppCompatActivity {
     private void fireStylesToHideChanged(final Set<String> stylesToHide) {
         for (ListChangedListener l : fListChangedListeners) {
             l.stylesToHideChanged(stylesToHide);
+        }
+    }
+
+    private void fireAllergensToHideChanged(final Set<String> allergensToHide) {
+        for (ListChangedListener l : fListChangedListeners) {
+            l.allergensToHideChanged(allergensToHide);
         }
     }
 
