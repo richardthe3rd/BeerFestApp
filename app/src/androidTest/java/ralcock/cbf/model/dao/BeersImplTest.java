@@ -81,9 +81,10 @@ public class BeersImplTest {
         }
     }
 
-    private List<Beer> doQuery(SortOrder sortOrder, CharSequence filterText, Set<String> stylesToHide) throws SQLException {
+    private List<Beer> doQuery(final SortOrder sortOrder, final CharSequence filterText, final Set<String> stylesToHide) throws SQLException {
         Set<String> noAllergensToHide = Collections.emptySet();
-        return fBeers.allBeersList(sortOrder, filterText, stylesToHide, noAllergensToHide, stylesToHide);
+        Set<String> noStatusToHide = Collections.emptySet();
+        return fBeers.allBeersList(sortOrder, filterText, stylesToHide, noAllergensToHide, noStatusToHide);
     }
 
     @Test
