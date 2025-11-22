@@ -1,8 +1,16 @@
 package ralcock.cbf;
 
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.EditText;
+
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.runner.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
+
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -14,7 +22,7 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import android.widget.EditText;
+import static org.hamcrest.Matchers.allOf;
 
 /**
  * End-to-end tests for search/filter functionality.
@@ -41,6 +49,31 @@ import android.widget.EditText;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class SearchFunctionalityTest {
+
+    /**
+     * Custom matcher that checks if an AdapterView has a specific adapter count.
+     * This is more reliable than hasChildCount() which checks view children, not adapter items.
+     */
+    private static Matcher<View> withAdapterCount(final int expectedCount) {
+        return new TypeSafeMatcher<View>() {
+            @Override
+            protected boolean matchesSafely(final View view) {
+                if (!(view instanceof AdapterView)) {
+                    return false;
+                }
+                AdapterView<?> adapterView = (AdapterView<?>) view;
+                if (adapterView.getAdapter() == null) {
+                    return false;
+                }
+                return adapterView.getAdapter().getCount() == expectedCount;
+            }
+
+            @Override
+            public void describeTo(final Description description) {
+                description.appendText("AdapterView with adapter count: " + expectedCount);
+            }
+        };
+    }
 
     /**
      * Test that search icon is displayed in toolbar.
@@ -236,9 +269,18 @@ public class SearchFunctionalityTest {
         try (ActivityScenario<CamBeerFestApplication> scenario =
                 ActivityScenario.launch(CamBeerFestApplication.class)) {
 
-            // TODO:
-            // 1. Search for nonsense string that won't match any beers
-            // 2. Verify list is empty (or shows "no results" message)
+            // Click search icon to expand SearchView
+            onView(withId(R.id.search))
+                .perform(click());
+
+            // Type a nonsense string that won't match any beers
+            onView(isAssignableFrom(EditText.class))
+                .perform(typeText("xyzzy12345nosuchbeer"), closeSoftKeyboard());
+
+            // Verify the list adapter has no items
+            // Using custom matcher to check adapter count (more reliable than hasChildCount)
+            onView(allOf(withId(android.R.id.list), isDisplayed()))
+                .check(matches(withAdapterCount(0)));
         }
     }
 
