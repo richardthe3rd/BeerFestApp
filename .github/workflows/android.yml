@@ -5,6 +5,8 @@ on:
 
   push:
     branches: [ "main" ]
+    tags:
+      - 'v*'
     paths-ignore:
       - 'README.md'
       - 'LICENSE'
@@ -28,16 +30,36 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
   checks: write
   pull-requests: write
 
 jobs:
   build-release:
     runs-on: ubuntu-latest
+    outputs:
+      version_name: ${{ steps.version.outputs.version_name }}
+      version_code: ${{ steps.version.outputs.version_code }}
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+
+    - name: Parse version from tag
+      id: version
+      run: |
+        if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+          TAG="${{ github.ref_name }}"
+          VERSION="${TAG#v}"  # Remove 'v' prefix
+          IFS='.' read -r YEAR MONTH PATCH <<< "$VERSION"
+          VERSION_CODE=$((YEAR * 10000 + MONTH * 100 + PATCH))
+          echo "version_name=$VERSION" >> $GITHUB_OUTPUT
+          echo "version_code=$VERSION_CODE" >> $GITHUB_OUTPUT
+          echo "Building release version: $VERSION (code: $VERSION_CODE)"
+        else
+          echo "version_name=dev" >> $GITHUB_OUTPUT
+          echo "version_code=1" >> $GITHUB_OUTPUT
+          echo "Building development version"
+        fi
 
     - name: Set up JDK 17
       uses: actions/setup-java@v4
@@ -68,7 +90,7 @@ jobs:
         cache-read-only: false
 
     - name: Build release APK (unsigned)
-      run: ./gradlew assembleRelease --scan --build-cache --parallel
+      run: ./gradlew assembleRelease -PversionName=${{ steps.version.outputs.version_name }} -PversionCode=${{ steps.version.outputs.version_code }} --scan --build-cache --parallel
 
     - name: Run library unit tests with coverage
       run: ./gradlew :libraries:beers:test :libraries:beers:jacocoTestReport --scan --build-cache --parallel
@@ -109,7 +131,7 @@ jobs:
   release:
     needs: [build-release, instrumented-test]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: startsWith(github.ref, 'refs/tags/v')
     steps:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
@@ -171,6 +193,22 @@ jobs:
         name: release-apk-signed
         path: ./app-release-signed.apk
         retention-days: 30
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        draft: true  # Set to false after testing
+        name: Cambridge Beer Festival ${{ needs.build-release.outputs.version_name }}
+        body: |
+          ## Cambridge Beer Festival App v${{ needs.build-release.outputs.version_name }}
+
+          ### Installation
+          Download and install `app-release-signed.apk` on your Android device.
+
+          ### What's New
+          - Update this section before publishing the release
+        files: ./app-release-signed.apk
+        fail_on_unmatched_files: true
 
   instrumented-test:
     runs-on: ubuntu-latest
