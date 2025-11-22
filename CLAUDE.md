@@ -240,7 +240,7 @@ try {
 
 **Artifacts:**
 - `release-apk-unsigned` - Unsigned release APK
-- `release-apk-signed` - Signed release APK (main branch only)
+- `release-apk-signed` - Signed release APK (tag pushes only)
 - `build-reports` - Build and lint reports
 - `library-coverage-reports` - Unit test coverage
 - `app-coverage-reports-api-*` - Instrumented test coverage
