@@ -176,7 +176,7 @@ BeerFestApp/
 | **Language** | Java | Primary language |
 | **JDK** | 17 (Temurin) | Development kit |
 | **Build** | Gradle 8.0.0 | Build automation |
-| **Android SDK** | Compile: 34, Target: 34, Min: 21 | Android platform |
+| **Android SDK** | Compile: 35, Target: 35, Min: 21 | Android platform |
 | **OrmLite** | 5.0 | Database ORM |
 | **Material Design** | 1.8.0 | UI components |
 
@@ -231,7 +231,7 @@ try {
 
 **Jobs:**
 1. **build-release** - Builds unsigned release APK, runs unit tests
-2. **instrumented-test** - Matrix testing on 4 emulator configurations (API 29/31/34, pixel_2/tablet)
+2. **instrumented-test** - Matrix testing on 4 emulator configurations (API 31/34/35, pixel_2/tablet)
 3. **release** - Signs APK and creates GitHub Release (tag pushes only, after tests pass)
 4. **coverage** - Aggregates coverage reports for PRs
 

@@ -11,7 +11,7 @@ dependencies {
     implementation group: 'org.slf4j',                   name: 'slf4j-android',    version: '1.7.25'
 
     // Updated AndroidX Test libraries for Android 13+ (API 33+) support
-    // Versions 1.5.0+ add RECEIVER_EXPORTED flag support required by targetSdkVersion 34
+    // Versions 1.5.0+ add RECEIVER_EXPORTED flag support required by targetSdkVersion 35
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.5.1'
     androidTestImplementation 'androidx.test:runner:1.5.2'
@@ -32,14 +32,14 @@ def appVersionCode = project.hasProperty('versionCode') ? project.property('vers
 def appVersionName = project.hasProperty('versionName') ? project.property('versionName') : "dev"
 
 android {
-    compileSdkVersion 34
+    compileSdkVersion 35
     namespace 'ralcock.cbf'
 
     defaultConfig {
            versionCode appVersionCode
            versionName appVersionName
            minSdkVersion 21
-           targetSdkVersion 34
+           targetSdkVersion 35
 
            testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
        }
