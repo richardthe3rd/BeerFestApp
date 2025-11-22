@@ -106,52 +106,6 @@ jobs:
         path: ./app/build/outputs/apk/release/
         retention-days: 7
 
-  build-debug:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: gradle
-
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-
-    - name: Cache Android SDK
-      uses: actions/cache@v4
-      with:
-        path: |
-          /usr/local/lib/android/sdk/build-tools
-          /usr/local/lib/android/sdk/platforms
-          /usr/local/lib/android/sdk/platform-tools
-        key: ${{ runner.os }}-android-sdk-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-android-sdk-
-
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v5
-      with:
-        develocity-injection-enabled: true
-        develocity-plugin-version: '3.18.2'
-        cache-read-only: false
-
-    - name: Build debug APK and test APK
-      run: ./gradlew assembleDebug assembleDebugAndroidTest --scan --build-cache --parallel
-
-    - name: Archive debug APKs
-      uses: actions/upload-artifact@v4
-      with:
-        name: debug-apks
-        path: |
-          ./app/build/outputs/apk/debug/
-          ./app/build/outputs/apk/androidTest/debug/
-        retention-days: 1
-
   release:
     needs: [build-release, instrumented-test]
     runs-on: ubuntu-latest
@@ -219,7 +173,6 @@ jobs:
         retention-days: 30
 
   instrumented-test:
-    needs: build-debug
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -283,18 +236,6 @@ jobs:
           develocity-plugin-version: '3.18.2'
           cache-read-only: false
 
-      - name: Download debug APKs
-        uses: actions/download-artifact@v4
-        with:
-          name: debug-apks
-          path: ./app/build/outputs/apk/
-
-      - name: Download Instrumentationpretty for JUnit XML generation
-        run: |
-          # Pin to specific commit (75ecd09) for supply-chain security instead of master
-          curl -fsSL -o instrumentationpretty.jar \
-            https://github.com/jamesknowsbest/Instrumentationpretty/raw/75ecd099442abf0b57e00ed1334e14cd48ce7481/Instrumentationpretty-all-v1.1.jar
-
       - name: AVD cache
         uses: actions/cache@v4
         id: avd-cache
@@ -346,43 +287,7 @@ jobs:
             adb shell settings put global window_animation_scale 0.0
             adb shell settings put global transition_animation_scale 0.0
             adb shell settings put global animator_duration_scale 0.0
-
-            # Install pre-built APKs with error handling
-            adb install ./app/build/outputs/apk/debug/app-debug.apk || \
-              { echo "Failed to install app APK"; exit 1; }
-            adb install -t ./app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk || \
-              { echo "Failed to install test APK"; exit 1; }
-
-            # Run instrumented tests, capture output for JUnit XML generation
-            adb shell am instrument -w -r \
-              -e coverage true \
-              -e coverageFile /data/data/ralcock.cbf/coverage.ec \
-              ralcock.cbf.test/androidx.test.runner.AndroidJUnitRunner | tee test-output.txt
-
-            # Generate JUnit XML report from instrumentation output
-            mkdir -p ./app/build/outputs/androidTest-results/connected
-            if ! cat test-output.txt | java -jar instrumentationpretty.jar \
-              -o ./app/build/outputs/androidTest-results/connected; then
-              echo "::warning::JUnit XML generation failed - test results may not be reported properly"
-            fi
-
-            # Check test results by parsing output (adb shell returns 0 even on test failure)
-            if grep -q "FAILURES\!\!\!" test-output.txt; then
-              echo "::error::Instrumented tests failed"
-              exit 1
-            elif grep -q "OK (" test-output.txt; then
-              echo "All tests passed"
-            else
-              echo "::warning::Could not determine test result from output"
-            fi
-
-      - name: Pull coverage data
-        if: always()
-        run: |
-          mkdir -p app/build/outputs/code_coverage/debugAndroidTest/connected/
-          if ! adb pull /data/data/ralcock.cbf/coverage.ec app/build/outputs/code_coverage/debugAndroidTest/connected/; then
-            echo "::warning::Failed to pull coverage data - coverage report may be incomplete"
-          fi
+            ./gradlew connectedCheck --scan --build-cache --parallel
 
       - name: Generate coverage report
         if: always()
@@ -393,7 +298,7 @@ jobs:
         if: always()
         with:
           files: |
-            ./app/build/outputs/androidTest-results/connected/**/*.xml
+            **/build/outputs/androidTest-results/**/*.xml
           check_name: Instrumented Test Results (API ${{ matrix.api-level }}, ${{ matrix.profile }})
           comment_mode: off
 
