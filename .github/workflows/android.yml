@@ -195,7 +195,7 @@ jobs:
         retention-days: 30
 
     - name: Create GitHub Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         draft: true  # Set to false after testing
         name: Cambridge Beer Festival ${{ needs.build-release.outputs.version_name }}
