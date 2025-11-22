@@ -352,8 +352,10 @@ jobs:
 
             # Generate JUnit XML report from instrumentation output
             mkdir -p ./app/build/outputs/androidTest-results/connected
-            cat test-output.txt | java -jar instrumentationpretty.jar \
-              -o ./app/build/outputs/androidTest-results/connected || true
+            if ! cat test-output.txt | java -jar instrumentationpretty.jar \
+              -o ./app/build/outputs/androidTest-results/connected; then
+              echo "::warning::JUnit XML generation failed - test results may not be reported properly"
+            fi
 
             # Exit with the test runner's exit code
             if [ $TEST_EXIT_CODE -ne 0 ]; then
