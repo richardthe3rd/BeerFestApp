@@ -84,16 +84,12 @@ jobs:
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v5
-      with:
-        develocity-injection-enabled: true
-        develocity-plugin-version: '3.18.2'
-        cache-read-only: false
 
     - name: Build release APK (unsigned)
-      run: ./gradlew assembleRelease -PversionName=${{ steps.version.outputs.version_name }} -PversionCode=${{ steps.version.outputs.version_code }} --scan --build-cache --parallel
+      run: ./gradlew assembleRelease -PversionName=${{ steps.version.outputs.version_name }} -PversionCode=${{ steps.version.outputs.version_code }} --build-cache --parallel
 
     - name: Run library unit tests with coverage
-      run: ./gradlew :libraries:beers:test :libraries:beers:jacocoTestReport --scan --build-cache --parallel
+      run: ./gradlew :libraries:beers:test :libraries:beers:jacocoTestReport --build-cache --parallel
 
     - name: Publish Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
@@ -120,6 +116,7 @@ jobs:
         name: build-reports
         path: ./app/build/reports/
         retention-days: 7
+        if-no-files-found: ignore
 
     - name: Archive unsigned release APK
       uses: actions/upload-artifact@v4
@@ -195,7 +192,7 @@ jobs:
         retention-days: 30
 
     - name: Create GitHub Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         draft: true  # Set to false after testing
         name: Cambridge Beer Festival ${{ needs.build-release.outputs.version_name }}
@@ -267,10 +264,6 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
-        with:
-          develocity-injection-enabled: true
-          develocity-plugin-version: '3.18.2'
-          cache-read-only: false
 
       - name: AVD cache
         uses: actions/cache@v4
@@ -323,11 +316,11 @@ jobs:
             adb shell settings put global window_animation_scale 0.0
             adb shell settings put global transition_animation_scale 0.0
             adb shell settings put global animator_duration_scale 0.0
-            ./gradlew connectedCheck --scan --build-cache --parallel
+            ./gradlew connectedCheck --build-cache --parallel
 
       - name: Generate coverage report
         if: always()
-        run: ./gradlew jacocoTestReport --scan --build-cache
+        run: ./gradlew jacocoTestReport --build-cache
 
       - name: Publish Instrumented Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
