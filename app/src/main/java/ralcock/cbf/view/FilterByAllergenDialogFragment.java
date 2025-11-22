@@ -34,7 +34,7 @@ public class FilterByAllergenDialogFragment extends DialogFragment {
         args.putStringArrayList(key, list);
     }
 
-    private static Set<String> getStringSet(final Bundle arguments, String key) {
+    private static Set<String> getStringSet(final Bundle arguments, final String key) {
         ArrayList<String> list = arguments.getStringArrayList(key);
         return new HashSet<String>(list);
     }

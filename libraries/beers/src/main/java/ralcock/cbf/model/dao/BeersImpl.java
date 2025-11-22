@@ -117,11 +117,11 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
         }
     }
 
-    public void addBeerChangedListener(BeerChangedListener l) {
+    public void addBeerChangedListener(final BeerChangedListener l) {
         fListeners.add(l);
     }
 
-    public void removeBeerChangedListener(BeerChangedListener l) {
+    public void removeBeerChangedListener(final BeerChangedListener l) {
         fListeners.remove(l);
     }
 
