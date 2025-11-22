@@ -36,6 +36,9 @@ public class FilterByAllergenDialogFragment extends DialogFragment {
 
     private static Set<String> getStringSet(final Bundle arguments, final String key) {
         ArrayList<String> list = arguments.getStringArrayList(key);
+        if (list == null) {
+            return new HashSet<String>();
+        }
         return new HashSet<String>(list);
     }
 
