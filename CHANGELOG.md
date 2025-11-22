@@ -7,17 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-- Target Android 15 (API 35) for Google Play Store compliance
-- Optimized CI test matrix based on Play Console user data (81% coverage with 3 AVDs)
-
-### Added
-- Manual edge-case testing job for API 29 and tablet (workflow_dispatch)
-
 ## [2025.11.0] - 2025-11-22
 
 ### Added
 - Tablet device testing (pixel_tablet) in CI matrix
+- Manual edge-case testing job for API 29 and tablet (workflow_dispatch)
 - Multi-API level testing (API 29, 31, 34) for broader device coverage
 - Comprehensive E2E test suite with UI architecture documentation
 - BeerSearcher unit tests with full coverage
@@ -28,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Progressive disclosure documentation structure (CLAUDE.md v3.0.0)
 
 ### Changed
+- Target Android 15 (API 35) for Google Play Store compliance
+- Optimized CI test matrix based on Play Console user data (81% coverage with 3 AVDs)
 - Upgraded Gradle to 8.14.3
 - Upgraded setup-gradle GitHub Action from v4 to v5
 - Migrated UI components to modern Material Design
