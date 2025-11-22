@@ -130,6 +130,16 @@ jobs:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Read changelog
+      id: changelog
+      uses: mindsers/changelog-reader-action@v2
+      with:
+        version: ${{ needs.build-release.outputs.version_name }}
+        path: ./CHANGELOG.md
+
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
@@ -198,9 +208,7 @@ jobs:
         name: Cambridge Beer Festival App v${{ needs.build-release.outputs.version_name }}
         generate_release_notes: false
         body: |
-          ## What's New
-
-          This release includes updates to the Cambridge Beer Festival companion app.
+          ${{ steps.changelog.outputs.changes }}
 
           ## Installation
 
