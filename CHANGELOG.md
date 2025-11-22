@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Edge-to-edge display compatibility for Android 15+ (SDK 35) ([#60](https://github.com/richardthe3rd/BeerFestApp/issues/60), [#61](https://github.com/richardthe3rd/BeerFestApp/issues/61))
+
 ## [2025.11.0] - 2025-11-22
 
 ### Added
