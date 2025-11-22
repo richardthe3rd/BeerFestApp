@@ -145,7 +145,7 @@ android {
 
 **Non-tagged builds (unchanged):**
 ```bash
-./gradlew assembleRelease --scan --build-cache --parallel
+./gradlew assembleRelease --build-cache --parallel
 ```
 
 **Tagged builds:**
@@ -153,7 +153,7 @@ android {
 ./gradlew assembleRelease \
   -PversionName=$VERSION_NAME \
   -PversionCode=$VERSION_CODE \
-  --scan --build-cache --parallel
+  --build-cache --parallel
 ```
 
 ## Validation (Proposal)
