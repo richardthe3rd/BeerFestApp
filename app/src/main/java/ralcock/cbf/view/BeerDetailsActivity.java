@@ -40,6 +40,7 @@ public final class BeerDetailsActivity extends AppCompatActivity {
         return fBeerAccessor.getBeer(fBeerId);
     }
 
+    @Override
     public void onCreate(final Bundle savedInstanceState) {
 
         // Enable edge-to-edge display for Android 15+ compatibility (fixes issues #60, #61)
