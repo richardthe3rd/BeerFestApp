@@ -141,14 +141,14 @@ org.gradle.workers.max=4           # Parallel task execution
 jobs:
   build-release:      # Builds unsigned APK + runs unit tests
   instrumented-test:  # Matrix of emulator tests (4 configurations)
-  release:            # Signs APK (main branch only)
+  release:            # Signs APK + creates GitHub Release (tag pushes only)
   coverage:           # Aggregates coverage reports
 ```
 
 **Key changes:**
 - `build-release`: Builds unsigned release APK, runs library unit tests
 - `instrumented-test`: Uses standard `./gradlew connectedCheck` for reliable test execution
-- `release`: Only runs on tag pushes, downloads unsigned APK and signs it
+- `release`: Only runs on tag pushes (v*), downloads unsigned APK, signs it, creates GitHub Release
 - Signing secrets (KEYSTORE, etc.) only accessed by `release` job
 
 **Impact:**

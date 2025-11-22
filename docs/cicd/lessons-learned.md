@@ -69,11 +69,11 @@ What **is** worth separating:
 
 ```yaml
 build-release:    # Builds unsigned APK + unit tests
-release:          # Signs APK (main branch only)
+release:          # Signs APK + creates GitHub Release (tag pushes only)
 ```
 
 **Why this works:**
-- Signing secrets only accessed on main branch
+- Signing secrets only accessed on tag pushes
 - PRs verify release builds without accessing production keys
 - Clear separation of concerns
 - No complex artifact juggling (just one APK)

@@ -26,6 +26,8 @@ dependencies {
 }
 
 // Version defaults - overridden by CI for tagged releases
+// Migration: Previous hardcoded values were versionCode=27, versionName="2025.0.0.1"
+// CalVer scheme: v2025.11.0 → versionCode=20251100 (compatible: 20251100 > 27)
 def appVersionCode = project.hasProperty('versionCode') ? project.property('versionCode').toInteger() : 1
 def appVersionName = project.hasProperty('versionName') ? project.property('versionName') : "dev"
 

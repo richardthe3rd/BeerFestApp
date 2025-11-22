@@ -230,11 +230,12 @@ try {
 **Jobs:**
 1. **build-release** - Builds unsigned release APK, runs unit tests
 2. **instrumented-test** - Matrix testing on 4 emulator configurations (API 29/31/34, pixel_2/tablet)
-3. **release** - Signs APK (main branch only, after tests pass)
+3. **release** - Signs APK and creates GitHub Release (tag pushes only, after tests pass)
 4. **coverage** - Aggregates coverage reports for PRs
 
 **Triggers:**
 - Push to `main`
+- Push tags matching `v*` (e.g., `v2025.11.0`)
 - Pull requests to `main`
 - Manual workflow dispatch
 
@@ -246,7 +247,7 @@ try {
 - `app-coverage-reports-api-*` - Instrumented test coverage
 
 **Secrets Required:** KEYSTORE, SIGNING_KEY_ALIAS, SIGNING_KEY_PASSWORD, SIGNING_STORE_PASSWORD
-(Only accessed by `release` job on main branch)
+(Only accessed by `release` job on tag pushes)
 
 ---
 

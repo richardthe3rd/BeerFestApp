@@ -87,27 +87,42 @@ on:
     branches: [ "main" ]
 ```
 
-**2. Modify release job:**
+**2. Add version parsing to build-release job (outputs shared with release job):**
+```yaml
+build-release:
+  outputs:
+    version_name: ${{ steps.version.outputs.version_name }}
+    version_code: ${{ steps.version.outputs.version_code }}
+  steps:
+    - name: Parse version from tag
+      id: version
+      run: |
+        if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+          TAG="${{ github.ref_name }}"
+          VERSION="${TAG#v}"  # v2025.11.0 → 2025.11.0
+          IFS='.' read -r YEAR MONTH PATCH <<< "$VERSION"
+          VERSION_CODE=$((YEAR * 10000 + MONTH * 100 + PATCH))
+          echo "version_name=$VERSION" >> $GITHUB_OUTPUT
+          echo "version_code=$VERSION_CODE" >> $GITHUB_OUTPUT
+        else
+          echo "version_name=dev" >> $GITHUB_OUTPUT
+          echo "version_code=1" >> $GITHUB_OUTPUT
+        fi
+```
+
+**3. Release job uses outputs from build-release:**
 ```yaml
 release:
   needs: [build-release, instrumented-test]
   if: startsWith(github.ref, 'refs/tags/v')
   steps:
-    - name: Parse version from tag
-      run: |
-        TAG=${GITHUB_REF_NAME#v}  # v2025.11.0 → 2025.11.0
-        IFS='.' read -r YEAR MONTH PATCH <<< "$TAG"
-        VERSION_CODE=$((YEAR * 10000 + MONTH * 100 + PATCH))
-        echo "VERSION_NAME=$TAG" >> $GITHUB_ENV
-        echo "VERSION_CODE=$VERSION_CODE" >> $GITHUB_ENV
-
     # ... existing signing steps ...
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
         files: ./app-release-signed.apk
-        name: "Release ${{ env.VERSION_NAME }}"
+        name: "Cambridge Beer Festival ${{ needs.build-release.outputs.version_name }}"
         generate_release_notes: true
 ```
 

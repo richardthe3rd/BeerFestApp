@@ -199,14 +199,12 @@ jobs:
       with:
         draft: true  # Set to false after testing
         name: Cambridge Beer Festival ${{ needs.build-release.outputs.version_name }}
+        generate_release_notes: true
         body: |
           ## Cambridge Beer Festival App v${{ needs.build-release.outputs.version_name }}
 
           ### Installation
           Download and install `app-release-signed.apk` on your Android device.
-
-          ### What's New
-          - Update this section before publishing the release
         files: ./app-release-signed.apk
         fail_on_unmatched_files: true
 
