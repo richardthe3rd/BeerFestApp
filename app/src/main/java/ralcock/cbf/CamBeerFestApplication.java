@@ -8,6 +8,11 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
+import androidx.activity.EdgeToEdge;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import com.google.android.material.tabs.TabLayout;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
@@ -19,7 +24,6 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import java.util.Date;
@@ -70,12 +74,23 @@ public class CamBeerFestApplication extends AppCompatActivity {
      */
     @Override
     @SuppressWarnings("deprecation")
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(final Bundle savedInstanceState) {
         Log.d(TAG, "In onCreate");
+
+        // Enable edge-to-edge display for Android 15+ compatibility (fixes issues #60, #61)
+        EdgeToEdge.enable(this);
 
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.beer_listview_activity);
+
+        // Handle window insets for edge-to-edge display
+        final View mainView = findViewById(R.id.mainListView);
+        ViewCompat.setOnApplyWindowInsetsListener(mainView, (v, windowInsets) -> {
+            Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(insets.left, insets.top, insets.right, insets.bottom);
+            return WindowInsetsCompat.CONSUMED;
+        });
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);

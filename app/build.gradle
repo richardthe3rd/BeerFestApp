@@ -8,6 +8,7 @@ dependencies {
     implementation group: 'com.j256.ormlite',            name: 'ormlite-core',     version: '5.0'
     implementation group: 'com.j256.ormlite',            name: 'ormlite-android',  version: '5.0'
     implementation group: 'com.google.android.material', name: 'material',         version: '1.8.0'
+    implementation 'androidx.activity:activity:1.8.0'  // EdgeToEdge support for Android 15+
     implementation group: 'org.slf4j',                   name: 'slf4j-android',    version: '1.7.25'
 
     // Updated AndroidX Test libraries for Android 13+ (API 33+) support
