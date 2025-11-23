@@ -29,9 +29,22 @@ public class BeerList {
             StatusToShow = statusToShow;
         }
 
+        public Config(final SortOrder sortOrder,
+                      final CharSequence searchText,
+                      final Set<String> stylesToHide,
+                      final Set<String> allergensToHide,
+                      final StatusToShow statusToShow) {
+            SortOrder = sortOrder;
+            SearchText = searchText;
+            StylesToHide = stylesToHide;
+            AllergensToHide = allergensToHide;
+            StatusToShow = statusToShow;
+        }
+
         public SortOrder SortOrder = ralcock.cbf.model.SortOrder.BREWERY_NAME_DESC;
         public CharSequence SearchText = "";
         public Set<String> StylesToHide = Collections.emptySet();
+        public Set<String> AllergensToHide = Collections.emptySet();
         public StatusToShow StatusToShow = ralcock.cbf.model.StatusToShow.ALL;
 
         public Config withSortOrder(final SortOrder sortOrder) {
@@ -44,8 +57,13 @@ public class BeerList {
             return this;
         }
 
-        public Config withStylesToHide(Set<String> stylesToHide) {
+        public Config withStylesToHide(final Set<String> stylesToHide) {
             StylesToHide = stylesToHide;
+            return this;
+        }
+
+        public Config withAllergensToHide(final Set<String> allergensToHide) {
+            AllergensToHide = allergensToHide;
             return this;
         }
     }
@@ -60,6 +78,7 @@ public class BeerList {
 
     private List<Beer> fBeerList;
     private Set<String> fFilterStyles;
+    private Set<String> fAllergensToHide;
     private Set<String> fStatusToHide;
 
     private static final Set<String> UNAVAILABLE_STATUS_SET;
@@ -79,6 +98,7 @@ public class BeerList {
         fSortOrder = config.SortOrder;
         fFilterText = config.SearchText;
         fFilterStyles = config.StylesToHide;
+        fAllergensToHide = config.AllergensToHide;
         fStatusToHide = statusToHide(config.StatusToShow);
         updateBeerList();
     }
@@ -88,12 +108,17 @@ public class BeerList {
         updateBeerList();
     }
 
-    public void filterBy(CharSequence filterText) {
+    public void allergensToHide(final Set<String> allergensToHide) {
+        fAllergensToHide = allergensToHide;
+        updateBeerList();
+    }
+
+    public void filterBy(final CharSequence filterText) {
         fFilterText = filterText;
         updateBeerList();
     }
 
-    public void sortBy(SortOrder sortOrder) {
+    public void sortBy(final SortOrder sortOrder) {
         fSortOrder = sortOrder;
         updateBeerList();
     }
@@ -113,7 +138,7 @@ public class BeerList {
     }
 
     public void updateBeerList() {
-        fBeerList = buildList(fSortOrder, fFilterText, fFilterStyles, fStatusToHide);
+        fBeerList = buildList(fSortOrder, fFilterText, fFilterStyles, fAllergensToHide, fStatusToHide);
     }
 
     public int getCount() {
@@ -127,11 +152,12 @@ public class BeerList {
     private List<Beer> buildList(final SortOrder sortOrder,
                                  final CharSequence filterText,
                                  final Set<String> stylesToHide,
+                                 final Set<String> allergensToHide,
                                  final Set<String> statusToHide) {
         if (fType == Type.ALL)
-            return fBeers.allBeersList(sortOrder, filterText, stylesToHide, statusToHide);
+            return fBeers.allBeersList(sortOrder, filterText, stylesToHide, allergensToHide, statusToHide);
         else {
-            return fBeers.bookmarkedBeersList(sortOrder, filterText, stylesToHide, statusToHide);
+            return fBeers.bookmarkedBeersList(sortOrder, filterText, stylesToHide, allergensToHide, statusToHide);
         }
     }
 

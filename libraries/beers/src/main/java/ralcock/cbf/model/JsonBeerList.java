@@ -22,7 +22,7 @@ public class JsonBeerList implements Iterable<Beer> {
     private static final String IDENTIFIER = "id";
     private static final String DISPENSE = "dispense";
     private static final String BAR = "bar";
-    private static final String ALLERGENS = "allegens";
+    private static final String ALLERGENS = "allergens";
 
     private List<Beer> fBeerList;
 
@@ -63,7 +63,50 @@ public class JsonBeerList implements Iterable<Beer> {
             .withStyle(product.isNull(STYLE)   ? "Unknown" : product.getString(STYLE))
             .withStatus(product.isNull(STATUS) ? "Unknown" : product.getString(STATUS))
             .withDispenseMethod(product.isNull(DISPENSE) ? "" : product.getString(DISPENSE))
+            .withAllergens(parseAllergens(product))
             .build();
+    }
+
+    private String parseAllergens(final JSONObject product) throws JSONException {
+        if (product.isNull(ALLERGENS)) {
+            return "";
+        }
+        JSONObject allergensObj = product.getJSONObject(ALLERGENS);
+        if (allergensObj.length() == 0) {
+            return "";
+        }
+        StringBuilder allergensList = new StringBuilder();
+        Iterator<String> keys = allergensObj.keys();
+        while (keys.hasNext()) {
+            String allergen = keys.next();
+            // Only include allergens with truthy values (1, true, non-empty string)
+            // API sends empty string "" for allergens not present
+            Object value = allergensObj.get(allergen);
+            if (isTruthyAllergenValue(value)) {
+                if (allergensList.length() > 0) {
+                    allergensList.append(", ");
+                }
+                allergensList.append(allergen);
+            }
+        }
+        return allergensList.toString();
+    }
+
+    private boolean isTruthyAllergenValue(final Object value) {
+        if (value == null) {
+            return false;
+        }
+        if (value instanceof Number) {
+            return ((Number) value).intValue() != 0;
+        }
+        if (value instanceof Boolean) {
+            return (Boolean) value;
+        }
+        if (value instanceof String) {
+            String str = (String) value;
+            return !str.isEmpty() && !"0".equals(str) && !"false".equalsIgnoreCase(str);
+        }
+        return true;
     }
 
     private Brewery makeBrewery(final JSONObject producer) throws JSONException {

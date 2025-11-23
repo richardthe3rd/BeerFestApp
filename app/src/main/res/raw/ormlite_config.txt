@@ -62,6 +62,10 @@ indexName=beers_on_wish_list_idx
 fieldName=fUserComments
 columnName=user_comments
 # --field-end--
+# --field-start--
+fieldName=fAllergens
+columnName=allergens
+# --field-end--
 # --table-fields-end--
 # --table-end--
 #################################

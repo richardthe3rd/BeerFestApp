@@ -93,6 +93,18 @@
                 android:layout_alignParentRight="true"
                 />
             <TextView
+                android:text="[ALLERGENS]"
+                android:id="@+id/detailsViewAllergens"
+                android:padding="5dip"
+                android:textStyle="bold"
+                android:textColor="#D32F2F"
+                android:visibility="gone"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_below="@id/detailsViewBeerDescription"
+                android:layout_alignParentLeft="true"
+                />
+            <TextView
                 android:text="[BREWERY_NAME]"
                 android:id="@+id/detailsViewBreweryName"
                 android:textStyle="bold"
@@ -100,7 +112,7 @@
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_below="@id/detailsViewBeerDescription"
+                android:layout_below="@id/detailsViewAllergens"
                 />
             <TextView
                 android:text="[BREWERY_DESCRIPTION]"

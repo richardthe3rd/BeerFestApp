@@ -38,7 +38,7 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
         return false;
     }
 
-    private View newView(ViewGroup viewGroup) {
+    private View newView(final ViewGroup viewGroup) {
         LayoutInflater layoutInflater = LayoutInflater.from(fContext);
         View view = layoutInflater.inflate(R.layout.beer_listitem, viewGroup, false);
         BeerListItemView beerListItemView = new BeerListItemView(view);
@@ -46,7 +46,7 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
         return view;
     }
 
-    private void bindView(View view, final Beer beer) {
+    private void bindView(final View view, final Beer beer) {
         BeerListItemView beerListItemView = (BeerListItemView) view.getTag();
 
         Brewery brewery = beer.getBrewery();
@@ -60,6 +60,15 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
         beerListItemView.BeerStatus.setText(beer.getStatus());
         beerListItemView.BeerStyle.setText(beer.getStyle());
         beerListItemView.BeerDispense.setText(beer.getDispenseMethod());
+
+        // Display allergen abbreviations
+        if (beer.hasAllergens()) {
+            String allergenAbbrevs = AllergenHelper.toAbbreviations(beer.getAllergens());
+            beerListItemView.BeerAllergens.setText(allergenAbbrevs);
+            beerListItemView.BeerAllergens.setVisibility(View.VISIBLE);
+        } else {
+            beerListItemView.BeerAllergens.setVisibility(View.GONE);
+        }
 
         if (beer.isIsOnWishList()) {
             beerListItemView.BookmarkImage.setImageResource(R.drawable.ic_bookmark_black_48dp);
@@ -111,6 +120,7 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
         TextView BeerStatus;
         RatingBar BeerRatingBar;
         TextView BeerDispense;
+        TextView BeerAllergens;
         ImageView BookmarkImage;
 
         BeerListItemView(final View view) {
@@ -120,6 +130,7 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
             BeerStyle = findTextViewById(view, R.id.beerStyle);
             BeerRatingBar = (RatingBar) view.findViewById(R.id.beerRatingBar);
             BeerDispense = findTextViewById(view, R.id.beerDispense);
+            BeerAllergens = findTextViewById(view, R.id.beerAllergens);
             BookmarkImage = (ImageView) view.findViewById(R.id.bookmark_image);
         }
 

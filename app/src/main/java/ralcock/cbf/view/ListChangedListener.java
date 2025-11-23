@@ -6,13 +6,15 @@ import ralcock.cbf.model.StatusToShow;
 import java.util.Set;
 
 public interface ListChangedListener {
-    void filterTextChanged(String filterText);
+    void filterTextChanged(final String filterText);
 
-    void sortOrderChanged(SortOrder sortOrder);
+    void sortOrderChanged(final SortOrder sortOrder);
 
-    void stylesToHideChanged(Set<String> stylesToHide);
+    void stylesToHideChanged(final Set<String> stylesToHide);
 
-    void statusToShowChanged(StatusToShow statusToShow);
+    void allergensToHideChanged(final Set<String> allergensToHide);
+
+    void statusToShowChanged(final StatusToShow statusToShow);
 
     void beersChanged();
 }

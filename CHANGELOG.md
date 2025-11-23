@@ -7,8 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Allergen information display in beer details view ([#8](https://github.com/richardthe3rd/BeerFestApp/issues/8))
+- Allergen abbreviations (using UK FSA standard) in beer list items
+- Filter by allergen functionality to hide beers containing specific allergens
+- AllergenHelper utility class for consistent allergen display across the app
+
 ### Fixed
 - Edge-to-edge display compatibility for Android 15+ (SDK 35) ([#60](https://github.com/richardthe3rd/BeerFestApp/issues/60), [#61](https://github.com/richardthe3rd/BeerFestApp/issues/61))
+- Fixed typo in JSON field name for allergens ("allegens" -> "allergens")
 
 ## [2025.11.0] - 2025-11-22
 
