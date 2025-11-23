@@ -43,13 +43,6 @@ public class MultiUrlInputStream extends InputStream {
                         Log.i(TAG, "Added " + producers.length() + " producers from " + urlString);
                     }
                 }
-                if (json.has(PRODUCERS)) {
-                    JSONArray producers = json.getJSONArray(PRODUCERS);
-                    for (int i = 0; i < producers.length(); i++) {
-                        combinedProducers.put(producers.get(i));
-                    }
-                    Log.i(TAG, "Added " + producers.length() + " producers from " + urlString);
-                }
             } catch (JSONException e) {
                 Log.w(TAG, "Failed to parse JSON from " + urlString, e);
             } catch (IOException e) {
