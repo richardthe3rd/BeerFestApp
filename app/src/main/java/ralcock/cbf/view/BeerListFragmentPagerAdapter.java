@@ -5,15 +5,19 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import android.content.Context;
+import ralcock.cbf.R;
 
 public class BeerListFragmentPagerAdapter extends FragmentPagerAdapter {
     private static final String TAG = BeerListFragmentPagerAdapter.class.getName();
-    private final String tabTitles[] = new String[] { "Beer", "Low/No", "Bookmarks" };
-    // private Context context;
+    private final String tabTitles[];
 
     public BeerListFragmentPagerAdapter(FragmentManager fm, Context context) {
         super(fm);
-        // this.context = context;
+        tabTitles = new String[] {
+            context.getString(R.string.tab_beer),
+            context.getString(R.string.tab_low_no),
+            context.getString(R.string.tab_bookmarks)
+        };
     }
 
     @Override

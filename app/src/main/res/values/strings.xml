@@ -52,6 +52,10 @@
     <string name="bookmark_title">Bookmark</string>
     <string name="unbookmark_title">Remove Bookmark</string>
 
+    <string name="tab_beer">Beer</string>
+    <string name="tab_low_no">Low/No</string>
+    <string name="tab_bookmarks">Bookmarks</string>
+
     <string-array name="navigation_list">
         <item>All Beers</item>
         <item>Available Only</item>
