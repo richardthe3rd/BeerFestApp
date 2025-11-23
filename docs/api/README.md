@@ -32,7 +32,7 @@ Specification for the **festival metadata registry** (`festivals.json`):
 **Comprehensive example** of beverage data API response demonstrating all field types and variations.
 
 **Includes examples of:**
-- All beverage categories (beer, cider, perry, mead, foreign beer)
+- Demonstrated beverage categories (beer, cider, perry, mead, foreign beer)
 - All dispense methods (cask, keg, keykeg, bottle, cider tub, mead polypin)
 - Different status text values (Sold Out, Plenty left, Nearly finished!, etc.)
 - Optional vs required fields
