@@ -355,7 +355,7 @@ Festival (Context - Top)
 │ ○ Cocktails (5)                     │
 │ ○ Sake (3)                          │
 │ ○ Kombucha (2)                      │
-│ ○ Non-Alcoholic (1)                 │
+│ ○ Low/No Alcohol (1)                │
 │                                     │
 │ ABV RANGE                           │ ← Section label
 │ ●━━━━━○━━━━━━━━━━━●                 │ ← RangeSlider
