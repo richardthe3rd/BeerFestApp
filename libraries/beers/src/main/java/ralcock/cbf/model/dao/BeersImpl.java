@@ -97,6 +97,45 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
         }
     }
 
+    public Set<String> getAvailableAllergens() {
+        QueryBuilder<Beer, Long> qb = queryBuilder();
+        qb.selectColumns(Beer.ALLERGENS_FIELD);
+        qb.distinct();
+
+        GenericRawResults<String[]> results = null;
+        try {
+            results = queryRaw(qb.prepareStatementString());
+            Set<String> allergens = new TreeSet<String>();
+            List<String[]> resultList = results.getResults();
+            for (String[] array : resultList) {
+                final String allergenString = array[0];
+                if (allergenString != null && allergenString.length() > 0) {
+                    // Allergens are comma-separated, so split and add each
+                    String[] parts = allergenString.split(",");
+                    for (String part : parts) {
+                        String allergen = part.trim();
+                        if (!allergen.isEmpty()) {
+                            // Capitalize first letter
+                            allergen = allergen.substring(0, 1).toUpperCase() + allergen.substring(1).toLowerCase();
+                            allergens.add(allergen);
+                        }
+                    }
+                }
+            }
+            return allergens;
+        } catch (SQLException e) {
+            throw newBeerAccessException("Failed to get available allergens", e);
+        } finally {
+            if (results != null) {
+                try {
+                    results.close();
+                } catch (IOException e) {
+                    throw newBeerAccessException("Failed to close results.", e);
+                }
+            }
+        }
+    }
+
     public List<Beer> getRatedBeers() {
         try {
             QueryBuilder<Beer, Long> qb = queryBuilder();

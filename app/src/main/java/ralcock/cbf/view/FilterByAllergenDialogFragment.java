@@ -47,8 +47,10 @@ public class FilterByAllergenDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
         Set<String> allergensToHide = getStringSet(getArguments(), "allergensToHide");
 
-        // Get all known allergens
-        final String[] allAllergens = AllergenHelper.getFilterableAllergens();
+        // Get allergens actually present in the festival beers
+        CamBeerFestApplication app = (CamBeerFestApplication) requireActivity();
+        Set<String> availableAllergens = app.getBeers().getAvailableAllergens();
+        final String[] allAllergens = availableAllergens.toArray(new String[0]);
         final boolean[] checkedItems = new boolean[allAllergens.length];
 
         // Mark currently hidden allergens as checked

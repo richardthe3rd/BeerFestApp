@@ -39,6 +39,8 @@ public interface Beers extends Dao<Beer, Long> {
 
     Set<String> getAvailableStyles();
 
+    Set<String> getAvailableAllergens();
+
     List<Beer> getRatedBeers();
 
     void updateBeer(Beer beer);
