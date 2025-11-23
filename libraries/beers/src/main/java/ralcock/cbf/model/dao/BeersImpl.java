@@ -97,6 +97,17 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
         }
     }
 
+    /**
+     * Returns a sorted set of unique allergen names found in the beer database.
+     * <p>
+     * This method queries all beers for their allergen information, which is stored as
+     * comma-separated strings (e.g., "Gluten, Sulphites"). It splits these strings,
+     * trims whitespace, capitalizes each allergen name, deduplicates, and sorts the results.
+     * <p>
+     * The returned set contains allergen names in title case, such as "Gluten" or "Sulphites".
+     *
+     * @return a sorted set of unique allergen names present in the beer database
+     */
     public Set<String> getAvailableAllergens() {
         QueryBuilder<Beer, Long> qb = queryBuilder();
         qb.selectColumns(Beer.ALLERGENS_FIELD);
