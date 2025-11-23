@@ -97,6 +97,7 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
         }
     }
 
+    @Override
     /**
      * Returns a sorted set of unique allergen names found in the beer database.
      * <p>
