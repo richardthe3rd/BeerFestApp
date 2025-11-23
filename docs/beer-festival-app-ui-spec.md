@@ -1445,13 +1445,6 @@ Festival (Context - Top)
 ---
 
 ### Typography Scale (Material 3)
-- Opens in default browser or Chrome Custom Tab
-- Icon: Link/search (20dp)
-
-**Accessibility:**
-- Clearly labeled as external action
-- "Opens in browser" hint
-
 ---
 
 ### Typography Scale (Material 3)
