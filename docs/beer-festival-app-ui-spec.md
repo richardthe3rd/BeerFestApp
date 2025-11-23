@@ -2257,7 +2257,7 @@ DrinkEntity
 ├── abv: Float (product.abv - parsed from string)
 ├── description: String? (product.notes)
 ├── dispense: String (product.dispense - Keg, Cask, Polypin, Bottle, Can, KeyKeg)
-├── bar: String? (product.bar - e.g., "Arctic", "Main Bar"; optional, may be missing for festivals with a single bar or legacy APIs. If not present in the API, set to null.)
+├── bar: String? [PROPOSED] (product.bar - e.g., "Arctic", "Main Bar"; optional, may be missing for festivals with a single bar or legacy APIs. This is a proposed new field and may not exist in current APIs. If not present in the API, set to null.)
 ├── allergens: Map<String, Int>? (product.allergens - {"gluten": 1, "sulphites": 1})
 └── statusText: String? (product.status_text - "Plenty left", "Running low", "Sold out")
 
