@@ -7,6 +7,6 @@
     <string formatted="false" name="share_intent_text">Drinking %1$s %2$s</string>
     <string-array name="beer_list_urls">
         <item>https://data.cambridgebeerfestival.com/cbfw2025/beer.json</item>
-        <item>https://data.cambridgebeerfestival.com/cbfw2025/no_low.json</item>
+        <item>https://data.cambridgebeerfestival.com/cbfw2025/low-no.json</item>
     </string-array>
 </resources>

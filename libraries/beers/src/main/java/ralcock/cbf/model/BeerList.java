@@ -15,7 +15,7 @@ public class BeerList {
         LOW_NO
     }
 
-    private static final String LOW_NO_CATEGORY = "no_low";
+    private static final String LOW_NO_CATEGORY = "low-no";
 
     public static class Config {
         public Config() {
