@@ -49,7 +49,7 @@ public class FilterByAllergenDialogFragment extends DialogFragment {
 
         // Get allergens actually present in the festival beers
         CamBeerFestApplication app = (CamBeerFestApplication) requireActivity();
-        Set<String> availableAllergens = app.getBeers().getAvailableAllergens();
+        Set<String> availableAllergens = app.getBeerDao().getAvailableAllergens();
         final String[] allAllergens = availableAllergens.toArray(new String[0]);
         final boolean[] checkedItems = new boolean[allAllergens.length];
 
