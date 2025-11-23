@@ -2268,10 +2268,11 @@ DrinkEntity
 ├── abv: Float (product.abv - parsed from string)
 ├── description: String? (product.notes)
 ├── dispense: String (product.dispense - Keg, Cask, Polypin, Bottle, Can, KeyKeg)
-├── bar: String? (product.bar - e.g., "Arctic", "Main Bar")
+├── bar: String? (product.bar - e.g., "Arctic", "Main Bar"; optional, may be missing for festivals with a single bar or legacy APIs. If not present in the API, set to null.)
 ├── allergens: Map<String, Int>? (product.allergens - {"gluten": 1, "sulphites": 1})
 └── statusText: String? (product.status_text - "Plenty left", "Running low", "Sold out")
 
+> **Note:** The `bar` field is optional and may not be present in all API responses. For festivals with a single bar, or for legacy data sources that do not provide a `bar` field, this value should be set to `null`. Only use this field if the API includes it.
 **Availability Status Mapping:**
 For UI display, map statusText to availability enum:
 - "Plenty left" / "Arrived" / "Available" → "plenty" (green 🟢)
