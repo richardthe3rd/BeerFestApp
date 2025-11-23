@@ -28,6 +28,46 @@ Specification for the **festival metadata registry** (`festivals.json`):
 - Separate repo: `https://raw.githubusercontent.com/cambridgebeerfestival/festival-registry/main/festivals.json`
 - Data API: `https://data.cambridgebeerfestival.com/festivals.json`
 
+### [example-beer-list.json](example-beer-list.json)
+**Comprehensive example** of beverage data API response demonstrating all field types and variations.
+
+**Includes examples of:**
+- All beverage categories (beer, cider, perry, mead, foreign beer)
+- All dispense methods (cask, keg, keykeg, bottle, cider tub, mead polypin)
+- Different status text values (Sold Out, Plenty left, Nearly finished!, etc.)
+- Optional vs required fields
+- Null and empty field handling
+- Allergen information formats
+
+**Use this for:**
+- Understanding API response structure
+- Testing data parsers
+- Development and debugging
+- Reference when building integrations
+
+### [beer-list-schema.json](beer-list-schema.json)
+**JSON Schema (draft-07)** defining structure and validation rules for beverage data API responses.
+
+**Enables:**
+- Automated validation of API responses
+- IDE autocomplete and IntelliSense
+- Documentation generation
+- Testing and CI/CD integration
+
+**Validation example:**
+```bash
+# Python
+pip install jsonschema
+python3 -c "import json, jsonschema; \
+  schema = json.load(open('docs/api/beer-list-schema.json')); \
+  data = json.load(open('docs/api/example-beer-list.json')); \
+  jsonschema.validate(data, schema); print('Valid!')"
+
+# Node.js
+npm install -g ajv-cli
+ajv validate -s docs/api/beer-list-schema.json -d docs/api/example-beer-list.json
+```
+
 ---
 
 ## Quick Start
