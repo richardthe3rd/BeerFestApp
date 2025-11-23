@@ -97,7 +97,6 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
         }
     }
 
-    @Override
     /**
      * Returns a sorted set of unique allergen names found in the beer database.
      * <p>
@@ -109,6 +108,7 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
      *
      * @return a sorted set of unique allergen names present in the beer database
      */
+    @Override
     public Set<String> getAvailableAllergens() {
         QueryBuilder<Beer, Long> qb = queryBuilder();
         qb.selectColumns(Beer.ALLERGENS_FIELD);
@@ -128,7 +128,11 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
                         String allergen = part.trim();
                         if (!allergen.isEmpty()) {
                             // Capitalize first letter
-                            allergen = allergen.substring(0, 1).toUpperCase() + allergen.substring(1).toLowerCase();
+                            if (allergen.length() == 1) {
+                                allergen = allergen.toUpperCase();
+                            } else {
+                                allergen = allergen.substring(0, 1).toUpperCase() + allergen.substring(1).toLowerCase();
+                            }
                             allergens.add(allergen);
                         }
                     }
@@ -211,11 +215,10 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
         }
     }
 
-    @Override
     /**
      * Returns a list of beers filtered by the specified category from the database.
      * <p>
-     * This method retrieves beers that match the given category field value (e.g., "low-no"),
+     * This method retrieves beers that match the given category (e.g., "low-no"),
      * applying additional filters for sort order, text search, styles, allergens, and status.
      * Unlike {@link #allBeersList}, which excludes a category, this method includes only beers
      * in the specified category.
@@ -225,9 +228,10 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
      * @param stylesToHide     set of beer styles to exclude from the results
      * @param allergensToHide  set of allergens to exclude beers containing them
      * @param statusToHide     set of beer statuses to exclude
-     * @param category         the category field value to match (e.g., "low-no" for low/no alcohol beers)
+     * @param category         the category of beers to include (e.g., "low-no")
      * @return a list of beers matching the specified category and filters
      */
+    @Override
     public List<Beer> lowNoAlcoholBeersList(final SortOrder sortOrder,
                                             final CharSequence filterText,
                                             final Set<String> stylesToHide,
