@@ -31,11 +31,18 @@ public class MultiUrlInputStream extends InputStream {
             try {
                 Log.i(TAG, "Fetching from: " + urlString);
                 URL url = new URL(urlString);
-                InputStream inputStream = url.openStream();
-                String jsonString = readEntireStream(inputStream);
-                inputStream.close();
+                try (InputStream inputStream = url.openStream()) {
+                    String jsonString = readEntireStream(inputStream);
 
-                JSONObject json = new JSONObject(jsonString);
+                    JSONObject json = new JSONObject(jsonString);
+                    if (json.has(PRODUCERS)) {
+                        JSONArray producers = json.getJSONArray(PRODUCERS);
+                        for (int i = 0; i < producers.length(); i++) {
+                            combinedProducers.put(producers.get(i));
+                        }
+                        Log.i(TAG, "Added " + producers.length() + " producers from " + urlString);
+                    }
+                }
                 if (json.has(PRODUCERS)) {
                     JSONArray producers = json.getJSONArray(PRODUCERS);
                     for (int i = 0; i < producers.length(); i++) {
