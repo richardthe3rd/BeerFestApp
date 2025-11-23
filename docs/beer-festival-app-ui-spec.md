@@ -693,7 +693,7 @@ Festival (Context - Top)
 - Min height: 160dp
 
 **Festival Name**
-- Typography: Headline Small (28sp), Bold
+- Typography: Headline Medium (28sp), Bold
 - Color: High emphasis
 
 **Dates**
