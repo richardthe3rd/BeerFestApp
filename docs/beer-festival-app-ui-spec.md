@@ -926,10 +926,6 @@ Festival (Context - Top)
 - Key width: ~80dp
 - Value: Remaining width
 - Line height: 32dp (adequate spacing)
-- Padding: 12dp all sides
-- Corner radius: 8dp
-- Always show if allergen data exists
-
 **Rating Section** (Personal/Local Only)
 - Position: After TASTING NOTES, before external link
 - Section header: "YOUR RATING" (same style as other headers)
