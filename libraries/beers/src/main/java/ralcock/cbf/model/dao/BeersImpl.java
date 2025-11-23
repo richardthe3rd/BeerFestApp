@@ -135,8 +135,9 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
                                    final CharSequence filterText,
                                    final Set<String> stylesToHide,
                                    final Set<String> allergensToHide,
-                                   final Set<String> statusToHide) {
-        QueryBuilder<Beer, Long> query = buildSortedFilteredBeerQuery(sortOrder, filterText, stylesToHide, statusToHide);
+                                   final Set<String> statusToHide,
+                                   final String categoryToExclude) {
+        QueryBuilder<Beer, Long> query = buildSortedFilteredBeerQuery(sortOrder, filterText, stylesToHide, statusToHide, categoryToExclude);
         try {
             List<Beer> beers = query.query();
             return filterByAllergens(beers, allergensToHide);
@@ -219,11 +220,15 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
     private QueryBuilder<Beer, Long> buildSortedFilteredBeerQuery(final SortOrder sortOrder,
                                                                   final CharSequence filterText,
                                                                   final Set<String> stylesToHide,
-                                                                  final Set<String> statusToHide) {
+                                                                  final Set<String> statusToHide,
+                                                                  final String categoryToExclude) {
         QueryBuilder<Beer, Long> qb = queryBuilder();
         Where where = qb.where();
         try {
             doWhere(where, fBreweries, filterText, stylesToHide, statusToHide);
+            if (categoryToExclude != null && !categoryToExclude.isEmpty()) {
+                where.and().ne(Beer.CATEGORY_FIELD, categoryToExclude);
+            }
             qb.orderBy(sortOrder.columnName(), sortOrder.ascending());
             return qb;
         } catch (SQLException e) {

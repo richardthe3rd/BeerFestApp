@@ -19,7 +19,8 @@ public interface Beers extends Dao<Beer, Long> {
                             CharSequence filterText,
                             Set<String> filterStyles,
                             Set<String> allergensToHide,
-                            Set<String> statusToHide);
+                            Set<String> statusToHide,
+                            String categoryToExclude);
 
     List<Beer> bookmarkedBeersList(SortOrder sortOrder,
                                    CharSequence filterText,

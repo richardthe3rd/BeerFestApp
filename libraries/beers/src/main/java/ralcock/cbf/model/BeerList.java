@@ -159,13 +159,13 @@ public class BeerList {
                                  final Set<String> statusToHide) {
         switch (fType) {
             case ALL:
-                return fBeers.allBeersList(sortOrder, filterText, stylesToHide, allergensToHide, statusToHide);
+                return fBeers.allBeersList(sortOrder, filterText, stylesToHide, allergensToHide, statusToHide, LOW_NO_CATEGORY);
             case BOOKMARKS:
                 return fBeers.bookmarkedBeersList(sortOrder, filterText, stylesToHide, allergensToHide, statusToHide);
             case LOW_NO:
                 return fBeers.lowNoAlcoholBeersList(sortOrder, filterText, stylesToHide, allergensToHide, statusToHide, LOW_NO_CATEGORY);
             default:
-                return fBeers.allBeersList(sortOrder, filterText, stylesToHide, allergensToHide, statusToHide);
+                return fBeers.allBeersList(sortOrder, filterText, stylesToHide, allergensToHide, statusToHide, LOW_NO_CATEGORY);
         }
     }
 
