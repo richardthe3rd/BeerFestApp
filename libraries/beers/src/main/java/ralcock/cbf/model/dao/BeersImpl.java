@@ -211,6 +211,7 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
         }
     }
 
+    @Override
     /**
      * Returns a list of beers filtered by the specified low/no alcohol category.
      * <p>
