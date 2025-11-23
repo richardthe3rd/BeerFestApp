@@ -213,9 +213,9 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
 
     @Override
     /**
-     * Returns a list of beers filtered by the specified low/no alcohol category.
+     * Returns a list of beers filtered by the specified category from the database.
      * <p>
-     * This method retrieves beers that match the given category (e.g., "Low Alcohol" or "No Alcohol"),
+     * This method retrieves beers that match the given category field value (e.g., "low-no"),
      * applying additional filters for sort order, text search, styles, allergens, and status.
      * Unlike {@link #allBeersList}, which excludes a category, this method includes only beers
      * in the specified category.
@@ -225,7 +225,7 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
      * @param stylesToHide     set of beer styles to exclude from the results
      * @param allergensToHide  set of allergens to exclude beers containing them
      * @param statusToHide     set of beer statuses to exclude
-     * @param category         the category of beers to include (e.g., "Low Alcohol", "No Alcohol")
+     * @param category         the category field value to match (e.g., "low-no" for low/no alcohol beers)
      * @return a list of beers matching the specified category and filters
      */
     public List<Beer> lowNoAlcoholBeersList(final SortOrder sortOrder,
