@@ -63,16 +63,17 @@ public class MultiUrlInputStream extends InputStream {
     }
 
     private static String readEntireStream(final InputStream inputStream) throws IOException {
-        Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
         StringBuilder builder = new StringBuilder();
         final char[] buffer = new char[0x10000];
         int read;
-        do {
-            read = reader.read(buffer);
-            if (read > 0) {
-                builder.append(buffer, 0, read);
-            }
-        } while (read >= 0);
+        try (Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
+            do {
+                read = reader.read(buffer);
+                if (read > 0) {
+                    builder.append(buffer, 0, read);
+                }
+            } while (read >= 0);
+        }
         return builder.toString();
     }
 
