@@ -2316,6 +2316,11 @@ PersonalRatingEntity (Local only - no sync)
 
 **Local Storage:** 
 - Room Database (SQLite) for drinks, favorites, festivals
+
+> ⚠️ **Breaking Change:**  
+> The current production implementation uses **OrmLite** for local SQLite storage (see `BeerDatabaseHelper.java`). Migrating to Room Database is a significant architectural change and will require a coordinated migration plan, including data migration and updates to all data access code.  
+> **Do not implement Room without planning for migration from OrmLite.**  
+> See project documentation for migration guidelines and ensure all stakeholders are aware of this change.
 - SharedPreferences OR Room for personal ratings (local only)
   - Key format: `rating_${festivalId}_${drinkId}`
   - No userId needed (device-local)
