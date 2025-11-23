@@ -191,14 +191,39 @@ public final class Beer implements Serializable {
         return lowerAllergens.contains(allergen.toLowerCase());
     }
 
+    /**
+     * Returns the category of this beer.
+     * <p>
+     * The category indicates the type of beer, such as "beer" for standard beers,
+     * or "low-no" for low or no alcohol beers. Other possible values may be defined
+     * by the festival or data source.
+     *
+     * @return the category string for this beer (e.g., "beer", "low-no")
+     */
     public String getCategory() {
         return fCategory;
     }
 
+    /**
+     * Sets the category for this beer.
+     * <p>
+     * Valid category values include "beer" for standard beers and "low-no" for low or no alcohol beers.
+     * Other values may be used as defined by the festival or data source.
+     *
+     * @param category the category string to set (e.g., "beer", "low-no")
+     */
     public void setCategory(final String category) {
         fCategory = category;
     }
 
+    /**
+     * Determines if this beer is classified as low or no alcohol.
+     * <p>
+     * A beer is considered low or no alcohol if its ABV (Alcohol By Volume) is less than or equal to 0.5%.
+     * This threshold is used to identify beers that are suitable for those seeking minimal or no alcohol content.
+     *
+     * @return true if the beer's ABV is less than or equal to 0.5%, false otherwise
+     */
     public boolean isLowOrNoAlcohol() {
         return fAbv <= 0.5f;
     }
