@@ -9,6 +9,7 @@ public class BeerBuilder {
     private String fStatus = "";
     private String fDispense = "";
     private String fAllergens = "";
+    private String fCategory = "beer";
     private Brewery fBrewery = null;
 
     public static BeerBuilder aBeer() {
@@ -55,13 +56,18 @@ public class BeerBuilder {
         return this;
     }
 
+    public BeerBuilder withCategory(String category) {
+        fCategory = category;
+        return this;
+    }
+
     public BeerBuilder fromBrewery(Brewery brewery) {
         fBrewery = brewery;
         return this;
     }
 
     public Beer build() {
-        return new Beer(fFestivalId, fName, fAbv, fDescription, fStyle, fStatus, fDispense, fAllergens, fBrewery);
+        return new Beer(fFestivalId, fName, fAbv, fDescription, fStyle, fStatus, fDispense, fAllergens, fCategory, fBrewery);
     }
 
     public BeerBuilder from(final BreweryBuilder breweryBuilder) {

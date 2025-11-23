@@ -27,6 +27,13 @@ public interface Beers extends Dao<Beer, Long> {
                                    Set<String> allergensToHide,
                                    Set<String> statusToHide);
 
+    List<Beer> lowNoAlcoholBeersList(SortOrder sortOrder,
+                                     CharSequence filterText,
+                                     Set<String> filterStyles,
+                                     Set<String> allergensToHide,
+                                     Set<String> statusToHide,
+                                     float maxAbv);
+
     void updateFromFestivalOrCreate(Beer beer);
 
     Set<String> getAvailableStyles();

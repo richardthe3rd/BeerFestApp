@@ -54,6 +54,11 @@ fieldName=fDispense
 columnName=dispense
 # --field-end--
 # --field-start--
+fieldName=fCategory
+columnName=category
+indexName=beers_category_idx
+# --field-end--
+# --field-start--
 fieldName=fIsOnWishList
 columnName=on_wish_list
 indexName=beers_on_wish_list_idx

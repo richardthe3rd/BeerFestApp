@@ -159,6 +159,21 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
         }
     }
 
+    public List<Beer> lowNoAlcoholBeersList(final SortOrder sortOrder,
+                                            final CharSequence filterText,
+                                            final Set<String> stylesToHide,
+                                            final Set<String> allergensToHide,
+                                            final Set<String> statusToHide,
+                                            final float maxAbv) {
+        QueryBuilder<Beer, Long> query = buildLowNoAlcoholQuery(sortOrder, filterText, stylesToHide, statusToHide, maxAbv);
+        try {
+            List<Beer> beers = query.query();
+            return filterByAllergens(beers, allergensToHide);
+        } catch (SQLException e) {
+            throw newBeerAccessException("Failed to get low/no alcohol beer list", e);
+        }
+    }
+
     private List<Beer> filterByAllergens(final List<Beer> beers, final Set<String> allergensToHide) {
         if (allergensToHide == null || allergensToHide.isEmpty()) {
             return beers;
@@ -216,6 +231,23 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
         }
     }
 
+    private QueryBuilder<Beer, Long> buildLowNoAlcoholQuery(final SortOrder sortOrder,
+                                                            final CharSequence filterText,
+                                                            final Set<String> stylesToHide,
+                                                            final Set<String> statusToHide,
+                                                            final float maxAbv) {
+        QueryBuilder<Beer, Long> qb = queryBuilder();
+        Where where = qb.where();
+        try {
+            doWhere(where, fBreweries, filterText, stylesToHide, statusToHide);
+            where.and().le(Beer.ABV_FIELD, maxAbv);
+            qb.orderBy(sortOrder.columnName(), sortOrder.ascending());
+            return qb;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static void doWhere(final Where where,
                                 final Breweries breweries,
                                 final CharSequence filterText,
@@ -262,6 +294,7 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
         SelectArg beerStatus = new SelectArg(festivalBeerDescription.getStatus());
         SelectArg beerStyle = new SelectArg(festivalBeerDescription.getStyle());
         SelectArg beerAllergens = new SelectArg(festivalBeerDescription.getAllergens());
+        SelectArg beerCategory = new SelectArg(festivalBeerDescription.getCategory());
         SelectArg beerFestivalId = new SelectArg(festivalBeerDescription.getFestivalID());
 
         UpdateBuilder<Beer, Long> updateBuilder = updateBuilder();
@@ -272,6 +305,7 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
         updateBuilder.updateColumnValue(Beer.STATUS_FIELD, beerStatus);
         updateBuilder.updateColumnValue(Beer.STYLE_FIELD, beerStyle);
         updateBuilder.updateColumnValue(Beer.ALLERGENS_FIELD, beerAllergens);
+        updateBuilder.updateColumnValue(Beer.CATEGORY_FIELD, beerCategory);
 
         updateBuilder.where().eq(Beer.FESTIVAL_ID_FIELD, beerFestivalId);
         PreparedUpdate<Beer> preparedUpdate = updateBuilder.prepare();

@@ -8,7 +8,7 @@ import android.content.Context;
 
 public class BeerListFragmentPagerAdapter extends FragmentPagerAdapter {
     private static final String TAG = BeerListFragmentPagerAdapter.class.getName();
-    private final String tabTitles[] = new String[] { "All Beers", "Bookmarks" };
+    private final String tabTitles[] = new String[] { "Beer", "Low/No", "Bookmarks" };
     // private Context context;
 
     public BeerListFragmentPagerAdapter(FragmentManager fm, Context context) {
@@ -18,16 +18,21 @@ public class BeerListFragmentPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 2;
+        return 3;
     }
 
     @Override
     public Fragment getItem(int position) {
         Log.i(TAG, "Returning new BeerListFragment for position " + position);
-        if (position == 0) {
-            return new AllBeersListFragment();
-        } else {
-            return new BookmarkedBeerListFragment();
+        switch (position) {
+            case 0:
+                return new AllBeersListFragment();
+            case 1:
+                return new LowNoAlcoholListFragment();
+            case 2:
+                return new BookmarkedBeerListFragment();
+            default:
+                return new AllBeersListFragment();
         }
     }
 

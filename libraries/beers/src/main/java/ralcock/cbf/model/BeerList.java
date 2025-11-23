@@ -11,8 +11,11 @@ public class BeerList {
 
     private static enum Type {
         ALL,
-        BOOKMARKS
+        BOOKMARKS,
+        LOW_NO
     }
+
+    private static final float LOW_NO_MAX_ABV = 0.5f;
 
     public static class Config {
         public Config() {
@@ -154,10 +157,15 @@ public class BeerList {
                                  final Set<String> stylesToHide,
                                  final Set<String> allergensToHide,
                                  final Set<String> statusToHide) {
-        if (fType == Type.ALL)
-            return fBeers.allBeersList(sortOrder, filterText, stylesToHide, allergensToHide, statusToHide);
-        else {
-            return fBeers.bookmarkedBeersList(sortOrder, filterText, stylesToHide, allergensToHide, statusToHide);
+        switch (fType) {
+            case ALL:
+                return fBeers.allBeersList(sortOrder, filterText, stylesToHide, allergensToHide, statusToHide);
+            case BOOKMARKS:
+                return fBeers.bookmarkedBeersList(sortOrder, filterText, stylesToHide, allergensToHide, statusToHide);
+            case LOW_NO:
+                return fBeers.lowNoAlcoholBeersList(sortOrder, filterText, stylesToHide, allergensToHide, statusToHide, LOW_NO_MAX_ABV);
+            default:
+                return fBeers.allBeersList(sortOrder, filterText, stylesToHide, allergensToHide, statusToHide);
         }
     }
 
@@ -169,6 +177,11 @@ public class BeerList {
     public static BeerList bookmarkedBeers(final Beers beers,
                                            final Config config) {
         return new BeerList(beers, Type.BOOKMARKS, config);
+    }
+
+    public static BeerList lowNoAlcoholBeers(final Beers beers,
+                                              final Config config) {
+        return new BeerList(beers, Type.LOW_NO, config);
     }
 
 }

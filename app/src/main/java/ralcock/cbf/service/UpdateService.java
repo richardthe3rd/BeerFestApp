@@ -123,9 +123,8 @@ public class UpdateService extends OrmLiteBaseService<BeerDatabaseHelper> {
 
             @Override
             InputStream openStream() throws IOException {
-                String beerJsonURL = getString(R.string.beer_list_url);
-                URL url = new URL(beerJsonURL);
-                return url.openStream();
+                String[] beerListUrls = getResources().getStringArray(R.array.beer_list_urls);
+                return new MultiUrlInputStream(beerListUrls);
             }
 
             @Override

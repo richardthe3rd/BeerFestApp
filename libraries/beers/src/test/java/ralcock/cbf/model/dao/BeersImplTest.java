@@ -25,7 +25,7 @@ public class BeersImplTest {
 
     private static Beer aBeer() {
         return new  Beer("festivalId", "name", 4.2f,
-                         "description", "style", "status", "cask", "", aBrewery());
+                         "description", "style", "status", "cask", "", "beer", aBrewery());
     }
 
     @Before
