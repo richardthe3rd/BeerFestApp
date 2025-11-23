@@ -32,7 +32,7 @@ Festival attendees who need to:
 - Share drink discoveries with friends
 
 ### Technical Context
-- **Platform:** Android (API 26+)
+- **Platform:** Android (API 21+)
 - **Design System:** Material Design 3
 - **Expected Data Volume:** 100+ drinks per festival
 - **Categories:** 10 drink categories (Beer is largest, ~60-70% of drinks)
