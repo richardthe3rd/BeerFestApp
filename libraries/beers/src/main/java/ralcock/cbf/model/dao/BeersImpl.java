@@ -216,7 +216,7 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
     }
 
     /**
-     * Returns a list of beers filtered by the specified low/no alcohol category.
+     * Returns a list of beers filtered by the specified category from the database.
      * <p>
      * This method retrieves beers that match the given category (e.g., "low-no"),
      * applying additional filters for sort order, text search, styles, allergens, and status.
