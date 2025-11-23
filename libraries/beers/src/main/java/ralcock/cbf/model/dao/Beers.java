@@ -32,7 +32,7 @@ public interface Beers extends Dao<Beer, Long> {
                                      Set<String> filterStyles,
                                      Set<String> allergensToHide,
                                      Set<String> statusToHide,
-                                     float maxAbv);
+                                     String category);
 
     void updateFromFestivalOrCreate(Beer beer);
 

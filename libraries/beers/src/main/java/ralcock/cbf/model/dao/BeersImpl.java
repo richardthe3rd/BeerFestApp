@@ -164,8 +164,8 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
                                             final Set<String> stylesToHide,
                                             final Set<String> allergensToHide,
                                             final Set<String> statusToHide,
-                                            final float maxAbv) {
-        QueryBuilder<Beer, Long> query = buildLowNoAlcoholQuery(sortOrder, filterText, stylesToHide, statusToHide, maxAbv);
+                                            final String category) {
+        QueryBuilder<Beer, Long> query = buildLowNoAlcoholQuery(sortOrder, filterText, stylesToHide, statusToHide, category);
         try {
             List<Beer> beers = query.query();
             return filterByAllergens(beers, allergensToHide);
@@ -235,12 +235,12 @@ public class BeersImpl extends BaseDaoImpl<Beer, Long> implements Beers {
                                                             final CharSequence filterText,
                                                             final Set<String> stylesToHide,
                                                             final Set<String> statusToHide,
-                                                            final float maxAbv) {
+                                                            final String category) {
         QueryBuilder<Beer, Long> qb = queryBuilder();
         Where where = qb.where();
         try {
             doWhere(where, fBreweries, filterText, stylesToHide, statusToHide);
-            where.and().le(Beer.ABV_FIELD, maxAbv);
+            where.and().eq(Beer.CATEGORY_FIELD, category);
             qb.orderBy(sortOrder.columnName(), sortOrder.ascending());
             return qb;
         } catch (SQLException e) {

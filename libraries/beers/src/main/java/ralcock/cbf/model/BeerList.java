@@ -15,7 +15,7 @@ public class BeerList {
         LOW_NO
     }
 
-    private static final float LOW_NO_MAX_ABV = 0.5f;
+    private static final String LOW_NO_CATEGORY = "no_low";
 
     public static class Config {
         public Config() {
@@ -163,7 +163,7 @@ public class BeerList {
             case BOOKMARKS:
                 return fBeers.bookmarkedBeersList(sortOrder, filterText, stylesToHide, allergensToHide, statusToHide);
             case LOW_NO:
-                return fBeers.lowNoAlcoholBeersList(sortOrder, filterText, stylesToHide, allergensToHide, statusToHide, LOW_NO_MAX_ABV);
+                return fBeers.lowNoAlcoholBeersList(sortOrder, filterText, stylesToHide, allergensToHide, statusToHide, LOW_NO_CATEGORY);
             default:
                 return fBeers.allBeersList(sortOrder, filterText, stylesToHide, allergensToHide, statusToHide);
         }
