@@ -216,18 +216,6 @@ public final class Beer implements Serializable {
         fCategory = category;
     }
 
-    /**
-     * Determines if this beer is classified as low or no alcohol.
-     * <p>
-     * A beer is considered low or no alcohol if its ABV (Alcohol By Volume) is less than or equal to 0.5%.
-     * This threshold is used to identify beers that are suitable for those seeking minimal or no alcohol content.
-     *
-     * @return true if the beer's ABV is less than or equal to 0.5%, false otherwise
-     */
-    public boolean isLowOrNoAlcohol() {
-        return fAbv <= 0.5f;
-    }
-
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
