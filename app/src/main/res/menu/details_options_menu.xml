@@ -5,7 +5,7 @@
     <item
             android:id="@+id/shareBeer"
             android:title="@string/share_this_beer_title"
+            android:icon="@android:drawable/ic_menu_share"
             app:showAsAction="ifRoom"
-            app:actionProviderClass="androidx.appcompat.widget.ShareActionProvider"
             />
 </menu>

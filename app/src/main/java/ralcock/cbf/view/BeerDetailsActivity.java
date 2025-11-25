@@ -7,9 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuInflater;
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.widget.ShareActionProvider;
 import androidx.core.graphics.Insets;
-import androidx.core.view.MenuItemCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,7 +15,6 @@ import androidx.appcompat.widget.Toolbar;
 import ralcock.cbf.R;
 import ralcock.cbf.actions.BeerSharer;
 import ralcock.cbf.model.Beer;
-import ralcock.cbf.model.BeerChangedListener;
 import ralcock.cbf.model.BeerAccessor;
 
 //OrmLiteBaseActivity<BeerDatabaseHelper>
@@ -28,7 +25,6 @@ public final class BeerDetailsActivity extends AppCompatActivity {
 
     private final BeerSharer fBeerSharer;
     private final BeerAccessor fBeerAccessor;
-    private ShareActionProvider fShareActionProvider;
     private long fBeerId;
 
     public BeerDetailsActivity() {
@@ -75,28 +71,21 @@ public final class BeerDetailsActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.details_options_menu, menu);
-
-        fShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menu.findItem(R.id.shareBeer));
-        fShareActionProvider.setShareIntent(fBeerSharer.makeShareIntent(getBeer()));
-
-        fBeerAccessor.getBeers().addBeerChangedListener(new BeerChangedListener() {
-            public void beerChanged(final Beer beer) {
-                fShareActionProvider.setShareIntent(
-                        fBeerSharer.makeShareIntent(beer));
-            }
-        });
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                setResult(RESULT_OK);
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
+            setResult(RESULT_OK);
+            finish();
+            return true;
+        } else if (itemId == R.id.shareBeer) {
+            fBeerSharer.shareBeer(getBeer());
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
         }
     }
 
