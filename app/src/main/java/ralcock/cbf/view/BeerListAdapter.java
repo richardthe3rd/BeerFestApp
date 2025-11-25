@@ -61,14 +61,8 @@ public final class BeerListAdapter extends BaseAdapter implements Filterable {
         beerListItemView.BeerStyle.setText(beer.getStyle());
         beerListItemView.BeerDispense.setText(beer.getDispenseMethod());
 
-        // Display allergen abbreviations
-        if (beer.hasAllergens()) {
-            String allergenAbbrevs = AllergenHelper.toAbbreviations(beer.getAllergens());
-            beerListItemView.BeerAllergens.setText(allergenAbbrevs);
-            beerListItemView.BeerAllergens.setVisibility(View.VISIBLE);
-        } else {
-            beerListItemView.BeerAllergens.setVisibility(View.GONE);
-        }
+        // Allergens display removed - hide the field
+        beerListItemView.BeerAllergens.setVisibility(View.GONE);
 
         if (beer.isIsOnWishList()) {
             beerListItemView.BookmarkImage.setImageResource(R.drawable.ic_bookmark_black_48dp);

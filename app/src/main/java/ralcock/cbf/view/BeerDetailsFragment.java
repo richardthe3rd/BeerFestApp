@@ -61,14 +61,8 @@ public class BeerDetailsFragment extends Fragment {
         fBeerDetailsView.BreweryDescription.setText(beer.getBrewery().getDescription());
         fBeerDetailsView.BeerDispense.setText(beer.getDispenseMethod());
 
-        // Display allergens
-        if (beer.hasAllergens()) {
-            String allergenText = AllergenHelper.toDisplayText(beer.getAllergens());
-            fBeerDetailsView.Allergens.setText(allergenText);
-            fBeerDetailsView.Allergens.setVisibility(View.VISIBLE);
-        } else {
-            fBeerDetailsView.Allergens.setVisibility(View.GONE);
-        }
+        // Allergens display removed - hide the field
+        fBeerDetailsView.Allergens.setVisibility(View.GONE);
 
         fBeerDetailsView.BeerRatingBar.setRating(beer.getRating());
 
