@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import ralcock.cbf.R;
 import ralcock.cbf.model.Beer;
 import ralcock.cbf.model.StarRating;
 
@@ -80,7 +81,8 @@ public class BeerExporterTest {
         String subject = intent.getStringExtra(Intent.EXTRA_SUBJECT);
         assertNotNull("Intent should have EXTRA_SUBJECT", subject);
         assertTrue("Subject should contain 'Beers from'", subject.startsWith("Beers from "));
-        assertTrue("Subject should contain festival name", subject.contains("Cambridge Beer Festival"));
+        String festivalName = context.getString(R.string.festival_name);
+        assertTrue("Subject should contain festival name", subject.contains(festivalName));
     }
 
     @Test
