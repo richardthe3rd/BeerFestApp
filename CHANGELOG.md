@@ -7,11 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2025.11.1] - 2025-11-25
+
 ### Added
 - Allergen information display in beer details view ([#8](https://github.com/richardthe3rd/BeerFestApp/issues/8))
 - Allergen abbreviations (using UK FSA standard) in beer list items
 - Filter by allergen functionality to hide beers containing specific allergens
 - AllergenHelper utility class for consistent allergen display across the app
+
+### Changed
+- Share button in beer details now uses Intent.createChooser for full app discovery, consistent with list view long-press behavior ([#96](https://github.com/richardthe3rd/BeerFestApp/pull/96))
 
 ### Fixed
 - Edge-to-edge display compatibility for Android 15+ (SDK 35) ([#60](https://github.com/richardthe3rd/BeerFestApp/issues/60), [#61](https://github.com/richardthe3rd/BeerFestApp/issues/61))
@@ -51,5 +56,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Gradle configuration resolution performance issue
 - Build warnings from deprecated API usage
 
-[Unreleased]: https://github.com/richardthe3rd/BeerFestApp/compare/v2025.11.0...HEAD
+[Unreleased]: https://github.com/richardthe3rd/BeerFestApp/compare/v2025.11.1...HEAD
+[2025.11.1]: https://github.com/richardthe3rd/BeerFestApp/compare/v2025.11.0...v2025.11.1
 [2025.11.0]: https://github.com/richardthe3rd/BeerFestApp/releases/tag/v2025.11.0
