@@ -15,19 +15,20 @@ public class BeerTest
     private static final String STATUS = "Available";
     private static final String DISPENSE = "Cask";
     private static final String ALLERGENS = "";
+    private static final String CATEGORY = "beer";
 
     private Brewery createTestBrewery() {
         return new Brewery("brew123", "Test Brewery", "A test brewery");
     }
 
     private Beer createTestBeer() {
-        return new Beer(FESTIVAL_ID, NAME, ABV, DESCRIPTION, STYLE, STATUS, DISPENSE, ALLERGENS, createTestBrewery());
+        return new Beer(FESTIVAL_ID, NAME, ABV, DESCRIPTION, STYLE, STATUS, DISPENSE, ALLERGENS, CATEGORY, createTestBrewery());
     }
 
     @Test
     public void constructor() {
         Brewery brewery = createTestBrewery();
-        Beer beer = new Beer(FESTIVAL_ID, NAME, ABV, DESCRIPTION, STYLE, STATUS, DISPENSE, ALLERGENS, brewery);
+        Beer beer = new Beer(FESTIVAL_ID, NAME, ABV, DESCRIPTION, STYLE, STATUS, DISPENSE, ALLERGENS, CATEGORY, brewery);
 
         assertThat(beer.getFestivalID(), equalTo(FESTIVAL_ID));
         assertThat(beer.getName(), equalTo(NAME));
@@ -37,6 +38,7 @@ public class BeerTest
         assertThat(beer.getStatus(), equalTo(STATUS));
         assertThat(beer.getDispenseMethod(), equalTo(DISPENSE));
         assertThat(beer.getAllergens(), equalTo(ALLERGENS));
+        assertThat(beer.getCategory(), equalTo(CATEGORY));
         assertThat(beer.getBrewery(), equalTo(brewery));
     }
 
@@ -78,8 +80,8 @@ public class BeerTest
 
     @Test
     public void equalsWithNullBrewery() {
-        Beer beer1 = new Beer(FESTIVAL_ID, NAME, ABV, DESCRIPTION, STYLE, STATUS, DISPENSE, ALLERGENS, null);
-        Beer beer2 = new Beer(FESTIVAL_ID, NAME, ABV, DESCRIPTION, STYLE, STATUS, DISPENSE, ALLERGENS, null);
+        Beer beer1 = new Beer(FESTIVAL_ID, NAME, ABV, DESCRIPTION, STYLE, STATUS, DISPENSE, ALLERGENS, CATEGORY, null);
+        Beer beer2 = new Beer(FESTIVAL_ID, NAME, ABV, DESCRIPTION, STYLE, STATUS, DISPENSE, ALLERGENS, CATEGORY, null);
         assertThat(beer1, equalTo(beer2));
     }
 
@@ -87,22 +89,22 @@ public class BeerTest
     public void notEqualsWithDifferentBrewery() {
         Brewery brewery1 = new Brewery("brew1", "Brewery 1", "Description 1");
         Brewery brewery2 = new Brewery("brew2", "Brewery 2", "Description 2");
-        Beer beer1 = new Beer(FESTIVAL_ID, NAME, ABV, DESCRIPTION, STYLE, STATUS, DISPENSE, ALLERGENS, brewery1);
-        Beer beer2 = new Beer(FESTIVAL_ID, NAME, ABV, DESCRIPTION, STYLE, STATUS, DISPENSE, ALLERGENS, brewery2);
+        Beer beer1 = new Beer(FESTIVAL_ID, NAME, ABV, DESCRIPTION, STYLE, STATUS, DISPENSE, ALLERGENS, CATEGORY, brewery1);
+        Beer beer2 = new Beer(FESTIVAL_ID, NAME, ABV, DESCRIPTION, STYLE, STATUS, DISPENSE, ALLERGENS, CATEGORY, brewery2);
         assertThat(beer1, not(equalTo(beer2)));
     }
 
     @Test
     public void notEqualsWithDifferentName() {
-        Beer beer1 = new Beer(FESTIVAL_ID, "Beer A", ABV, DESCRIPTION, STYLE, STATUS, DISPENSE, ALLERGENS, createTestBrewery());
-        Beer beer2 = new Beer(FESTIVAL_ID, "Beer B", ABV, DESCRIPTION, STYLE, STATUS, DISPENSE, ALLERGENS, createTestBrewery());
+        Beer beer1 = new Beer(FESTIVAL_ID, "Beer A", ABV, DESCRIPTION, STYLE, STATUS, DISPENSE, ALLERGENS, CATEGORY, createTestBrewery());
+        Beer beer2 = new Beer(FESTIVAL_ID, "Beer B", ABV, DESCRIPTION, STYLE, STATUS, DISPENSE, ALLERGENS, CATEGORY, createTestBrewery());
         assertThat(beer1, not(equalTo(beer2)));
     }
 
     @Test
     public void notEqualsWithDifferentAbv() {
-        Beer beer1 = new Beer(FESTIVAL_ID, NAME, 4.5f, DESCRIPTION, STYLE, STATUS, DISPENSE, ALLERGENS, createTestBrewery());
-        Beer beer2 = new Beer(FESTIVAL_ID, NAME, 6.5f, DESCRIPTION, STYLE, STATUS, DISPENSE, ALLERGENS, createTestBrewery());
+        Beer beer1 = new Beer(FESTIVAL_ID, NAME, 4.5f, DESCRIPTION, STYLE, STATUS, DISPENSE, ALLERGENS, CATEGORY, createTestBrewery());
+        Beer beer2 = new Beer(FESTIVAL_ID, NAME, 6.5f, DESCRIPTION, STYLE, STATUS, DISPENSE, ALLERGENS, CATEGORY, createTestBrewery());
         assertThat(beer1, not(equalTo(beer2)));
     }
 

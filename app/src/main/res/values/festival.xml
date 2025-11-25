@@ -1,9 +1,12 @@
 <resources>
     <string name="app_name">Cambridge Beer Festival</string>
-    <string name="festival_name">Cambridge Beer Festival 2025</string>
-    <string name="festival_hashtag">cbf2025</string>
+    <string name="festival_name">Cambridge Winter Beer Festival 2025</string>
+    <string name="festival_hashtag">cbfw2025</string>
     <string name="festival_website_url">https://www.cambridgebeerfestival.com/</string>
     <string formatted="false" name="share_intent_subject">Drinking a %1$s at the %2$s</string>
     <string formatted="false" name="share_intent_text">Drinking %1$s %2$s</string>
-    <string name="beer_list_url">https://data.cambridgebeerfestival.com/cbf2025/beer.json</string>
+    <string-array name="beer_list_urls">
+        <item>https://data.cambridgebeerfestival.com/cbfw2025/beer.json</item>
+        <item>https://data.cambridgebeerfestival.com/cbfw2025/low-no.json</item>
+    </string-array>
 </resources>
