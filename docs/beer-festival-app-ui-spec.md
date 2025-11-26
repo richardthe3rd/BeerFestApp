@@ -2203,11 +2203,8 @@ fun BeerFestivalTheme(
 Card(
     modifier = Modifier.semantics {
         contentDescription = "Hazy IPA by Cloudwater Brew Co, 6.5 percent ABV"
-        role = Role.Button
     }
 )
-```
-
 ---
 
 ### Performance Targets
