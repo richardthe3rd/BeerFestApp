@@ -35,7 +35,7 @@ Festival attendees who need to:
 - **Platform:** Android (API 21+)
 - **Design System:** Material Design 3
 - **Expected Data Volume:** 100+ drinks per festival
-- **Categories:** 10 drink categories (Beer is largest, ~60-70% of drinks)
+- **Categories:** 5 drink categories from API (beer, cider, perry, mead, foreign beer)
 - **Usage Context:** One-handed operation while standing/walking at festival
 
 ---
@@ -337,11 +337,11 @@ Festival (Context - Top)
 
 **Purpose:** Select drink category and apply additional filters
 
-> **Implementation Note (Current API Limitation):**  
-> The current API (`example-beer-list.json`) does not include a `category` field. It only provides a `style` field (e.g., "Bitter", "IPA", "Stout"). For the Cambridge Beer Festival, all drinks are beer. Until the API is enhanced to support multi-category festivals, implementations should:
-> 1. Hide or simplify the category filter for single-category festivals
-> 2. Use `style` for sub-filtering within the beer category
-> 3. Default to showing a "Style" filter instead of "Category" filter
+> **Implementation Note:**  
+> The API (`docs/api/example-beer-list.json`) provides a `category` field for each product with values like "beer", "cider", "perry", "mead", "foreign beer". The category filter should:
+> 1. Display categories dynamically based on what's available in the festival data
+> 2. Show counts for each category
+> 3. For beer category, optionally allow sub-filtering by `style` field (e.g., "Bitter", "IPA", "Stout")
 
 #### Layout Structure
 
@@ -352,27 +352,23 @@ Festival (Context - Top)
 │ Filters                             │ ← Title (Title Large, 22sp)
 │                                     │
 │ CATEGORY                            │ ← Section label (Label Large)
-│ ○ All (127)                         │
-│ ● Beer (87)                ← Selected (filled radio)
-│ ○ Cider (15)                        │
-│ ○ Wine (12)                         │
-│ ○ Mead (8)                          │
-│ ○ Spirits (6)                       │
-│ ○ Cocktails (5)                     │
-│ ○ Sake (3)                          │
-│ ○ Kombucha (2)                      │
-│ ○ Low/No Alcohol (1)                │
+│ ○ All (50)                          │
+│ ● Beer (40)               ← Selected (filled radio)
+│ ○ Cider (5)                         │
+│ ○ Perry (2)                         │
+│ ○ Mead (2)                          │
+│ ○ Foreign Beer (1)                  │
 │                                     │
 │ ABV RANGE                           │ ← Section label
 │ ●━━━━━○━━━━━━━━━━━●                 │ ← RangeSlider
-│ 0%                        12%       │ ← Current values
+│ 0%                        15%       │ ← Current values
 │                                     │
 │ QUICK FILTERS                       │
 │ ☑ Show favorites only               │ ← Checkbox
 │ ☐ Available now                     │
 │                                     │
 │ ┌──────────┐  ┌──────────────────┐ │
-│ │  Clear   │  │  Apply (87)      │ │ ← Buttons
+│ │  Clear   │  │  Apply (40)      │ │ ← Buttons
 │ └──────────┘  └──────────────────┘ │
 │                                     │
 └─────────────────────────────────────┘
@@ -1794,11 +1790,8 @@ Material 3 uses tonal elevation (color overlays) rather than shadows:
 
 ## End-to-End Test Scenarios
 
-> **Note on Test Data Requirements:**  
-> Some tests (e.g., E2E Test 2: Filter by Category) assume an API that includes a `category` field with multiple drink categories (beer, cider, wine, etc.). The current API (`example-beer-list.json`) only provides a `style` field and all drinks are beer. For testing with current API data:
-> - Tests involving category filtering should use `style` instead
-> - Or use mock data that includes the proposed `category` field
-> - Or skip category filter tests until API is enhanced
+> **Note on Test Data:**  
+> The API (`docs/api/example-beer-list.json`) includes a `category` field with values like "beer", "cider", "perry", "mead", "foreign beer". Tests should use this example data or similar test fixtures that include multiple categories for comprehensive category filtering tests.
 
 ### E2E Test 1: Browse and Favorite Flow
 
@@ -2260,23 +2253,25 @@ DrinkEntity
 ├── festivalId: String (foreign key - derived from festival context)
 ├── name: String (product.name)
 ├── brewery: String (producer.name)
-├── breweryLocation: String? (parsed from producer.notes - e.g., "Southwold, Suffolk est. 1890")
-├── style: String (product.style - e.g., "Bitter", "IPA", "Stout", "Golden Ale")
+├── breweryLocation: String? (producer.location - e.g., "Southwold, Suffolk")
+├── category: String (product.category - e.g., "beer", "cider", "perry", "mead", "foreign beer")
+├── style: String? (product.style - e.g., "Bitter", "IPA", "Stout", "Golden Ale"; nullable for non-beer categories)
+├── dispense: String (product.dispense - e.g., "cask", "keg", "keykeg", "bottle", "cider tub", "mead polypin")
 ├── abv: Float (product.abv - parsed from string)
 ├── description: String? (product.notes)
-├── statusText: String? (product.status_text - e.g., "Plenty left", "Sold Out")
-├── category: String? [PROPOSED] (product.category - for future support of beer, cider, mead, perry, wine, low-no; not in current API)
-├── dispense: String? [PROPOSED] (product.dispense - Keg, Cask, Polypin, Bottle, Can, KeyKeg; not in current API)
-├── bar: String? [PROPOSED] (product.bar - e.g., "Arctic", "Main Bar"; not in current API)
-└── allergens: Map<String, Int>? [PROPOSED] (product.allergens - e.g., {"gluten": 1, "sulphites": 1}; not in current API)
+├── bar: String? (product.bar - e.g., "Main Bar", "Arctic", "Cider Bar"; optional, may not be present for all products)
+├── allergens: Map<String, Int>? (product.allergens - e.g., {"gluten": 1, "sulphites": 1}; empty object if no allergens)
+└── statusText: String? (product.status_text - e.g., "Plenty left", "Sold Out", "Available", "Arrived")
 
-> **Note on Current vs. Proposed Fields:**
-> The fields marked `[PROPOSED]` are not present in the current API (`example-beer-list.json`) and represent future enhancements. The current API provides: `id`, `name`, `style`, `notes`, `abv`, and `status_text` for products. Producers provide `id`, `name`, `notes` (containing location info), and `products` array.
+> **Note on API Reference:**
+> This data model is based on the latest API structure in `docs/api/example-beer-list.json`. The API provides:
+> - **Producer fields:** `id`, `name`, `location`, `year_founded` (optional), `notes`, `products` array
+> - **Product fields:** `id`, `name`, `category`, `style` (nullable), `dispense`, `abv`, `notes`, `status_text`, `bar` (optional), `allergens`
 >
-> For category filtering (a key feature in this spec), until a `category` field is added to the API, the app could:
-> 1. Default all drinks to "beer" category for the current Cambridge Beer Festival data
-> 2. Derive category from `style` field (e.g., styles containing "Cider", "Perry", "Mead" would map to those categories)
-> 3. Wait for API enhancement to add explicit category support
+> Some fields are optional and may be missing:
+> - `bar` - may not be present for products without assigned bar locations
+> - `style` - may be null for non-beer categories like cider, perry, or mead
+> - `allergens` - present but may be an empty object `{}`
 **Availability Status Mapping:**
 For UI display, map statusText to availability enum:
 - "Plenty left" / "Arrived" / "Available" → "plenty" (green 🟢)
