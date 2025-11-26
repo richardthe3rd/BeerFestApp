@@ -337,6 +337,12 @@ Festival (Context - Top)
 
 **Purpose:** Select drink category and apply additional filters
 
+> **Implementation Note (Current API Limitation):**  
+> The current API (`example-beer-list.json`) does not include a `category` field. It only provides a `style` field (e.g., "Bitter", "IPA", "Stout"). For the Cambridge Beer Festival, all drinks are beer. Until the API is enhanced to support multi-category festivals, implementations should:
+> 1. Hide or simplify the category filter for single-category festivals
+> 2. Use `style` for sub-filtering within the beer category
+> 3. Default to showing a "Style" filter instead of "Category" filter
+
 #### Layout Structure
 
 ```
@@ -1788,6 +1794,12 @@ Material 3 uses tonal elevation (color overlays) rather than shadows:
 
 ## End-to-End Test Scenarios
 
+> **Note on Test Data Requirements:**  
+> Some tests (e.g., E2E Test 2: Filter by Category) assume an API that includes a `category` field with multiple drink categories (beer, cider, wine, etc.). The current API (`example-beer-list.json`) only provides a `style` field and all drinks are beer. For testing with current API data:
+> - Tests involving category filtering should use `style` instead
+> - Or use mock data that includes the proposed `category` field
+> - Or skip category filter tests until API is enhanced
+
 ### E2E Test 1: Browse and Favorite Flow
 
 **Test Name:** `test_browse_and_favorite_drink`
@@ -2244,21 +2256,27 @@ FestivalEntity
 └── drinks: List<DrinkEntity>
 
 DrinkEntity
-├── id: String (SHA-1 hash from API)
-├── festivalId: String (foreign key)
+├── id: String (product.id - SHA-1 hash from API)
+├── festivalId: String (foreign key - derived from festival context)
 ├── name: String (product.name)
 ├── brewery: String (producer.name)
-├── breweryLocation: String (producer.location - e.g., "Ellon, Scotland")
-├── category: String (product.category - beer, cider, mead, perry, wine, low-no)
-├── style: String? (product.style - nullable)
+├── breweryLocation: String? (parsed from producer.notes - e.g., "Southwold, Suffolk est. 1890")
+├── style: String (product.style - e.g., "Bitter", "IPA", "Stout", "Golden Ale")
 ├── abv: Float (product.abv - parsed from string)
 ├── description: String? (product.notes)
-├── dispense: String (product.dispense - Keg, Cask, Polypin, Bottle, Can, KeyKeg)
-├── bar: String? [PROPOSED] (product.bar - e.g., "Arctic", "Main Bar"; optional, may be missing for festivals with a single bar or legacy APIs. This is a proposed new field and may not exist in current APIs. If not present in the API, set to null.)
-├── allergens: Map<String, Int>? (product.allergens - {"gluten": 1, "sulphites": 1})
-└── statusText: String? (product.status_text - "Plenty left", "Running low", "Sold out")
+├── statusText: String? (product.status_text - e.g., "Plenty left", "Sold Out")
+├── category: String? [PROPOSED] (product.category - for future support of beer, cider, mead, perry, wine, low-no; not in current API)
+├── dispense: String? [PROPOSED] (product.dispense - Keg, Cask, Polypin, Bottle, Can, KeyKeg; not in current API)
+├── bar: String? [PROPOSED] (product.bar - e.g., "Arctic", "Main Bar"; not in current API)
+└── allergens: Map<String, Int>? [PROPOSED] (product.allergens - e.g., {"gluten": 1, "sulphites": 1}; not in current API)
 
-> **Note:** The `bar` field is optional and may not be present in all API responses. For festivals with a single bar, or for legacy data sources that do not provide a `bar` field, this value should be set to `null`. Only use this field if the API includes it.
+> **Note on Current vs. Proposed Fields:**
+> The fields marked `[PROPOSED]` are not present in the current API (`example-beer-list.json`) and represent future enhancements. The current API provides: `id`, `name`, `style`, `notes`, `abv`, and `status_text` for products. Producers provide `id`, `name`, `notes` (containing location info), and `products` array.
+>
+> For category filtering (a key feature in this spec), until a `category` field is added to the API, the app could:
+> 1. Default all drinks to "beer" category for the current Cambridge Beer Festival data
+> 2. Derive category from `style` field (e.g., styles containing "Cider", "Perry", "Mead" would map to those categories)
+> 3. Wait for API enhancement to add explicit category support
 **Availability Status Mapping:**
 For UI display, map statusText to availability enum:
 - "Plenty left" / "Arrived" / "Available" → "plenty" (green 🟢)
