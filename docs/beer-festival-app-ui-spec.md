@@ -1,6 +1,6 @@
 # Beer Festival App - UI Specification
 
-**Version:** 1.5  
+**Version:** 1.6  
 **Date:** November 23, 2025  
 **Platform:** Android  
 **Design System:** Material Design 3
@@ -200,11 +200,12 @@ Festival (Context - Top)
 ```
 
 **Brewery Location:**
-- Shows producer location from API
-- Format: "BrewDog • Ellon, Scotland"
+- Shows producer location parsed from producer.notes (see "Brewery Location Parsing" section)
+- Format: "Adnams • Southwold, Suffolk"
 - Uses bullet separator between name and location
 - Typography: Body Medium (14sp), Medium emphasis
 - Truncates location if very long
+- If location parsing fails, show brewery name only
 
 **Dispense Field:**
 - Shows how drink is served: Keg, Cask, Polypin, Bottle, Can, etc.
@@ -1179,7 +1180,7 @@ Festival (Context - Top)
 - `drinkId: String`
 - `drinkName: String`
 - `breweryName: String`
-- `breweryLocation: String` (e.g., "Ellon, Scotland")
+- `breweryLocation: String?` (e.g., "Southwold, Suffolk"; parsed from producer.notes, may be null)
 - `abv: Float`
 - `style: String`
 - `dispense: String` (Keg, Cask, Polypin, Bottle, Can, etc.)
@@ -2251,7 +2252,7 @@ DrinkEntity
 ├── festivalId: String (foreign key)
 ├── name: String (product.name)
 ├── brewery: String (producer.name)
-├── breweryLocation: String (producer.location - e.g., "Ellon, Scotland")
+├── breweryLocation: String? (parsed from producer.notes - e.g., "Southwold, Suffolk"; see parsing note below)
 ├── category: String (product.category - beer, cider, mead, perry, wine, low-no)
 ├── style: String? (product.style - nullable)
 ├── abv: Float (product.abv - parsed from string)
@@ -2262,6 +2263,43 @@ DrinkEntity
 └── statusText: String? (product.status_text - "Plenty left", "Running low", "Sold out")
 
 > **Note:** The `bar` field is optional and may not be present in all API responses. For festivals with a single bar, or for legacy data sources that do not provide a `bar` field, this value should be set to `null`. Only use this field if the API includes it.
+
+**Brewery Location Parsing:**
+The `breweryLocation` field is derived from the `producer.notes` field in the API. The `notes` field contains combined location and establishment year information in the format: `"Location, Region est. YEAR"`. 
+
+Example API values:
+- `"Southwold, Suffolk est. 1890"` → `"Southwold, Suffolk"`
+- `"Lawrence Hill, Bristol est. 2007"` → `"Lawrence Hill, Bristol"`
+- `"Cambridge, Cambs est. 2013"` → `"Cambridge, Cambs"`
+- `"London est. 2008"` → `"London"`
+
+```kotlin
+/**
+ * Parses brewery location from producer.notes field.
+ * The notes field typically contains: "Location est. Year" or "Location, Region est. Year"
+ * 
+ * @param notes The producer.notes value from the API
+ * @return The location portion, or null if parsing fails
+ */
+fun parseBreweryLocation(notes: String?): String? {
+  if (notes.isNullOrBlank()) return null
+  
+  // Pattern: everything before " est." (case insensitive)
+  val estPattern = Regex("""\s+est\.\s*""", RegexOption.IGNORE_CASE)
+  val match = estPattern.find(notes)
+  
+  return if (match != null && match.range.first > 0) {
+    notes.substring(0, match.range.first).trim()
+  } else {
+    // If no "est." found, return the whole notes as location
+    // (may be just a location without establishment year)
+    notes.trim().takeIf { it.isNotEmpty() }
+  }
+}
+```
+
+> **Note:** If the API is updated in the future to provide a dedicated `producer.location` field, prefer using that over parsing `producer.notes`.
+
 **Availability Status Mapping:**
 For UI display, map statusText to availability enum:
 - "Plenty left" / "Arrived" / "Available" → "plenty" (green 🟢)
@@ -2637,6 +2675,7 @@ PersonalRatingEntity (Local only - no sync)
 | 1.3 | Nov 23, 2025 | Update | Added Festival Overview screen with dates, location, maps, and website links |
 | 1.4 | Nov 23, 2025 | Update | Changed "format/serving" to "dispense" field; Enhanced Similar Drinks with filter chips |
 | 1.5 | Nov 23, 2025 | Update | API compatibility update: Removed IBU and price; Added bar and brewery location fields |
+| 1.6 | Nov 26, 2025 | Update | Fixed breweryLocation field mapping: changed from non-existent producer.location to parsing from producer.notes; Added parsing function and examples |
 
 ---
 
