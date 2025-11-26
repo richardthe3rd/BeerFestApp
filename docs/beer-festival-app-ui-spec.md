@@ -2275,7 +2275,7 @@ DrinkEntity
 **Availability Status Mapping:**
 For UI display, map statusText to availability enum:
 - "Plenty left" / "Arrived" / "Available" → "plenty" (green 🟢)
-- "Running low" / "Low" → "low" (amber ⚠️)
+- "A little remaining" / "Some remaining" / "Running low" / "Low" / "Nearly finished!" → "low" (amber ⚠️)
 - "Sold out" / "Out" → "out" (red ⭕)
 - null → hide indicator
 
@@ -2286,6 +2286,8 @@ fun mapAvailabilityStatus(statusText: String?): AvailabilityStatus? {
     statusText.contains("plenty", ignoreCase = true) -> AvailabilityStatus.PLENTY
     statusText.contains("arrived", ignoreCase = true) -> AvailabilityStatus.PLENTY
     statusText.contains("available", ignoreCase = true) -> AvailabilityStatus.PLENTY
+    statusText.contains("remaining", ignoreCase = true) -> AvailabilityStatus.LOW
+    statusText.contains("nearly", ignoreCase = true) -> AvailabilityStatus.LOW
     statusText.contains("low", ignoreCase = true) -> AvailabilityStatus.LOW
     statusText.contains("out", ignoreCase = true) -> AvailabilityStatus.OUT
     statusText.contains("sold", ignoreCase = true) -> AvailabilityStatus.OUT
