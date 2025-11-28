@@ -35,7 +35,7 @@ Festival attendees who need to:
 - **Platform:** Android (API 21+)
 - **Design System:** Material Design 3
 - **Expected Data Volume:** 100+ drinks per festival
-- **Categories:** 10 drink categories (Beer is largest, ~60-70% of drinks)
+- **Categories:** 5 drink categories from API (beer, cider, perry, mead, foreign beer)
 - **Usage Context:** One-handed operation while standing/walking at festival
 
 ---
@@ -338,6 +338,12 @@ Festival (Context - Top)
 
 **Purpose:** Select drink category and apply additional filters
 
+> **Implementation Note:**  
+> The API (`docs/api/example-beer-list.json`) provides a `category` field for each product with values like "beer", "cider", "perry", "mead", "foreign beer". The category filter should:
+> 1. Display categories dynamically based on what's available in the festival data
+> 2. Show counts for each category
+> 3. For beer category, optionally allow sub-filtering by `style` field (e.g., "Bitter", "IPA", "Stout")
+
 #### Layout Structure
 
 ```
@@ -347,27 +353,23 @@ Festival (Context - Top)
 │ Filters                             │ ← Title (Title Large, 22sp)
 │                                     │
 │ CATEGORY                            │ ← Section label (Label Large)
-│ ○ All (127)                         │
-│ ● Beer (87)                ← Selected (filled radio)
-│ ○ Cider (15)                        │
-│ ○ Wine (12)                         │
-│ ○ Mead (8)                          │
-│ ○ Spirits (6)                       │
-│ ○ Cocktails (5)                     │
-│ ○ Sake (3)                          │
-│ ○ Kombucha (2)                      │
-│ ○ Low/No Alcohol (1)                │
+│ ○ All (50)                          │
+│ ● Beer (40)               ← Selected (filled radio)
+│ ○ Cider (5)                         │
+│ ○ Perry (2)                         │
+│ ○ Mead (2)                          │
+│ ○ Foreign Beer (1)                  │
 │                                     │
 │ ABV RANGE                           │ ← Section label
 │ ●━━━━━○━━━━━━━━━━━●                 │ ← RangeSlider
-│ 0%                        12%       │ ← Current values
+│ 0%                        15%       │ ← Current values
 │                                     │
 │ QUICK FILTERS                       │
 │ ☑ Show favorites only               │ ← Checkbox
 │ ☐ Available now                     │
 │                                     │
 │ ┌──────────┐  ┌──────────────────┐ │
-│ │  Clear   │  │  Apply (87)      │ │ ← Buttons
+│ │  Clear   │  │  Apply (40)      │ │ ← Buttons
 │ └──────────┘  └──────────────────┘ │
 │                                     │
 └─────────────────────────────────────┘
@@ -1789,6 +1791,9 @@ Material 3 uses tonal elevation (color overlays) rather than shadows:
 
 ## End-to-End Test Scenarios
 
+> **Note on Test Data:**  
+> The API (`docs/api/example-beer-list.json`) includes a `category` field with values like "beer", "cider", "perry", "mead", "foreign beer". Tests should use this example data or similar test fixtures that include multiple categories for comprehensive category filtering tests.
+
 ### E2E Test 1: Browse and Favorite Flow
 
 **Test Name:** `test_browse_and_favorite_drink`
@@ -2204,8 +2209,11 @@ fun BeerFestivalTheme(
 Card(
     modifier = Modifier.semantics {
         contentDescription = "Hazy IPA by Cloudwater Brew Co, 6.5 percent ABV"
+        role = Role.Button
     }
 )
+```
+
 ---
 
 ### Performance Targets
@@ -2263,8 +2271,8 @@ FestivalEntity
 └── drinks: List<DrinkEntity>
 
 DrinkEntity
-├── id: String (SHA-1 hash from API)
-├── festivalId: String (foreign key)
+├── id: String (product.id - SHA-1 hash from API)
+├── festivalId: String (foreign key - derived from festival context)
 ├── name: String (product.name)
 ├── brewery: String (producer.name)
 ├── breweryLocation: String? (producer.location - e.g., "Southwold, Suffolk"; see field mapping note below)
@@ -2272,10 +2280,19 @@ DrinkEntity
 ├── style: String? (product.style - nullable)
 ├── abv: Float (product.abv - parsed from string)
 ├── description: String? (product.notes)
-├── dispense: String (product.dispense - Keg, Cask, Polypin, Bottle, Can, KeyKeg)
-├── bar: String? [PROPOSED] (product.bar - e.g., "Arctic", "Main Bar"; optional, may be missing for festivals with a single bar or legacy APIs. This is a proposed new field and may not exist in current APIs. If not present in the API, set to null.)
-├── allergens: Map<String, Int>? (product.allergens - {"gluten": 1, "sulphites": 1})
-└── statusText: String? (product.status_text - "Plenty left", "Running low", "Sold out")
+├── bar: String? (product.bar - e.g., "Main Bar", "Arctic", "Cider Bar"; optional, may not be present for all products)
+├── allergens: Map<String, Int>? (product.allergens - e.g., {"gluten": 1, "sulphites": 1}; empty object if no allergens)
+└── statusText: String? (product.status_text - e.g., "Plenty left", "Sold Out", "Available", "Arrived")
+
+> **Note on API Reference:**
+> This data model is based on the latest API structure in `docs/api/example-beer-list.json`. The API provides:
+> - **Producer fields:** `id`, `name`, `location`, `year_founded` (optional), `notes`, `products` array
+> - **Product fields:** `id`, `name`, `category`, `style` (nullable), `dispense`, `abv`, `notes`, `status_text`, `bar` (optional), `allergens`
+>
+> Some fields are optional and may be missing:
+> - `bar` - may not be present for products without assigned bar locations
+> - `style` - may be null for non-beer categories like cider, perry, or mead
+> - `allergens` - present but may be an empty object `{}`
 
 > **Note:** The `bar` field is optional and may not be present in all API responses. For festivals with a single bar, or for legacy data sources that do not provide a `bar` field, this value should be set to `null`. Only use this field if the API includes it.
 
@@ -2338,7 +2355,7 @@ fun getBreweryLocation(location: String?, notes: String?): String? {
 **Availability Status Mapping:**
 For UI display, map statusText to availability enum:
 - "Plenty left" / "Arrived" / "Available" → "plenty" (green 🟢)
-- "Running low" / "Low" → "low" (amber ⚠️)
+- "A little remaining" / "Some remaining" / "Running low" / "Low" / "Nearly finished!" → "low" (amber ⚠️)
 - "Sold out" / "Out" → "out" (red ⭕)
 - null → hide indicator
 
@@ -2349,6 +2366,8 @@ fun mapAvailabilityStatus(statusText: String?): AvailabilityStatus? {
     statusText.contains("plenty", ignoreCase = true) -> AvailabilityStatus.PLENTY
     statusText.contains("arrived", ignoreCase = true) -> AvailabilityStatus.PLENTY
     statusText.contains("available", ignoreCase = true) -> AvailabilityStatus.PLENTY
+    statusText.contains("remaining", ignoreCase = true) -> AvailabilityStatus.LOW
+    statusText.contains("nearly", ignoreCase = true) -> AvailabilityStatus.LOW
     statusText.contains("low", ignoreCase = true) -> AvailabilityStatus.LOW
     statusText.contains("out", ignoreCase = true) -> AvailabilityStatus.OUT
     statusText.contains("sold", ignoreCase = true) -> AvailabilityStatus.OUT

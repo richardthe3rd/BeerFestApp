@@ -1,0 +1,209 @@
+{
+    "timestamp": "2025-05-24T00:01:00Z",
+    "producers": [
+        {
+            "id": "827bfc458708f0b442009c9c9836f7e4b65557fb",
+            "name": "Adnams",
+            "location": "Southwold, Suffolk",
+            "year_founded": 1890,
+            "notes": "Southwold, Suffolk est. 1890",
+            "products": [
+                {
+                    "id": "ef2afd226e3384e34d9833fe09cd123db498754c",
+                    "name": "Broadside",
+                    "category": "beer",
+                    "style": "Bitter",
+                    "dispense": "cask",
+                    "notes": "Brewed with Pale Ale malt and First Gold hops, Broadside is a dark ruby red beer rich in fruitcake aromas, almonds and conserved fruit.",
+                    "abv": "4.7",
+                    "status_text": "Sold Out",
+                    "bar": "Main Bar",
+                    "allergens": {
+                        "gluten": 1
+                    }
+                },
+                {
+                    "id": "fcbe5b62ba083df3ccf2c3a127ec1ce3ef8fe635",
+                    "name": "Cambridge Beer Festival Special",
+                    "category": "beer",
+                    "style": "Stout",
+                    "dispense": "cask",
+                    "notes": "A one-off, black stout, aged in oak casks previously occupied by Adnams Copper House Distillery's North Cove Vodka. This additional maturation has imparted flavours of vanilla, coffee and chocolate. Warming with a dry finish.",
+                    "abv": "6.0",
+                    "status_text": "Plenty left",
+                    "bar": "Arctic",
+                    "allergens": {
+                        "gluten": 1
+                    }
+                },
+                {
+                    "id": "654c1676d93b0887a95e25fb8d9bb11f91f93780",
+                    "name": "Fat Sprat",
+                    "category": "beer",
+                    "style": "Bitter",
+                    "dispense": "keg",
+                    "notes": "A pale amber summer beer with a lovely citrus, grapefruit aroma and some spicy notes. On the palate, the citrus character of the hops shines through, balanced with a light biscuit flavour and a crisp, dry finish.",
+                    "abv": "3.8",
+                    "status_text": "A little remaining",
+                    "bar": "Main Bar",
+                    "allergens": {
+                        "gluten": 1
+                    }
+                },
+                {
+                    "id": "99f1656c0a34c5664b01116914ada95ffa992028",
+                    "name": "Ghost Ship",
+                    "category": "beer",
+                    "style": "Golden Ale",
+                    "dispense": "cask",
+                    "notes": "This pale ale has a good assertive pithy bitterness and a malty backbone. It is brewed with a selection of malts -- Pale Ale, Rye Crystal and Cara. Citra and a blend of other American hop varieties create some great citrus flavours.",
+                    "abv": "4.5",
+                    "status_text": "Nearly finished!",
+                    "allergens": {}
+                }
+            ]
+        },
+        {
+            "id": "5f6955d227a320c7f1f6c7da2a6d96a851a8118f",
+            "name": "Arbor Ales",
+            "location": "Lawrence Hill, Bristol",
+            "year_founded": 2007,
+            "notes": "Lawrence Hill, Bristol est. 2007",
+            "products": [
+                {
+                    "id": "74eb4cb32246ed6ececad0e0d13efe5c81080896",
+                    "name": "Greenhorn Rising",
+                    "category": "beer",
+                    "style": "IPA",
+                    "dispense": "keykeg",
+                    "notes": "Amber in colour with citrus, floral and pine aromas. Grapefruit and tropical fruit flavours are balanced by some caramel sweetness. Peppery bitterness lingers on the finish.",
+                    "abv": "5.2",
+                    "status_text": "Available",
+                    "bar": "Cask Bar",
+                    "allergens": {
+                        "gluten": 1,
+                        "sulphites": 1
+                    }
+                }
+            ]
+        },
+        {
+            "id": "abc123def456",
+            "name": "Ross on Wye Cider & Perry Co.",
+            "location": "Ross on Wye, Herefordshire",
+            "notes": "Traditional cider and perry producer",
+            "products": [
+                {
+                    "id": "cider001",
+                    "name": "Strong Kentish Cider",
+                    "category": "cider",
+                    "style": null,
+                    "dispense": "cider tub",
+                    "abv": "8.4",
+                    "notes": "Made from Kentish cider apples. Strong, dry cider with traditional character.",
+                    "status_text": "Plenty left",
+                    "bar": "Cider Bar",
+                    "allergens": {
+                        "sulphites": 1
+                    }
+                },
+                {
+                    "id": "perry001",
+                    "name": "Three Pears Perry",
+                    "category": "perry",
+                    "style": "Medium",
+                    "dispense": "cider tub",
+                    "abv": "7.2",
+                    "notes": "A blend of three heritage perry pear varieties. Elegant and aromatic.",
+                    "status_text": "Some remaining",
+                    "bar": "Cider Bar",
+                    "allergens": {}
+                }
+            ]
+        },
+        {
+            "id": "mead789xyz",
+            "name": "Lindisfarne",
+            "location": "Holy Island, Northumberland",
+            "year_founded": 1962,
+            "notes": "Historic mead producer from Holy Island",
+            "products": [
+                {
+                    "id": "mead001",
+                    "name": "Original Mead",
+                    "category": "mead",
+                    "style": null,
+                    "dispense": "mead polypin",
+                    "abv": "14.5",
+                    "notes": "Dry/Sweet balance, light mead made from fermented honey and grape juice",
+                    "status_text": "Available",
+                    "bar": "Mead Bar",
+                    "allergens": {
+                        "sulphites": 1
+                    }
+                }
+            ]
+        },
+        {
+            "id": "foreign123",
+            "name": "Chimay",
+            "location": "Chimay, Belgium",
+            "year_founded": 1862,
+            "notes": "Trappist brewery",
+            "products": [
+                {
+                    "id": "foreign001",
+                    "name": "Première (Red)",
+                    "category": "foreign beer",
+                    "style": "Dubbel",
+                    "dispense": "bottle",
+                    "abv": "7.0",
+                    "notes": "Dark red Trappist ale, fruity with slight bitterness and caramel notes",
+                    "status_text": "Arrived",
+                    "bar": "International Bar",
+                    "allergens": {
+                        "gluten": 1
+                    }
+                }
+            ]
+        },
+        {
+            "id": "lowno123",
+            "name": "Big Drop Brewing Co",
+            "location": "London",
+            "year_founded": 2016,
+            "notes": "Award-winning low and no alcohol beer specialist",
+            "products": [
+                {
+                    "id": "lowno001",
+                    "name": "Galactic Milk Stout",
+                    "category": "beer",
+                    "style": "Stout",
+                    "dispense": "keykeg",
+                    "abv": "0.5",
+                    "notes": "Full-bodied alcohol-free stout with notes of coffee, chocolate and lactose",
+                    "status_text": "Plenty left",
+                    "bar": "Low/No Bar",
+                    "allergens": {
+                        "gluten": 1
+                    }
+                }
+            ]
+        },
+        {
+            "id": "minimal123",
+            "name": "Minimal Example Brewery",
+            "location": "Cambridge",
+            "notes": "Example showing minimal required fields",
+            "products": [
+                {
+                    "id": "minimal001",
+                    "name": "Basic Bitter",
+                    "category": "beer",
+                    "abv": "4.0",
+                    "dispense": "cask"
+                }
+            ]
+        }
+    ]
+}
