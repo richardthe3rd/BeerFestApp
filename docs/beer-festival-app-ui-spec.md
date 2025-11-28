@@ -2208,8 +2208,11 @@ fun BeerFestivalTheme(
 Card(
     modifier = Modifier.semantics {
         contentDescription = "Hazy IPA by Cloudwater Brew Co, 6.5 percent ABV"
+        role = Role.Button
     }
 )
+```
+
 ---
 
 ### Performance Targets
@@ -2231,7 +2234,25 @@ Card(
 
 ### Data Architecture
 
-**Recommended Structure:**
+> ⚠️ **Migration Note: OrmLite → Room Database**
+> 
+> The current production app uses **OrmLite** for SQLite storage (see `BeerDatabaseHelper.java`). This specification recommends **Room Database** as the local storage solution for the new multi-festival architecture. Room is the recommended direction because:
+> 
+> - **Official Android support**: Room is part of Android Jetpack and is the officially recommended database solution
+> - **Compile-time verification**: Room validates SQL queries at compile time, reducing runtime errors
+> - **Kotlin coroutines integration**: Built-in support for async operations with Flow
+> - **Better testability**: Easier to mock and test database operations
+> - **LiveData/Flow integration**: Seamless reactive data observation
+> 
+> **Migration Plan Required:** Before implementing Room, a migration strategy must be developed to:
+> 1. Export existing user data (favorites, ratings) from OrmLite
+> 2. Migrate the schema to Room entities
+> 3. Import user data into the new Room database
+> 4. Update all data access code throughout the app
+> 
+> See project documentation for detailed migration guidelines.
+
+**Recommended Structure (Room Entities):**
 ```
 FestivalEntity
 ├── id: String
@@ -2272,6 +2293,7 @@ DrinkEntity
 > - `bar` - may not be present for products without assigned bar locations
 > - `style` - may be null for non-beer categories like cider, perry, or mead
 > - `allergens` - present but may be an empty object `{}`
+
 **Availability Status Mapping:**
 For UI display, map statusText to availability enum:
 - "Plenty left" / "Arrived" / "Available" → "plenty" (green 🟢)
@@ -2317,11 +2339,6 @@ PersonalRatingEntity (Local only - no sync)
 
 **Local Storage:** 
 - Room Database (SQLite) for drinks, favorites, festivals
-
-> ⚠️ **Breaking Change:**  
-> The current production implementation uses **OrmLite** for local SQLite storage (see `BeerDatabaseHelper.java`). Migrating to Room Database is a significant architectural change and will require a coordinated migration plan, including data migration and updates to all data access code.  
-> **Do not implement Room without planning for migration from OrmLite.**  
-> See project documentation for migration guidelines and ensure all stakeholders are aware of this change.
 - SharedPreferences OR Room for personal ratings (local only)
   - Key format: `rating_${festivalId}_${drinkId}`
   - No userId needed (device-local)
