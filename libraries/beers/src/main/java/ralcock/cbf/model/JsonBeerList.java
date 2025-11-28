@@ -23,6 +23,7 @@ public class JsonBeerList implements Iterable<Beer> {
     private static final String DISPENSE = "dispense";
     private static final String BAR = "bar";
     private static final String ALLERGENS = "allergens";
+    private static final String CATEGORY = "category";
 
     private List<Beer> fBeerList;
 
@@ -64,6 +65,7 @@ public class JsonBeerList implements Iterable<Beer> {
             .withStatus(product.isNull(STATUS) ? "Unknown" : product.getString(STATUS))
             .withDispenseMethod(product.isNull(DISPENSE) ? "" : product.getString(DISPENSE))
             .withAllergens(parseAllergens(product))
+            .withCategory(product.isNull(CATEGORY) ? "beer" : product.getString(CATEGORY))
             .build();
     }
 

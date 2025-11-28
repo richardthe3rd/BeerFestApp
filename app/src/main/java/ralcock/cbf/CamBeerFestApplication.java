@@ -318,8 +318,9 @@ public class CamBeerFestApplication extends AppCompatActivity {
     }
 
     private void showFilterByAllergenDialog() {
+        final Set<String> allAllergens = getBeerDao().getAvailableAllergens();
         final Set<String> allergensToHide = fAppPreferences.getAllergensToHide();
-        FilterByAllergenDialogFragment newFragment = FilterByAllergenDialogFragment.newInstance(allergensToHide);
+        FilterByAllergenDialogFragment newFragment = FilterByAllergenDialogFragment.newInstance(allergensToHide, allAllergens);
         newFragment.show(getSupportFragmentManager(), "filterByAllergen");
     }
 

@@ -1,0 +1,135 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://data.cambridgebeerfestival.com/beer-list-schema.json",
+  "title": "Beer Festival Data API Schema",
+  "description": "JSON Schema for Cambridge Beer Festival beverage data API responses",
+  "type": "object",
+  "required": ["producers"],
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "description": "ISO 8601 timestamp of when the data was last updated",
+      "format": "date-time",
+      "examples": ["2025-05-24T00:01:00Z", "2014-05-25 16:59:13"]
+    },
+    "producers": {
+      "type": "array",
+      "description": "Array of producers (breweries, cideries, meaderies, wineries, etc.)",
+      "items": {
+        "$ref": "#/definitions/producer"
+      }
+    }
+  },
+  "definitions": {
+    "producer": {
+      "type": "object",
+      "description": "A producer of beverages (brewery, cidery, meadery, winery, etc.)",
+      "required": ["id", "name", "notes", "products"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the producer (typically SHA-1 hash)",
+          "examples": ["827bfc458708f0b442009c9c9836f7e4b65557fb"]
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the producer",
+          "examples": ["Adnams", "Ross on Wye Cider & Perry Co.", "Chimay"]
+        },
+        "location": {
+          "type": "string",
+          "description": "Geographic location of the producer (city, region, country)",
+          "examples": ["Southwold, Suffolk", "Chimay, Belgium", "Holy Island, Northumberland"]
+        },
+        "year_founded": {
+          "type": "integer",
+          "description": "Year the producer was established",
+          "minimum": 1000,
+          "maximum": 2100,
+          "examples": [1890, 2007, 1862]
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional information about the producer (often includes location and year founded)",
+          "examples": ["Southwold, Suffolk est. 1890", "Trappist brewery"]
+        },
+        "products": {
+          "type": "array",
+          "description": "Array of beverages produced by this producer",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/product"
+          }
+        }
+      }
+    },
+    "product": {
+      "type": "object",
+      "description": "A specific beverage (beer, cider, mead, perry, wine, etc.)",
+      "required": ["id", "name", "category", "abv", "dispense"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the product (typically SHA-1 hash)",
+          "examples": ["ef2afd226e3384e34d9833fe09cd123db498754c"]
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the beverage",
+          "examples": ["Broadside", "Strong Kentish Cider", "Original Mead"]
+        },
+        "category": {
+          "type": "string",
+          "description": "Category of beverage",
+          "enum": ["beer", "foreign beer", "cider", "perry", "mead", "wine", "low-no"],
+          "examples": ["beer", "cider", "foreign beer", "mead"]
+        },
+        "style": {
+          "type": ["string", "null"],
+          "description": "Style or variety of the beverage (may be null for some categories like cider)",
+          "examples": ["Bitter", "IPA", "Stout", "Golden Ale", "Dubbel", "Medium", null]
+        },
+        "dispense": {
+          "type": "string",
+          "description": "Method of dispensing the beverage",
+          "enum": ["cask", "keg", "keykeg", "bottle", "cider tub", "mead polypin"],
+          "examples": ["cask", "keg", "bottle", "cider tub"]
+        },
+        "abv": {
+          "type": ["string", "number"],
+          "description": "Alcohol by volume percentage (can be string or number)",
+          "examples": ["4.7", "8.4", "0.5", 4.7]
+        },
+        "notes": {
+          "type": "string",
+          "description": "Tasting notes, ingredients, and other descriptive information",
+          "examples": ["Brewed with Pale Ale malt and First Gold hops..."]
+        },
+        "status_text": {
+          "type": "string",
+          "description": "Availability status of the beverage at the festival",
+          "examples": ["Sold Out", "Plenty left", "A little remaining", "Nearly finished!", "Available", "Arrived", "Some beer remaining"]
+        },
+        "bar": {
+          "type": "string",
+          "description": "Location/bar where the beverage is served",
+          "examples": ["Main Bar", "Arctic", "Cider Bar", "Mead Bar", "International Bar", "Cask Bar", "Low/No Bar"]
+        },
+        "allergens": {
+          "type": "object",
+          "description": "Allergen information (keys are allergen names, values are truthy indicators)",
+          "additionalProperties": {
+            "type": ["number", "boolean", "string"],
+            "description": "Truthy value indicates presence of allergen (1, true, non-empty string)"
+          },
+          "examples": [
+            {"gluten": 1},
+            {"gluten": 1, "sulphites": 1},
+            {"sulphites": 1},
+            {}
+          ]
+        }
+      }
+    }
+  }
+}

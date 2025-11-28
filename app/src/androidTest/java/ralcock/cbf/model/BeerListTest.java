@@ -25,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 public class BeerListTest {
 
     private static final Set<String> EMPTY_SET = Collections.emptySet();
+    private static final String LOW_NO_CATEGORY = "low-no";
 
     private Beers fBeers;
     private Breweries fBreweries;
@@ -51,7 +52,8 @@ public class BeerListTest {
                 eq(mild),
                 eq(EMPTY_SET),
                 eq(EMPTY_SET),
-                eq(EMPTY_SET)
+                eq(EMPTY_SET),
+                eq(LOW_NO_CATEGORY)
         )).andReturn(Arrays.asList(aMild));
 
         expect(fBeers.allBeersList(
@@ -59,7 +61,8 @@ public class BeerListTest {
                 eq(best),
                 eq(EMPTY_SET),
                 eq(EMPTY_SET),
-                eq(EMPTY_SET)
+                eq(EMPTY_SET),
+                eq(LOW_NO_CATEGORY)
         )).andReturn(Arrays.asList(aBest, anotherBest));
 
         replay(fBeers, fBreweries);
@@ -92,7 +95,8 @@ public class BeerListTest {
                 eq(filterText),
                 eq(EMPTY_SET),
                 eq(EMPTY_SET),
-                eq(EMPTY_SET)
+                eq(EMPTY_SET),
+                eq(LOW_NO_CATEGORY)
         )).andReturn(Arrays.asList(beer1, beer2, beer3));
 
         final SortOrder sortOrder2 = SortOrder.BREWERY_NAME_DESC;
@@ -101,7 +105,8 @@ public class BeerListTest {
                 eq(filterText),
                 eq(EMPTY_SET),
                 eq(EMPTY_SET),
-                eq(EMPTY_SET)
+                eq(EMPTY_SET),
+                eq(LOW_NO_CATEGORY)
         )).andReturn(Arrays.asList(beer2, beer1, beer3));
         replay(fBeers, fBreweries);
 
@@ -135,7 +140,8 @@ public class BeerListTest {
                 eq(filterText),
                 eq(stylesToHide),
                 eq(EMPTY_SET),
-                eq(EMPTY_SET)
+                eq(EMPTY_SET),
+                eq(LOW_NO_CATEGORY)
         )).andReturn(Arrays.asList(new Beer()));
         replay(fBeers, fBreweries);
 

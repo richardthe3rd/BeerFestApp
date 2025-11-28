@@ -21,10 +21,12 @@ import java.util.Set;
  */
 public class FilterByAllergenDialogFragment extends DialogFragment {
 
-    public static FilterByAllergenDialogFragment newInstance(final Set<String> allergensToHide) {
+    public static FilterByAllergenDialogFragment newInstance(final Set<String> allergensToHide,
+            final Set<String> allAllergens) {
         FilterByAllergenDialogFragment fragment = new FilterByAllergenDialogFragment();
         Bundle args = new Bundle();
         putStringSet(args, "allergensToHide", allergensToHide);
+        putStringSet(args, "allAllergens", allAllergens);
         fragment.setArguments(args);
         return fragment;
     }
@@ -46,9 +48,9 @@ public class FilterByAllergenDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
         Set<String> allergensToHide = getStringSet(getArguments(), "allergensToHide");
+        Set<String> allAllergensSet = getStringSet(getArguments(), "allAllergens");
 
-        // Get all known allergens
-        final String[] allAllergens = AllergenHelper.getFilterableAllergens();
+        final String[] allAllergens = allAllergensSet.toArray(new String[0]);
         final boolean[] checkedItems = new boolean[allAllergens.length];
 
         // Mark currently hidden allergens as checked
