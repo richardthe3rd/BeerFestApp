@@ -1,0 +1,19 @@
+{
+  "defaultModel": "sonnet",
+  "permissions": {
+    "bash": {
+      "allow": true,
+      "denyPatterns": []
+    },
+    "fileOperations": {
+      "allow": true
+    },
+    "webSearch": {
+      "allow": true
+    }
+  },
+  "contextFiles": [
+    "CLAUDE.md",
+    ".github/copilot-instructions.md"
+  ]
+}
